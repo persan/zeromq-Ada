@@ -1,0 +1,12 @@
+zeromq-Ada
+ provides an Ada-binding the 0MQ library 
+
+Prerequisits:
+   zeromq 2.x installed
+   a modern GCC (4.3 or better) with Ada enabled
+   
+Install:
+   $make
+   $sudo make install
+
+
