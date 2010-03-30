@@ -1,0 +1,20 @@
+with "zmq.gpr";
+project ZMQ.Examples is
+
+   for Main use ("zmq-examples-client.adb",
+                 "zmq-examples-display.adb",
+                 "zmq-examples-prompt.adb",
+                 "zmq-examples-server.adb");
+
+   for Object_Dir use ".obj";
+   for Exec_Dir use ".";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-g", "-O2", "-gnatf", "-gnat05");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+end ZMQ.Examples;

@@ -1,0 +1,20 @@
+project Zmq is
+   for Languages use ("Ada");
+   Version := "2.0.0";
+
+   type ZMQ_Kind_Type is ("static", "relocatable");
+   ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
+
+   for Library_Name use "zmqAda";
+   for Library_Dir use "../zmq/" & ZMQ_Kind;
+   for Source_Dirs use ("../../inlude/zmq");
+
+   case ZMQ_Kind is
+      when "static" =>
+         for Library_Kind use "static";
+      when "relocatable" =>
+         for Library_Kind use "dynamic";
+   end case;
+
+end Zmq;
+

@@ -1,0 +1,24 @@
+with "../zmq.gpr";
+with "aunit.gpr";
+project ZMQ.Tests is
+
+   for Main use ("zmq-tests-testharnesess-test_all.adb");
+
+   for Source_Dirs use (".","testcases");
+   for Object_Dir use ".obj";
+   for Exec_Dir use "bin";
+
+   package Builder is
+      for Default_Switches ("ada") use ("-k", "-j2");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnatwa", "-g", "-gnat05", "-gnatf", "-O2");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+end ZMQ.Tests;
+
