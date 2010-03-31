@@ -38,7 +38,7 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       msg : ZMQ.Messages.Message;
    begin
       msg.Initialize (MSG_STRING);
-      T.pub.send (query);
+      T.pub.send (msg);
    end Send;
 
    -------------------------
@@ -48,9 +48,9 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       T : Test_Case renames Test_Case (Test);
       msg : ZMQ.Messages.Message;
    begin
-      query.Initialize;
+      msg.Initialize;
       T.Sub.recv (msg);
-      Assesrt (STring (msg.getData) = MSG_STRING, "Wrong Data");
+      T.Assert (STring'(msg.getData) = MSG_STRING, "Wrong Data");
    end Recieve;
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
@@ -67,7 +67,10 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       use Test_Cases.Registration;
 
    begin
-      Register_Routine  (T, SampleTest'Access, "SampleTest");
+      Register_Routine(T, initialize'access, "initialize");
+      Register_Routine(T, Send'access, "Send");
+      Register_Routine(T, Recieve'access, "Recieve");
+      Register_Routine(T, Finalize'access, "Finalize");
    end Register_Tests;
 
 end Zmq.Tests.Testcases.Test_Pubsub;

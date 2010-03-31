@@ -12,5 +12,11 @@ package body ZMQ is
       return "[" &  S (S'FIRST + 1 .. S'Last) & "] " & interfaces.C.Strings.value (Low_Level.zmq_strerror (int (no)));
    end;
 
+   function Library_Version return Version_Type is
+   begin
+      return ret :Version_Type do
+         ret := (2, 0, 0); --#TODO fetch from library
+      end return;
+   end;
 
 end ZMQ;
