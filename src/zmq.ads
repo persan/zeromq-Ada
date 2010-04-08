@@ -7,9 +7,10 @@ package ZMQ is
       Patch : Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (0, 0, 2);
+   Binding_Version : constant Version_Type := (0, 0, 1);
    function Library_Version return Version_Type;
 
+   function image (item : Version_Type) return string;
 private
    pragma Linker_Options ("-lzmq");
    function Error_Message (no : integer) return string;

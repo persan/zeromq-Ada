@@ -12,55 +12,56 @@ package body ZMQ.Contexts is
    ----------------
 
    not overriding procedure Initialize
-     (this        : in out Context;
-      app_threads : Positive;
-      io_threads  : Positive;
-      flags       : Context_Flags := No_Flags)
+     (This        : in out Context;
+      App_Threads : Positive;
+      IO_Threads  : Positive;
+      Flags       : Context_Flags := No_Flags)
    is
    begin
       if This.c /= Null_Address then
          raise ZMQ_Error with "Alredy Initialized";
       end if;
-      this.c := Low_Level.zmq_init (int (app_threads), int (io_threads), int (flags));
-      if this.c = Null_Address then
+      This.c := Low_Level.zmq_init
+        (int (App_Threads), int (IO_Threads), int (Flags));
+      if This.c = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
          GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Initialize;
 
    overriding
-   procedure Initialize (this : in out Context) is
+   procedure Initialize (This : in out Context) is
    begin
       This.c := Null_Address;
-   end;
+   end Initialize;
 
    --------------
    -- Finalize --
    --------------
 
    overriding procedure Finalize
-     (this : in out Context)
+     (This : in out Context)
    is
       rc : int;
    begin
       if This.c /= Null_Address then
-         rc := Low_Level.zmq_term (this.c);
+         rc := Low_Level.zmq_term (This.c);
          This.c := Null_Address;
          if rc  /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity;
+            raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+            GNAT.Source_Info.Enclosing_Entity;
          end if;
       end if;
    end Finalize;
 
-   function is_Connected (this : Context) return boolean is
+   function Is_Connected (This : Context) return Boolean is
    begin
       return This.c /= Null_Address;
-   end;
+   end Is_Connected;
 
-   function getImpl (This : Context) return System.Address is
+   function GetImpl (This : Context) return System.Address is
    begin
       return This.c;
-   end getImpl;
+   end GetImpl;
 
 end ZMQ.Contexts;

@@ -12,19 +12,19 @@ package ZMQ.Contexts is
    No_Flags : constant Context_Flags := 0;
 
    not overriding
-   procedure Initialize (this : in out Context;
-                         app_threads : Positive;
-                         io_threads  : Positive;
-                         flags       : Context_Flags := No_Flags);
+   procedure Initialize (This : in out Context;
+                         App_Threads : Positive;
+                         IO_Threads  : Positive;
+                         Flags       : Context_Flags := No_Flags);
    overriding
-   procedure Initialize (this : in out Context);
+   procedure Initialize (This : in out Context);
 
    overriding
-   procedure Finalize (this : in out Context);
+   procedure Finalize (This : in out Context);
 
-   function is_Connected (this : Context) return boolean;
+   function Is_Connected (This : Context) return Boolean;
 
-   function getImpl (This : Context) return System.Address;
+   function GetImpl (This : Context) return System.Address;
 private
    type Context is new Ada.Finalization.Limited_Controlled with record
       c : System.Address := System.Null_Address;

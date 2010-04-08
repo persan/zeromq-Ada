@@ -3,7 +3,7 @@ with Interfaces.C.Strings;
 with System;
 
 package ZMQ.Low_Level is
-
+   pragma Warnings (off);
    package defs is
 
       ZMQ_HAUSNUMERO : constant := 156384712;  --  zmq.h:48

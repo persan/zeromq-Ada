@@ -1,22 +1,33 @@
-with interfaces.C.Strings;
+with Interfaces.C.Strings;
 with ZMQ.Low_Level;
 package body ZMQ is
-   use interfaces.C;
+   use Interfaces.C;
    -------------------
    -- Error_Message --
    -------------------
 
-   function Error_Message (no : integer) return string is
+   function Error_Message (no : Integer) return String is
       s : constant String := no'Img;
    begin
-      return "[" &  S (S'FIRST + 1 .. S'Last) & "] " & interfaces.C.Strings.value (Low_Level.zmq_strerror (int (no)));
-   end;
+      return "[" &  s (s'First + 1 .. s'Last) & "] " &
+      Interfaces.C.Strings.Value (Low_Level.zmq_strerror (int (no)));
+   end Error_Message;
 
    function Library_Version return Version_Type is
    begin
-      return ret :Version_Type do
-         ret := (2, 0, 0); --#TODO fetch from library
+      return ret : Version_Type do
+         ret := (2, 0, 6); --#TODO fetch from library
       end return;
-   end;
+   end Library_Version;
+
+   function image (item : Version_Type) return String is
+      s1 : constant String := item.Major'Img;
+      s2 : constant String := item.Minor'Img;
+      s3 : constant String := item.Patch'Img;
+   begin
+      return s1 (s1'First + 1 .. s1'Last) & "." &
+      s2 (s2'First + 1 .. s2'Last) & "." &
+      s3 (s3'First + 1 .. s3'Last);
+   end image;
 
 end ZMQ;

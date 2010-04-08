@@ -1,6 +1,5 @@
 project Zmq is
    for Languages use ("Ada");
-   Version := "2.0.0";
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");

@@ -5,6 +5,22 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    -- Fixture elements
 
    MSG_STRING : constant string := "test.data.kalle saldhfhsfkhsafkhsadjfhsdjhfsajkhsdajksadjksadjhfsdkjasdlhfsldjsajsdajkhsdjhdsajkhsdfjhds";
+
+
+
+   task body server is --  (self : not null access Test_Case) is
+   begin
+      loop
+         select
+            accept read;
+         or
+            accept stop;
+         or
+            terminate;
+         end select;
+      end loop;
+   end server;
+
    ----------
    -- Name --
    ----------
@@ -13,7 +29,7 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
                   return AUnit.Message_String is
       pragma Unreferenced (T);
    begin
-      return Format (GNAT.Source_Info.File & ":(no description)");
+      return Format (GNAT.Source_Info.File);
    end Name;
 
 
@@ -37,8 +53,11 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       T     : Test_Case renames Test_Case (Test);
       msg : ZMQ.Messages.Message;
    begin
+      t.s.read;
+      delay 0.001;
       msg.Initialize (MSG_STRING);
       T.pub.send (msg);
+
    end Send;
 
    -------------------------
@@ -52,6 +71,7 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       T.Sub.recv (msg);
       T.Assert (STring'(msg.getData) = MSG_STRING, "Wrong Data");
    end Recieve;
+
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
