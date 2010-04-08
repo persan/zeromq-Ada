@@ -177,7 +177,7 @@ package body ZMQ.Sockets is
    not overriding procedure Send
      (This    : in out Socket;
       Msg     : Messages.Message'Class;
-      Flags   : Integer := 0)
+      Flags   : Socket_Flags := No_Flags)
    is
       ret  : int;
    begin
@@ -191,7 +191,7 @@ package body ZMQ.Sockets is
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : String;
-                   Flags   : Integer := 0) is
+                   Flags   : Socket_Flags := No_Flags) is
       m : Messages.Message;
    begin
       m.Initialize (Msg);
@@ -202,28 +202,28 @@ package body ZMQ.Sockets is
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : Ada.Streams.Stream_Element_Array;
-                   Flags   : Integer := 0) is
-      m : Messages.Message;
+                   Flags   : Socket_Flags := No_Flags) is
+      M : Messages.Message;
    begin
-      m.Initialize (Msg);
-      This.Send (m, Flags);
-      m.Finalize;
+      M.Initialize (Msg);
+      This.Send (M, Flags);
+      M.Finalize;
    end Send;
 
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : Ada.Strings.Unbounded.Unbounded_String;
-                   Flags   : Integer := 0) is
-      m : Messages.Message;
+                   Flags   : Socket_Flags := No_Flags) is
+      M : Messages.Message;
    begin
-      m.Initialize (Ada.Strings.Unbounded.To_String (Msg));
-      This.Send (m, Flags);
-      m.Finalize;
+      M.Initialize (Ada.Strings.Unbounded.To_String (Msg));
+      This.Send (M, Flags);
+      M.Finalize;
    end Send;
 
    procedure Send_Generic (This    : in out Socket;
                            Msg     : Element;
-                           Flags   : Integer := 0) is
+                           Flags   : Socket_Flags := No_Flags) is
    begin
       This.Send
         (Msg'Address,
@@ -238,7 +238,7 @@ package body ZMQ.Sockets is
    procedure Send (This           : in out Socket;
                    Msg_Addres     : System.Address;
                    Msg_Length     : Natural;
-                   Flags          : Integer := 0) is
+                   Flags          : Socket_Flags := No_Flags) is
       M : Messages.Message;
    begin
       M.Initialize (Msg_Addres, Msg_Length);
@@ -270,7 +270,7 @@ package body ZMQ.Sockets is
    not overriding procedure recv
      (This    : in out Socket;
       Msg     : Messages.Message'Class;
-      Flags   : Integer := 0)
+      Flags   : Socket_Flags := No_Flags)
    is
       ret  : int;
    begin

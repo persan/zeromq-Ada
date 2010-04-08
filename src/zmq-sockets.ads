@@ -31,6 +31,11 @@ package ZMQ.Sockets is
       MCAST_LOOP,
       SNDBUF,
       RCVBUF);
+   type Socket_Flags is mod 2 ** 32;
+
+   function "+" (L, R : Socket_Flags) return Socket_Flags renames "or";
+
+   No_Flags : constant Socket_Flags := 2#0000_0000_0000_0000#;
 
    not overriding
    procedure Initialize (This         : in out Socket;
@@ -53,7 +58,8 @@ package ZMQ.Sockets is
    procedure  setsockopt (This    : in out Socket;
                           Option  : Socket_Opt;
                           Value   : Natural);
-   not overriding procedure setsockopt
+   not overriding
+   procedure setsockopt
      (This    : in out Socket;
       Option  : Socket_Opt;
       Value   : Ada.Streams.Stream_Element_Array);
@@ -71,28 +77,28 @@ package ZMQ.Sockets is
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : Messages.Message'Class;
-                   Flags   : Integer := 0);
+                   Flags   : Socket_Flags := No_Flags);
 
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : String;
-                   Flags   : Integer := 0);
+                   Flags   : Socket_Flags := No_Flags);
 
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : Ada.Strings.Unbounded.Unbounded_String;
-                   Flags   : Integer := 0);
+                   Flags   : Socket_Flags := No_Flags);
 
    not overriding
    procedure Send (This    : in out Socket;
                    Msg     : Ada.Streams.Stream_Element_Array;
-                   Flags   : Integer := 0);
+                   Flags   : Socket_Flags := No_Flags);
 
    not overriding
    procedure Send (This           : in out Socket;
                    Msg_Addres     : System.Address;
                    Msg_Length     : Natural;
-                   Flags          : Integer := 0);
+                   Flags          : Socket_Flags := No_Flags);
 
 
    --  Creates a Message and sends it over the socket.
@@ -101,7 +107,7 @@ package ZMQ.Sockets is
       type Element is private;
    procedure Send_Generic (This    : in out Socket;
                            Msg     : Element;
-                           Flags   : Integer := 0);
+                           Flags   : Socket_Flags := No_Flags);
 
    --  Send the message over the socet
 
@@ -111,7 +117,7 @@ package ZMQ.Sockets is
    not overriding
    procedure recv (This    : in out Socket;
                    Msg     : Messages.Message'Class;
-                   Flags   : Integer := 0);
+                   Flags   : Socket_Flags := No_Flags);
 
 
    overriding
