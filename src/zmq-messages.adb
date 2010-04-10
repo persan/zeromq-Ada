@@ -1,6 +1,8 @@
 with Interfaces.C;
 with GNAT.OS_Lib;
 with GNAT.Source_Info;
+with Ada.Unchecked_Conversion;
+with System.Address_To_Access_Conversions;
 package body ZMQ.Messages is
    use Interfaces.C;
 
@@ -87,20 +89,29 @@ package body ZMQ.Messages is
          GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Initialize;
+
+
    ------------------------
    -- Initialize_Generic --
    ------------------------
 
    procedure Initialize_Generic
      (Self   : in out Message;
-      Data   : conv.Object_Pointer)
+      Data   : Element_Access)
    is
+      function conv is new
+        Ada.Unchecked_Conversion (System.Address, Element_Access);
+      procedure Internal_free (Data : System.Address; Hint : System.Address);
+      procedure Internal_free (Data : System.Address; Hint : System.Address) is
+         pragma Unreferenced (Hint);
+         temp  : Element_Access := conv (Data);
+      begin
+         free (temp);
+      end Internal_free;
    begin
-      Self.Initialize;
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning
-        (True, "Initialize_Generic unimplemented");
-      raise Program_Error with "Unimplemented procedure Initialize_Generic";
+      Self.Initialize (Data.all'Address,
+                       Data.all'Size / 8,
+                       Internal_free'Unrestricted_Access);
    end Initialize_Generic;
 
    ----------------------------------
@@ -109,15 +120,26 @@ package body ZMQ.Messages is
 
    procedure Initialize_Generic_With_Hint
      (Self  : in out Message;
-      Data  : conv.Object_Pointer;
+      Data  : Element_Access;
       Hint  : Hint_Access)
    is
+      function convHint is new
+        Ada.Unchecked_Conversion (System.Address, Hint_Access);
+      function conv is new
+        Ada.Unchecked_Conversion (System.Address, Element_Access);
+
+      procedure Internal_free (Data : System.Address; Hint : System.Address);
+      procedure Internal_free (Data : System.Address; Hint : System.Address) is
+         Temp_Data  : Element_Access := conv (Data);
+         Temp_Hint  : constant Hint_Access := convHint (Hint);
+      begin
+         free (Temp_Data, Temp_Hint);
+      end Internal_free;
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning
-        (True, "Initialize_Generic_With_Hint unimplemented");
-      raise Program_Error with
-        "Unimplemented procedure Initialize_Generic_With_Hint";
+      Self.Initialize (Data.all'Address,
+                       Data.all'Size / 8,
+                       Internal_free'Unrestricted_Access,
+                       Hint.all'Address);
    end Initialize_Generic_With_Hint;
 
 
@@ -125,12 +147,18 @@ package body ZMQ.Messages is
    --  GetData / GetSize
    --  ========================================================================
 
+   ---------------
+   --  getData  --
+   ---------------
    function getData (Self : Message) return System.Address is
    begin
       return Low_Level.zmq_msg_data (Self.Msg'Unrestricted_Access);
    end getData;
 
 
+   ---------------
+   --  getData  --
+   ---------------
    function getData (Self : Message) return String is
       type data_type is new String (1 .. Self.getSize);
       package conv is new System.Address_To_Access_Conversions (data_type);
@@ -138,6 +166,9 @@ package body ZMQ.Messages is
       return String (conv.To_Pointer (Self.getData).all);
    end getData;
 
+   ---------------
+   --  getData  --
+   ---------------
    function  getData  (Self : Message)
                        return Ada.Streams.Stream_Element_Array is
       type data_type is new Ada.Streams.Stream_Element_Array
@@ -148,6 +179,9 @@ package body ZMQ.Messages is
         (conv.To_Pointer (Self.getData).all);
    end getData;
 
+   ---------------
+   --  getData  --
+   ---------------
    function  getData  (Self : Message)
                        return Ada.Strings.Unbounded.Unbounded_String is
       type data_type is new String (1 .. Self.getSize);
@@ -157,6 +191,9 @@ package body ZMQ.Messages is
         (String (conv.To_Pointer (Self.getData).all));
    end getData;
 
+   -----------------------
+   --  getData_Generic  --
+   -----------------------
    function  getData_Generic  (Self : Message)
                                return Element is
       package conv is new System.Address_To_Access_Conversions (Element);
@@ -165,6 +202,9 @@ package body ZMQ.Messages is
    end getData_Generic;
 
 
+   ---------------
+   --  getSize  --
+   ---------------
    function getSize (Self : Message) return Natural is
    begin
       return Low_Level.zmq_msg_size (Self.Msg'Unrestricted_Access);

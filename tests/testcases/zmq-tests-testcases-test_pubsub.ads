@@ -1,3 +1,4 @@
+with Ada.Strings.Unbounded;
 with AUnit;
 with AUnit.Test_Cases;
 with ZMQ.Contexts;
@@ -14,6 +15,7 @@ package Zmq.Tests.Testcases.Test_Pubsub is
       pub : ZMQ.Sockets.Socket;
       Sub : ZMQ.Sockets.Socket;
       s   : server (Test_Case'Access);
+      msg : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
    procedure Register_Tests (T : in out Test_Case);

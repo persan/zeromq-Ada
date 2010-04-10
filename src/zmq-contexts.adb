@@ -18,6 +18,7 @@ package body ZMQ.Contexts is
       Flags       : Context_Flags := No_Flags)
    is
    begin
+      Validate_Library_Version;
       if This.c /= Null_Address then
          raise ZMQ_Error with "Alredy Initialized";
       end if;

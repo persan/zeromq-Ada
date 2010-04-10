@@ -110,7 +110,7 @@ package body ZMQ.Sockets is
       Value        : String)
    is
    begin
-      This.setsockopt (Option, Value (Value'First)'Address, Value'Length);
+      This.setsockopt (Option, Value'Address, Value'Length);
    end setsockopt;
 
    ----------------
@@ -268,7 +268,7 @@ package body ZMQ.Sockets is
    ----------
 
    not overriding procedure recv
-     (This    : in out Socket;
+     (This    : in Socket;
       Msg     : Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags)
    is
@@ -282,6 +282,34 @@ package body ZMQ.Sockets is
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
            & GNAT.Source_Info.Enclosing_Entity;
       end if;
+   end recv;
+   not overriding
+   function recv (This    : in Socket;
+                  Flags   : Socket_Flags := No_Flags) return String is
+      Msg     : Messages.Message;
+   begin
+      Msg.Initialize;
+      This.recv (Msg, Flags);
+      return ret : String (1 .. Msg.getSize) do
+         ret := Msg.getData;
+      end return;
+   end recv;
+   procedure recv (This    : in Socket;
+                   msg     : out Ada.Strings.Unbounded.Unbounded_String;
+                   Flags   : Socket_Flags := No_Flags) is
+   begin
+      msg := Ada.Strings.Unbounded.To_Unbounded_String (This.recv (Flags));
+   end recv;
+
+
+   not overriding
+   function recv (This    : in Socket;
+                  Flags   : Socket_Flags := No_Flags)
+                  return Ada.Strings.Unbounded.Unbounded_String is
+   begin
+      return ret : Ada.Strings.Unbounded.Unbounded_String do
+         This.recv (ret, Flags);
+      end return;
    end recv;
 
    --------------

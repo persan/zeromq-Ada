@@ -11,7 +11,10 @@ package ZMQ is
    function Library_Version return Version_Type;
 
    function image (item : Version_Type) return string;
+
 private
    pragma Linker_Options ("-lzmq");
    function Error_Message (no : integer) return string;
+   procedure Validate_Library_Version;
+   --  Raiese ZMQ_Error if the underlaying library isent a valid version
 end ZMQ;

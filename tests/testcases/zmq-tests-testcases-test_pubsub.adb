@@ -1,10 +1,9 @@
 with GNAT.Source_Info;
-with Zmq.Messages;
 package body Zmq.Tests.Testcases.Test_Pubsub is
    use AUnit;
-   -- Fixture elements
+   use ada.Strings.Unbounded;
 
-   MSG_STRING : constant string := "test.data.kalle saldhfhsfkhsafkhsadjfhsdjhfsajkhsdajksadjksadjhfsdkjasdlhfsldjsajsdajkhsdjhdsajkhsdfjhds";
+   MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
 
 
 
@@ -13,8 +12,10 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       loop
          select
             accept read;
+            self.sub.recv (self.msg);
          or
             accept stop;
+            exit;
          or
             terminate;
          end select;
@@ -40,41 +41,36 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.ctx.initialize (1, 1, 0);
+      T.ctx.initialize (2, 2, 0);
       T.pub.initialize (T.ctx, Sockets.PUB);
+
       T.Sub.initialize (T.ctx, Sockets.SUB);
-      T.Sub.Bind ("tcp://lo:5555");
-      T.Pub.Bind ("tcp://lo:5555");
+      T.Sub.setsockopt (Sockets.SUBSCRIBE, "");
+
+      T.Sub.Bind ("inproc://pub-sub");
+      T.Pub.Bind ("inproc://pub-sub");
    end initialize;
    -------------------------
    --  Publish
    -------------------------
    procedure Send (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T     : Test_Case renames Test_Case (Test);
-      msg : ZMQ.Messages.Message;
    begin
+      t.msg:=To_Unbounded_String("");
       t.s.read;
-      delay 0.001;
-      msg.Initialize (MSG_STRING);
-      T.pub.send (msg);
-
+      delay 0.1;
+      T.pub.send (MSG_STRING);
+      delay 0.1;
+      T.assert (t.msg = MSG_STRING, "Error");
    end Send;
 
    -------------------------
     --  Subscribe
    -------------------------
-   procedure Recieve (Test : in out AUnit.Test_Cases.Test_Case'Class) is
-      T : Test_Case renames Test_Case (Test);
-      msg : ZMQ.Messages.Message;
-   begin
-      msg.Initialize;
-      T.Sub.recv (msg);
-      T.Assert (STring'(msg.getData) = MSG_STRING, "Wrong Data");
-   end Recieve;
-
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
+      t.s.stop;
       T.pub.Finalize;
       T.Sub.Finalize;
       T.ctx.Finalize;
@@ -89,7 +85,6 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    begin
       Register_Routine(T, initialize'access, "initialize");
       Register_Routine(T, Send'access, "Send");
-      Register_Routine(T, Recieve'access, "Recieve");
       Register_Routine(T, Finalize'access, "Finalize");
    end Register_Tests;
 

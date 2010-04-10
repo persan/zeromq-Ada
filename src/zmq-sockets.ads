@@ -115,10 +115,23 @@ package ZMQ.Sockets is
    procedure flush (This    : in out Socket);
 
    not overriding
-   procedure recv (This    : in out Socket;
+   procedure recv (This    : in Socket;
                    Msg     : Messages.Message'Class;
                    Flags   : Socket_Flags := No_Flags);
 
+   procedure recv (This    : in Socket;
+                   msg     : out Ada.Strings.Unbounded.Unbounded_String;
+                   Flags   : Socket_Flags := No_Flags);
+
+
+   not overriding
+   function recv (This    : in Socket;
+                  Flags   : Socket_Flags := No_Flags) return String;
+
+   not overriding
+   function recv (This    : in Socket;
+                  Flags   : Socket_Flags := No_Flags)
+                  return Ada.Strings.Unbounded.Unbounded_String;
 
    overriding
    procedure Finalize (this : in out Socket);

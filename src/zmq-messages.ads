@@ -1,7 +1,6 @@
 with ZMQ.Low_Level;
 with Ada.Streams;
 with System;
-with System.Address_To_Access_Conversions;
 with Ada.Strings.Unbounded;
 
 package ZMQ.Messages is
@@ -50,27 +49,26 @@ package ZMQ.Messages is
                          Hint    : System.Address := System.Null_Address);
    --  initialise 0MQ message from a supplied buffer
 
-   --#TODO
-
 
    generic
-      type Element (<>) is private;
-      with package conv is new System.Address_To_Access_Conversions (Element);
-      with procedure free (data : in out conv.Object_Pointer);
+      type Element is private;
+      type Element_Access is access Element;
+      with procedure free (data : in out Element_Access);
    procedure Initialize_Generic (Self   : in out Message;
-                                 Data   : conv.Object_Pointer);
+                                 Data   : Element_Access);
+
 
    generic
-      type Element (<>) is private;
-      with package conv is new System.Address_To_Access_Conversions (Element);
-      type Hint_Type (<>) is private;
+      type Element is private;
+      type Element_Access is access Element;
+      type Hint_Type is private;
       type Hint_Access is access Hint_Type;
       with procedure free
-        (data : in out conv.Object_Pointer; hint : Hint_Access);
+        (data : in out Element_Access; hint : Hint_Access);
    procedure Initialize_Generic_With_Hint (Self  : in out Message;
-                                           Data  : conv.Object_Pointer;
+                                           Data  : Element_Access;
                                            Hint  : Hint_Access);
-
+   --
 
 
    procedure Finalize   (Self : in out Message);

@@ -29,5 +29,9 @@ package body ZMQ is
       s2 (s2'First + 1 .. s2'Last) & "." &
       s3 (s3'First + 1 .. s3'Last);
    end image;
+   procedure Validate_Library_Version is
+   begin
+      null;
+   end Validate_Library_Version;
 
 end ZMQ;

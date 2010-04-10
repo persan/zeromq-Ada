@@ -1,6 +1,8 @@
 with "../zmq.gpr";
 with "aunit.gpr";
 with "../helpers/zmq-helpers.gpr";
+with "../examples/zmq-examples.gpr";
+
 project ZMQ.Tests is
 
    for Main use ("zmq-tests-testharnesess-test_all.adb");
