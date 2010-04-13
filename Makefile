@@ -1,8 +1,10 @@
 
 ifndef PREFIX
-PREFIX=$(dir $(which gnatls))..
+  PREFIX=$(dir $(which gnatls))..
 endif
 
+examples:
+	gprbuild -p -P examples/zmq-examples.gpr
 
 compile:
 	gprbuild -p -P zmq.gpr -XLIBRARY_TYPE=static

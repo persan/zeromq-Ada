@@ -1,26 +1,11 @@
 with GNAT.Source_Info;
+with Ada.Strings.Unbounded;
 package body Zmq.Tests.Testcases.Test_Pubsub is
    use AUnit;
    use ada.Strings.Unbounded;
 
    MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
 
-
-
-   task body server is --  (self : not null access Test_Case) is
-   begin
-      loop
-         select
-            accept read;
-            self.sub.recv (self.msg);
-         or
-            accept stop;
-            exit;
-         or
-            terminate;
-         end select;
-      end loop;
-   end server;
 
    ----------
    -- Name --
@@ -41,27 +26,26 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.ctx.initialize (2, 2, 0);
+      T.ctx.initialize (1, 1, 0);
       T.pub.initialize (T.ctx, Sockets.PUB);
 
       T.Sub.initialize (T.ctx, Sockets.SUB);
-      T.Sub.setsockopt (Sockets.SUBSCRIBE, "");
+      T.Sub.setsockopt_SUBSCRIBE ("");
 
       T.Sub.Bind ("inproc://pub-sub");
-      T.Pub.Bind ("inproc://pub-sub");
+      T.Pub.Connect ("inproc://pub-sub");
    end initialize;
+
    -------------------------
    --  Publish
    -------------------------
    procedure Send (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T     : Test_Case renames Test_Case (Test);
+      msg   : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      t.msg:=To_Unbounded_String("");
-      t.s.read;
-      delay 0.1;
       T.pub.send (MSG_STRING);
-      delay 0.1;
-      T.assert (t.msg = MSG_STRING, "Error");
+      T.sub.recv (msg);
+      T.assert (msg = MSG_STRING, "Error");
    end Send;
 
    -------------------------
@@ -70,7 +54,6 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      t.s.stop;
       T.pub.Finalize;
       T.Sub.Finalize;
       T.ctx.Finalize;

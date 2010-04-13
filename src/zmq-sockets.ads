@@ -5,6 +5,7 @@ with System;
 with ZMQ.Messages;
 with ZMQ.Contexts;
 package ZMQ.Sockets is
+
    type Socket_Type is
      (P2P,
       PUB,
@@ -18,23 +19,10 @@ package ZMQ.Sockets is
 
    type Socket is new Ada.Finalization.Limited_Controlled with private;
 
-   type Socket_Opt is
-     (HWM,   -- Set high water mark
-      LWM,   -- Set low water mark
-      SWAP,
-      AFFINITY,
-      IDENTITY,
-      SUBSCRIBE,
-      UNSUBSCRIBE,
-      RATE,
-      RECOVERY_IVL,
-      MCAST_LOOP,
-      SNDBUF,
-      RCVBUF);
+
    type Socket_Flags is mod 2 ** 32;
 
    function "+" (L, R : Socket_Flags) return Socket_Flags renames "or";
-
    No_Flags : constant Socket_Flags := 2#0000_0000_0000_0000#;
 
    not overriding
@@ -45,33 +33,67 @@ package ZMQ.Sockets is
    not overriding
    procedure Bind (This    : in out Socket;
                    Address : String);
+   not overriding
+   procedure Bind (This    : in out Socket;
+                   Address : Ada.Strings.Unbounded.Unbounded_String);
+
 
    not overriding
-   procedure  setsockopt (This    : in out Socket;
-                          Option  : Socket_Opt;
-                          Value   : String);
+   procedure  setsockopt_HWM (This       : in out Socket;
+                              Value      : Natural);
    not overriding
-   procedure  setsockopt (This    : in out Socket;
-                          Option  : Socket_Opt;
-                          Value   : Boolean);
+   procedure  setsockopt_LWM (This       : in out Socket;
+                              Value      : Natural);
    not overriding
-   procedure  setsockopt (This    : in out Socket;
-                          Option  : Socket_Opt;
-                          Value   : Natural);
+   procedure  setsockopt_SWAP (This       : in out Socket;
+                               Value      : Boolean);
    not overriding
-   procedure setsockopt
-     (This    : in out Socket;
-      Option  : Socket_Opt;
-      Value   : Ada.Streams.Stream_Element_Array);
+   procedure  setsockopt_AFFINITY (This       : in out Socket;
+                                   Value      : Natural);
+   not overriding
+   procedure  setsockopt_IDENTITY (This       : in out Socket;
+                                   Value      : Natural);
+   not overriding
+   procedure  setsockopt_SUBSCRIBE (This       : in out Socket;
+                                    Value      : String);
+   not overriding
+   procedure  setsockopt_SUBSCRIBE
+     (This       : in out Socket;
+      Value      : Ada.Strings.Unbounded.Unbounded_String);
+   not overriding
+   procedure  setsockopt_UNSUBSCRIBE (This       : in out Socket;
+                                      Value      : String);
+   not overriding
+   procedure  setsockopt_UNSUBSCRIBE
+     (This       : in out Socket;
+      Value      : Ada.Strings.Unbounded.Unbounded_String);
+   not overriding
+
+   procedure  setsockopt_RATE (This       : in out Socket;
+                               Value      : Natural);
 
    not overriding
-   procedure  setsockopt (This       : in out Socket;
-                          Option     : Socket_Opt;
-                          Value      : System.Address;
-                          Value_Size : Natural);
+   procedure  setsockopt_RECOVERY_IVL (This       : in out Socket;
+                                       Value      : Natural);
+   not overriding
+   procedure  setsockopt_MCAST_LOOP (This       : in out Socket;
+                                     Value      : Natural);
+   not overriding
+   procedure  setsockopt_SNDBUF (This       : in out Socket;
+                                 Value      : Natural);
+   not overriding
+   procedure  setsockopt_RCVBUF (This       : in out Socket;
+                                 Value      : Natural);
 
+
+
+   not overriding
    procedure Connect (This    : in out Socket;
                       Address : String);
+
+   procedure Connect (This    : in out Socket;
+                      Address : Ada.Strings.Unbounded.Unbounded_String);
+
 
 
    not overriding
@@ -144,4 +166,46 @@ private
       c : System.Address := System.Null_Address;
    end record;
    function img (item : Ada.Streams.Stream_Element_Array) return String;
+
+      type Socket_Opt is
+     (HWM,   -- Set high water mark
+      LWM,   -- Set low water mark
+      SWAP,
+      AFFINITY,
+      IDENTITY,
+      SUBSCRIBE,
+      UNSUBSCRIBE,
+      RATE,
+      RECOVERY_IVL,
+      MCAST_LOOP,
+      SNDBUF,
+      RCVBUF);
+   not overriding
+
+   procedure  setsockopt (This    : in out Socket;
+                          Option  : Socket_Opt;
+                          Value   : String);
+   not overriding
+   procedure  setsockopt (This    : in out Socket;
+                          Option  : Socket_Opt;
+                          Value   : Boolean);
+   not overriding
+   procedure  setsockopt (This    : in out Socket;
+                          Option  : Socket_Opt;
+                          Value   : Natural);
+   not overriding
+   procedure setsockopt
+     (This    : in out Socket;
+      Option  : Socket_Opt;
+      Value   : Ada.Streams.Stream_Element_Array);
+
+   not overriding
+   procedure  setsockopt (This       : in out Socket;
+                          Option     : Socket_Opt;
+                          Value      : System.Address;
+                          Value_Size : Natural);
+
+
+
+
 end ZMQ.Sockets;

@@ -100,7 +100,8 @@ package body ZMQ.Messages is
       Data   : Element_Access)
    is
       function conv is new
-        Ada.Unchecked_Conversion (System.Address, Element_Access);
+        Ada.Unchecked_Conversion (Source => System.Address,
+                                  Target => Element_Access);
       procedure Internal_free (Data : System.Address; Hint : System.Address);
       procedure Internal_free (Data : System.Address; Hint : System.Address) is
          pragma Unreferenced (Hint);
@@ -124,9 +125,11 @@ package body ZMQ.Messages is
       Hint  : Hint_Access)
    is
       function convHint is new
-        Ada.Unchecked_Conversion (System.Address, Hint_Access);
+        Ada.Unchecked_Conversion (Source => System.Address,
+                                  Target => Hint_Access);
       function conv is new
-        Ada.Unchecked_Conversion (System.Address, Element_Access);
+        Ada.Unchecked_Conversion (Source => System.Address,
+                                  Target => Element_Access);
 
       procedure Internal_free (Data : System.Address; Hint : System.Address);
       procedure Internal_free (Data : System.Address; Hint : System.Address) is

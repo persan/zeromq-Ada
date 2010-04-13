@@ -50,8 +50,11 @@ project Zmq is
 
    package Naming is
       -- for Spec("Makefile") use "Makefile";
-      for Spec_Suffix("Project File") use ".gpr";
+      -- for Body_Suffix("Project File") use ".gpr";
    end Naming;
+   package Check is
+      for Default_Switches ("ada") use ("-rules", "-from=" & Project'Project_Dir & "/zmq.rules");
+   end Check;
 
 end Zmq;
 

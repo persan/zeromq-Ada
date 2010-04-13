@@ -1,20 +1,19 @@
 with ZMQ.Sockets;
 with ZMQ.Contexts;
 with ZMQ.Messages;
-with Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure zmq.examples.server is
-   ctx   : ZMQ.Contexts.context;
+procedure ZMQ.examples.Server is
+   ctx   : ZMQ.Contexts.Context;
    s     : ZMQ.Sockets.Socket;
    resultset_string : constant String := "OK";
 begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
-   ctx.initialize (1, 1, 0);
+   ctx.Initialize (1, 1, 0);
 
    --   Create a ZMQ_REP socket to receive requests and send replies
-   s.initialize (ctx, Sockets.REP);
+   s.Initialize (ctx, Sockets.REP);
 
    --   Bind to the TCP transport and port 5555 on the 'lo' interface
    s.Bind ("tcp://lo:5555");
@@ -34,11 +33,11 @@ begin
          begin
             resultset.Initialize (query.getData & "->" & resultset_string);
             --   Send back our canned response
-            s.send ( resultset);
+            s.Send (resultset);
             resultset.Finalize;
          end;
-         Query.Finalize;
+         query.Finalize;
       end;
 
    end loop;
-end;
+end ZMQ.Examples.Server;

@@ -2,12 +2,14 @@ with ZMQ.Low_Level;
 with Interfaces.C.Strings;
 with GNAT.OS_Lib;
 with GNAT.Source_Info;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 package body ZMQ.Sockets is
    use Interfaces.C.Strings;
    use Interfaces.C;
    use System;
    use Ada.Streams;
-   map : constant array (Socket_Opt) of int :=
+   type Map_Array is  array (Socket_Opt) of int;
+   Map :  constant Map_Array  :=
            (HWM          => Low_Level.defs.ZMQ_HWM,   -- Set high water mark
             LWM          => Low_Level.defs.ZMQ_LWM,   -- Set low water mark
             SWAP         => Low_Level.defs.ZMQ_SWAP,
@@ -83,6 +85,12 @@ package body ZMQ.Sockets is
       end if;
    end Bind;
 
+   procedure Bind (This    : in out Socket;
+                   Address : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.Bind (To_String (Address));
+   end Bind;
+
    procedure  setsockopt (This       : in out Socket;
                           Option     : Socket_Opt;
                           Value      : System.Address;
@@ -91,7 +99,7 @@ package body ZMQ.Sockets is
    begin
       ret := Low_Level.zmq_setsockopt
         (This.c,
-         map (Option),
+         Map (Option),
          Value,
          Value_Size);
       if ret /= 0 then
@@ -169,6 +177,14 @@ package body ZMQ.Sockets is
          GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
    end Connect;
+
+
+   procedure Connect (This    : in out Socket;
+                      Address : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.Connect (To_String (Address));
+   end Connect;
+
 
    ----------
    -- Send --
@@ -329,6 +345,107 @@ package body ZMQ.Sockets is
          end if;
       end if;
    end Finalize;
+
+
+   not overriding
+
+   procedure  setsockopt_HWM (This       : in out Socket;
+                              Value      : Natural) is
+   begin
+      This.setsockopt (HWM, Value);
+   end setsockopt_HWM;
+
+   not overriding
+   procedure  setsockopt_LWM (This       : in out Socket;
+                              Value      : Natural) is
+   begin
+      This.setsockopt (LWM, Value);
+   end setsockopt_LWM;
+
+   not overriding
+   procedure  setsockopt_SWAP (This       : in out Socket;
+                               Value      : Boolean) is
+   begin
+      This.setsockopt (SWAP, Boolean'Pos (Value));
+   end setsockopt_SWAP;
+   not overriding
+   procedure  setsockopt_AFFINITY (This       : in out Socket;
+                                   Value      : Natural) is
+   begin
+      This.setsockopt (AFFINITY, Value);
+   end setsockopt_AFFINITY;
+
+   not overriding
+   procedure  setsockopt_IDENTITY (This       : in out Socket;
+                                   Value      : Natural) is
+   begin
+      This.setsockopt (IDENTITY, Value);
+   end setsockopt_IDENTITY;
+
+   not overriding
+   procedure  setsockopt_SUBSCRIBE (This       : in out Socket;
+                                    Value      : String) is
+   begin
+      This.setsockopt (SUBSCRIBE, Value);
+   end setsockopt_SUBSCRIBE;
+
+   not overriding
+
+   procedure  setsockopt_SUBSCRIBE
+     (This       : in out Socket;
+      Value      : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.setsockopt (SUBSCRIBE, To_String (Value));
+   end setsockopt_SUBSCRIBE;
+
+   not overriding
+
+   procedure  setsockopt_UNSUBSCRIBE (This       : in out Socket;
+                                      Value      : String) is
+   begin
+      This.setsockopt (UNSUBSCRIBE, Value);
+   end setsockopt_UNSUBSCRIBE;
+
+   not overriding
+   procedure  setsockopt_UNSUBSCRIBE
+     (This       : in out Socket;
+      Value      : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.setsockopt (UNSUBSCRIBE, To_String (Value));
+   end setsockopt_UNSUBSCRIBE;
+   not overriding
+
+   procedure  setsockopt_RATE (This       : in out Socket;
+                               Value      : Natural) is
+   begin
+      This.setsockopt (RATE, Value);
+   end setsockopt_RATE;
+
+   not overriding
+   procedure  setsockopt_RECOVERY_IVL (This       : in out Socket;
+                                       Value      : Natural) is
+   begin
+      This.setsockopt (RECOVERY_IVL, Value);
+   end setsockopt_RECOVERY_IVL;
+   not overriding
+   procedure  setsockopt_MCAST_LOOP (This       : in out Socket;
+                                     Value      : Natural) is
+   begin
+      This.setsockopt (HWM, Value);
+   end setsockopt_MCAST_LOOP;
+   not overriding
+   procedure  setsockopt_SNDBUF (This       : in out Socket;
+                                 Value      : Natural) is
+   begin
+      This.setsockopt (SNDBUF, Value);
+   end setsockopt_SNDBUF;
+   not overriding
+
+   procedure  setsockopt_RCVBUF (This       : in out Socket;
+                                 Value      : Natural) is
+   begin
+      This.setsockopt (RCVBUF, Value);
+   end setsockopt_RCVBUF;
 
 
 end ZMQ.Sockets;

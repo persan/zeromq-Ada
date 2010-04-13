@@ -1,8 +1,7 @@
- with ZMQ.Sockets;
+with ZMQ.Sockets;
 with ZMQ.Contexts;
-with ZMQ.Messages;
 with Ada.Text_IO;
-procedure zmq.examples.Display is
+procedure ZMQ.examples.Display is
    use Ada.Text_IO;
    Context  : aliased Contexts.Context;
    Socket   : Sockets.Socket;
@@ -11,12 +10,16 @@ procedure zmq.examples.Display is
 begin
 
    Context.Initialize (1, 1);
-   Socket.initialize (Context, Sockets.SUB);
+   Socket.Initialize (Context, Sockets.SUB);
    Socket.setsockopt (Sockets.SUBSCRIBE, "");
-   Socket.connect ("tcp://localhost:5555");
-
-   loop
-      Ada.Text_Io.Put_Line (Socket.Recv);
-   end loop;
-
-end zmq.examples.Display;
+   Socket.Bind ("tcp://lo:5555");
+   Ada.Text_IO.Put_Line ("Connected");
+   Read_Loop : loop
+      declare
+         Buffer : constant String := Socket.recv;
+      begin
+         Ada.Text_IO.Put_Line (Buffer);
+         exit Read_Loop when Buffer = END_MESSAGE;
+      end;
+   end loop Read_Loop;
+end ZMQ.Examples.Display;
