@@ -1,0 +1,13 @@
++RAnonymous_Arrays
++RExceptions_As_Control_Flow
++REXIT_Statements_With_No_Loop_Name
++RGOTO_Statements
++RImproper_Returns
++RPositional_Actuals_For_Defaulted_Generic_Parameters
++RPositional_Generic_Parameters
++RUncommented_BEGIN_In_Package_Bodies
++RUnassigned_OUT_Parameters
++RFloat_Equality_Checks
++RMetrics_LSLOC:1000
++RMetrics_Cyclomatic_Complexity:10
++RMetrics_Essential_Complexity:10

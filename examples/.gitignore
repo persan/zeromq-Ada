@@ -1,4 +1,8 @@
 debug
 .#*#
-
+gnatcheck.out
+zmq-examples-client
+zmq-examples-display
+zmq-examples-prompt
+zmq-examples-server
 
