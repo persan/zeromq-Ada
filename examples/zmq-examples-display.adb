@@ -11,7 +11,7 @@ begin
 
    Context.Initialize (1, 1);
    Socket.Initialize (Context, Sockets.SUB);
-   Socket.setsockopt (Sockets.SUBSCRIBE, "");
+   Socket.setsockopt_SUBSCRIBE ("");
    Socket.Bind ("tcp://lo:5555");
    Ada.Text_IO.Put_Line ("Connected");
    Read_Loop : loop

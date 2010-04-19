@@ -18,5 +18,5 @@ project ZMQ.Examples is
    end Check;
 
    for Object_Dir use ".obj";
-   for Exec_Dir use ".";
+   for Exec_Dir use "bin";
 end ZMQ.Examples;
