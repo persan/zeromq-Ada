@@ -1,8 +1,8 @@
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
-package body Zmq.Tests.Testcases.Test_Pubsub is
+package body ZMQ.Tests.Testcases.Test_Pubsub is
    use AUnit;
-   use ada.Strings.Unbounded;
+   use Ada.Strings.Unbounded;
 
    MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
 
@@ -26,14 +26,14 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
    procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.ctx.initialize (1, 1, 0);
-      T.pub.initialize (T.ctx, Sockets.PUB);
+      T.Ctx.Initialize (1, 1, 0);
+      T.pub.Initialize (T.Ctx, Sockets.PUB);
 
-      T.Sub.initialize (T.ctx, Sockets.SUB);
+      T.Sub.Initialize (T.Ctx, Sockets.SUB);
       T.Sub.setsockopt_SUBSCRIBE ("");
 
       T.Sub.Bind ("inproc://pub-sub");
-      T.Pub.Connect ("inproc://pub-sub");
+      T.pub.Connect ("inproc://pub-sub");
    end initialize;
 
    -------------------------
@@ -43,20 +43,20 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       T     : Test_Case renames Test_Case (Test);
       msg   : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.pub.send (MSG_STRING);
-      T.sub.recv (msg);
-      T.assert (msg = MSG_STRING, "Error");
+      T.pub.Send (MSG_STRING);
+      T.Sub.recv (msg);
+      T.Assert (msg = MSG_STRING, "Error");
    end Send;
 
    -------------------------
-    --  Subscribe
+   --  Subscribe
    -------------------------
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
       T.pub.Finalize;
       T.Sub.Finalize;
-      T.ctx.Finalize;
+      T.Ctx.Finalize;
    end Finalize;
    --------------------
    -- Register_Tests --
@@ -66,9 +66,9 @@ package body Zmq.Tests.Testcases.Test_Pubsub is
       use Test_Cases.Registration;
 
    begin
-      Register_Routine(T, initialize'access, "initialize");
-      Register_Routine(T, Send'access, "Send");
-      Register_Routine(T, Finalize'access, "Finalize");
+      Register_Routine (T, initialize'Access, "initialize");
+      Register_Routine (T, Send'Access, "Send");
+      Register_Routine (T, Finalize'Access, "Finalize");
    end Register_Tests;
 
-end Zmq.Tests.Testcases.Test_Pubsub;
+end ZMQ.Tests.TestCases.Test_Pubsub;

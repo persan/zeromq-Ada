@@ -35,6 +35,7 @@ with Interfaces.C.Strings;
 with System;
 
 package ZMQ.Low_Level is
+   pragma Preelaborate;
    pragma Warnings (off);
    package defs is
 

@@ -16,12 +16,13 @@ project ZMQ.Tests is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatwa", "-g", "-gnat05", "-gnatf", "-O2");
+      for Default_Switches ("ada") use
+        ZMQ.Compiler'Default_Switches ("ada") & ("-gnaty-s");
    end Compiler;
 
    package Binder is
       for Default_Switches ("ada") use ("-E");
    end Binder;
-
+   package Ide renames ZMQ.Ide;
 end ZMQ.Tests;
 

@@ -6,6 +6,7 @@ project Zmq.helpers is
 
    package Compiler renames zmq.Compiler;
    --  package Binder   renames zmq.Binder;
+   package IDE renames zmq.IDE;
 
 end Zmq.helpers;
 

@@ -4,7 +4,7 @@ with ZMQ.Contexts;
 with ZMQ.Sockets;
 with ZMQ.Messages;
 with ZMQ.Low_Level;
-package body Zmq.Tests.Testcases.Test_Compile is
+package body ZMQ.Tests.Testcases.Test_Compile is
    use AUnit;
 
    ----------
@@ -38,4 +38,4 @@ package body Zmq.Tests.Testcases.Test_Compile is
       Register_Routine  (T, Compile'Access, "Compile");
    end Register_Tests;
 
-end Zmq.Tests.Testcases.Test_Compile;
+end ZMQ.Tests.TestCases.Test_Compile;
