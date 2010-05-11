@@ -1,0 +1,12 @@
+with "libuuid";
+project UUID is
+
+   for source_files use ("uuid.ads",
+                         "uuid.adb");
+   for Library_Name use "uuidAda";
+   for Library_Dir use "..";
+   for Library_Kind use "dynamic";
+   for Source_Dirs use ("../../include/uuid");
+   for Externally_Built use "True";
+end UUID;
+

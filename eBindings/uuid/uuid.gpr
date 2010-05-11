@@ -1,0 +1,15 @@
+with "libuuid";
+project UUID is
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-g", "-O2", "-gnat05");
+   end Compiler;
+
+   for Object_Dir use ".obj";
+   for Library_Name use "uuidAda";
+   for Library_Dir use "lib";
+   for Library_Interface use ("uuid");
+   for Library_Kind use "dynamic";
+
+end UUID;
+

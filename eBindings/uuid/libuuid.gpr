@@ -1,0 +1,9 @@
+project libuuid is
+   for languages use ("C");
+   for source_files use ("uuid.h");
+   for source_dirs use ("/usr/include/uuid");
+   for Library_name use "uuid";
+   for externally_Built use "True";
+   for Library_dir use "/usr/lib";
+   for Library_Kind use "dynamic";
+end libuuid;
