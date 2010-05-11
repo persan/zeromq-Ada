@@ -29,7 +29,10 @@
 -- covered by the  GNU Public License.                                      --
 --                                                                          --
 ------------------------------------------------------------------------------
-project Zmq is
+with "../zeromq2/libzmq.gpr";
+with "libuuid.gpr";
+with "libpthread.gpr";
+project ZMQ is
    For Languages use ("Ada","Project File");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
@@ -46,6 +49,10 @@ project Zmq is
    for Source_Files use
      ("zmq.adb",
       "zmq.ads",
+
+      -- "zmq-devices.adb",
+      "zmq-devices.ads",
+
       "zmq-contexts.adb",
       "zmq-contexts.ads",
       "zmq-low_level.ads",
@@ -99,5 +106,5 @@ project Zmq is
    package Ide is
       for Vcs_Kind use "Auto";
    end Ide;
-end Zmq;
+end ZMQ;
 

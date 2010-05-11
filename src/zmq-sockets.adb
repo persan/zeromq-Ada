@@ -294,21 +294,21 @@ package body ZMQ.Sockets is
    end Send;
 
 
-   -----------
-   -- flush --
-   -----------
-
-   not overriding procedure flush
-     (This    : in out Socket)
-   is
-      ret  : int;
-   begin
-      ret := Low_Level.zmq_flush (This.c);
-      if ret /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
-           & GNAT.Source_Info.Enclosing_Entity;
-      end if;
-   end flush;
+--     -----------
+--     -- flush --
+--     -----------
+--
+--     not overriding procedure flush
+--       (This    : in out Socket)
+--     is
+--        ret  : int;
+--     begin
+--        ret := Low_Level.zmq_flush (This.c);
+--        if ret /= 0 then
+--           raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
+--             & GNAT.Source_Info.Enclosing_Entity;
+--        end if;
+--     end flush;
 
    ----------
    -- recv --

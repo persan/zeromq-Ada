@@ -12,6 +12,7 @@ project ZMQ.Tests is
    for Exec_Dir use "bin";
 
    package Builder is
+--      for executable ("zmq-tests-testharnesess-test_all.adb") use "zmq-tests-testharnesess-test_all";
       for Default_Switches ("ada") use ("-k", "-j2");
    end Builder;
 
@@ -23,6 +24,9 @@ project ZMQ.Tests is
    package Binder is
       for Default_Switches ("ada") use ("-E");
    end Binder;
+   package Linker is
+      for Default_Switches ("ada") use ("-lpthread","-luuid");
+   end Linker;
    package Ide renames ZMQ.Ide;
 end ZMQ.Tests;
 

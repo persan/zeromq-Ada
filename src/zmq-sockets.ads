@@ -165,8 +165,8 @@ package ZMQ.Sockets is
 
    --  Send the message over the socet
 
-   not overriding
-   procedure flush (This    : in out Socket);
+--     not overriding
+--     procedure flush (This    : in out Socket);
 
    not overriding
    procedure recv (This    : in Socket;
