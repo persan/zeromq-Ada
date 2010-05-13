@@ -139,30 +139,28 @@ package body uuid is
    end "=";
 
 
-   function Generate return  UUID is
+   procedure Generate (this : out UUID) is
    begin
-      return ret : UUID do
-         uuid_uuid_h.uuid_generate (ret.data (1)'Access);
-      end return;
+      uuid_uuid_h.uuid_generate (this.data (this.data'First)'Access);
    end Generate;
 
    function Generate_Random return  UUID is
    begin
       return ret : UUID do
-         uuid_uuid_h.uuid_generate_random (ret.data (1)'Access);
+         uuid_uuid_h.uuid_generate_random (ret.data (ret.data'First)'Access);
       end return;
    end Generate_Random;
 
    function Generate_Time return  UUID is
    begin
       return ret : UUID do
-         uuid_uuid_h.uuid_generate_time (ret.data (1)'Access);
+         uuid_uuid_h.uuid_generate_time (ret.data (ret.data'First)'Access);
       end return;
    end Generate_Time;
 
    function Is_Null (arg1 : UUID) return Boolean is
    begin
-      return uuid_uuid_h.uuid_is_null (arg1.data (1)'Unrestricted_Access) /= 0;
+      return uuid_uuid_h.uuid_is_null (arg1.data (arg1.data'First)'Unrestricted_Access) /= 0;
    end Is_Null;
 
    function Parse (arg2 : String) return UUID is
@@ -172,22 +170,22 @@ package body uuid is
       end return;
    end Parse;
 
-   function Unparse (arg1 : access UUID) return String is
+   function Unparse (arg1 : UUID) return String is
    begin
       return "";
    end Unparse;
 
-   function Unparse_Lower (arg1 : access UUID) return String is
+   function Unparse_Lower (arg1 : UUID) return String is
    begin
       return "";
    end Unparse_Lower;
 
-   function Unparse_Upper (arg1 : access UUID) return String is
+   function Unparse_Upper (arg1 : UUID) return String is
    begin
       return "";
    end Unparse_Upper;
 
-   function time (arg1 : access uuid;
+   function time (arg1 : uuid;
                   arg2 : access bits_time_h.timeval) return time_h.time_t is
    begin
       return time(arg1,arg2);

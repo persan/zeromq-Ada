@@ -13,7 +13,7 @@ package uuid is
    function "=" (l, r : UUID) return Boolean;
 
 
-   function Generate return  UUID;
+   procedure Generate (this : out UUID);
 
    function Generate_Random return  UUID;
 
@@ -23,11 +23,11 @@ package uuid is
 
    function Parse (arg2 : String) return UUID;
 
-   function Unparse (arg1 : access UUID) return String;
+   function Unparse (arg1 : UUID) return String;
 
-   function Unparse_Lower (arg1 : access UUID) return String;
+   function Unparse_Lower (arg1 : UUID) return String;
 
-   function Unparse_Upper (arg1 : access UUID) return String;
+   function Unparse_Upper (arg1 : UUID) return String;
 
    --  function time (arg1 : access uuid;
    --                 arg2 : access bits_time_h.timeval) return time_h.time_t;
@@ -41,6 +41,6 @@ package uuid is
 private
    type uuid_t is array (0 .. 15) of aliased Interfaces.C.unsigned_char;
    type UUID is tagged record
-      data : aliased uuid_t;
+      data : uuid_t;
    end record;
 end uuid;

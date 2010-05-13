@@ -1,5 +1,5 @@
-with "libuuid";
-project UUID is
+with "libdl.gpr";
+project DL is
 
    for Languages use ("C","Ada");
 
@@ -9,10 +9,10 @@ project UUID is
    end Compiler;
 
    for Object_Dir use ".obj";
-   for Library_Name use "uuidAda";
+   for Library_Name use "dlAda";
    for Library_Dir use "lib";
-   for Library_Interface use ("uuid");
+   for Library_Interface use ("dl");
    for Library_Kind use "dynamic";
 
-end UUID;
+end DL;
 

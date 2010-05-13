@@ -18,3 +18,7 @@ install:
 
 clean:
 	rm -rf lib .obj
+generate:
+	rm -rf gen
+	mkdir -p gen
+	(cd gen ;gcc -c -fdump-ada-spec ../generate.c)

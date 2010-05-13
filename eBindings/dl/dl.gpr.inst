@@ -1,0 +1,12 @@
+with "libdl";
+project dl is
+
+   for source_files use ("dl.ads",
+                         "dl.adb");
+   for Library_Name use "dlAda";
+   for Library_Dir use "..";
+   for Library_Kind use "dynamic";
+   for Source_Dirs use ("../../include/dl");
+   for Externally_Built use "True";
+end dl;
+
