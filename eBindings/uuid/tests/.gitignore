@@ -4,5 +4,6 @@ lib
 *.pyc
 new\ file
 .temp
-make
+gen
+ctest.c
 
