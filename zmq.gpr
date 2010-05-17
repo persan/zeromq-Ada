@@ -29,7 +29,7 @@
 -- covered by the  GNU Public License.                                      --
 --                                                                          --
 ------------------------------------------------------------------------------
-with "../zeromq2/libzmq.gpr";
+with "libzmq.gpr";
 with "libuuid.gpr";
 with "libpthread.gpr";
 project ZMQ is

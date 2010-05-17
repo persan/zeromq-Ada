@@ -1,0 +1,10 @@
+project libZMQ is
+   for languages use ("C");
+   for source_files use ("zmq.h");
+   for source_dirs use ("/usr/local/include");
+   for Library_name use "zmq";
+   for externally_Built use "True";
+   for Library_dir use "/usr/local/lib";
+   for Library_Kind use "dynamic";
+end libZMQ;
+

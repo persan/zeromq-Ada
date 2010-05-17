@@ -3,8 +3,7 @@ ifndef PREFIX
   PREFIX=$(dir $(which gnatls))..
 endif
 
-examples:
-	gprbuild -p -P examples/zmq-examples.gpr
+
 
 compile:
 	gprbuild -p -P zmq.gpr -XLIBRARY_TYPE=static
@@ -26,6 +25,9 @@ install:
 	cp examples/zmq-examples.gpr.inst ${PREFIX}/share/zmq/examples/Ada/zmq-examples.gpr
 
 all: compile install
+
+examples:
+	gprbuild -p -P examples/zmq-examples.gpr
 
 generate:
 	mkdir -p .temp
