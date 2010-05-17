@@ -50,7 +50,7 @@ project ZMQ is
      ("zmq.adb",
       "zmq.ads",
 
-      -- "zmq-devices.adb",
+      "zmq-devices.adb",
       "zmq-devices.ads",
 
       "zmq-contexts.adb",

@@ -478,5 +478,9 @@ package body ZMQ.Sockets is
       This.setsockopt (RCVBUF, Value);
    end setsockopt_RCVBUF;
 
+   function get_impl (This : in Socket) return System.Address is
+   begin
+      return This.c;
+   end get_impl;
 
 end ZMQ.Sockets;

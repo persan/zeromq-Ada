@@ -192,7 +192,7 @@ package ZMQ.Sockets is
 
 
    --  function "=" (Left, Right : in Context) return Boolean;
-
+   function get_impl (This : in Socket) return System.Address;
 private
    type Socket is new Ada.Finalization.Limited_Controlled with record
       c : System.Address := System.Null_Address;

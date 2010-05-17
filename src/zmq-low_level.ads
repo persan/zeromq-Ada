@@ -39,46 +39,60 @@ package ZMQ.Low_Level is
    pragma Warnings (off);
    package defs is
 
-      ZMQ_HAUSNUMERO : constant := 156384712;  --  zmq.h:48
-      EMTHREAD       : constant := ZMQ_HAUSNUMERO + 50;
-      EFSM           : constant := ZMQ_HAUSNUMERO + 51;
-      ENOCOMPATPROTO : constant := ZMQ_HAUSNUMERO + 52;
+      ZMQ_HAUSNUMERO : constant := 156384712;  --  zmq.h:56
+      --  unsupported macro: EMTHREAD (ZMQ_HAUSNUMERO + 50)
+      --  unsupported macro: EFSM (ZMQ_HAUSNUMERO + 51)
+      --  unsupported macro: ENOCOMPATPROTO (ZMQ_HAUSNUMERO + 52)
+      --  unsupported macro: ETERM (ZMQ_HAUSNUMERO + 53)
 
-      ZMQ_MAX_VSM_SIZE : constant := 30;  --  zmq.h:92
+      ZMQ_MAX_VSM_SIZE : constant := 30;  --  zmq.h:107
 
-      ZMQ_DELIMITER  : constant := 31;  --  zmq.h:96
-      ZMQ_VSM        : constant := 32;  --  zmq.h:97
+      ZMQ_DELIMITER : constant := 31;  --  zmq.h:111
+      ZMQ_VSM : constant := 32;  --  zmq.h:112
 
-      ZMQ_POLL       : constant := 1;  --  zmq.h:128
+      ZMQ_MSG_MORE : constant := 1;  --  zmq.h:117
+      ZMQ_MSG_SHARED : constant := 128;  --  zmq.h:118
 
-      ZMQ_P2P        : constant := 0;  --  zmq.h:150
-      ZMQ_PUB        : constant := 1;  --  zmq.h:151
-      ZMQ_SUB        : constant := 2;  --  zmq.h:152
-      ZMQ_REQ        : constant := 3;  --  zmq.h:153
-      ZMQ_REP        : constant := 4;  --  zmq.h:154
-      ZMQ_XREQ       : constant := 5;  --  zmq.h:155
-      ZMQ_XREP       : constant := 6;  --  zmq.h:156
-      ZMQ_UPSTREAM   : constant := 7;  --  zmq.h:157
-      ZMQ_DOWNSTREAM : constant := 8;  --  zmq.h:158
+      ZMQ_POLL : constant := 1;  --  zmq.h:148
 
-      ZMQ_HWM        : constant := 1;  --  zmq.h:160
-      ZMQ_LWM        : constant := 2;  --  zmq.h:161
-      ZMQ_SWAP       : constant := 3;  --  zmq.h:162
-      ZMQ_AFFINITY   : constant := 4;  --  zmq.h:163
-      ZMQ_IDENTITY   : constant := 5;  --  zmq.h:164
-      ZMQ_SUBSCRIBE  : constant := 6;  --  zmq.h:165
-      ZMQ_UNSUBSCRIBE : constant := 7;  --  zmq.h:166
-      ZMQ_RATE       : constant := 8;  --  zmq.h:167
-      ZMQ_RECOVERY_IVL : constant := 9;  --  zmq.h:168
-      ZMQ_MCAST_LOOP : constant := 10;  --  zmq.h:169
-      ZMQ_SNDBUF     : constant := 11;  --  zmq.h:170
-      ZMQ_RCVBUF     : constant := 12;  --  zmq.h:171
+      ZMQ_PAIR : constant := 0;  --  zmq.h:159
+      ZMQ_P2P : constant := 0;  --  zmq.h:160
+      ZMQ_PUB : constant := 1;  --  zmq.h:161
+      ZMQ_SUB : constant := 2;  --  zmq.h:162
+      ZMQ_REQ : constant := 3;  --  zmq.h:163
+      ZMQ_REP : constant := 4;  --  zmq.h:164
+      ZMQ_XREQ : constant := 5;  --  zmq.h:165
+      ZMQ_XREP : constant := 6;  --  zmq.h:166
+      ZMQ_UPSTREAM : constant := 7;  --  zmq.h:167
+      ZMQ_DOWNSTREAM : constant := 8;  --  zmq.h:168
 
-      ZMQ_NOBLOCK    : constant := 1;  --  zmq.h:173
-      ZMQ_NOFLUSH    : constant := 2;  --  zmq.h:174
+      ZMQ_HWM : constant := 1;  --  zmq.h:171
+      ZMQ_LWM : constant := 2;  --  zmq.h:172
+      ZMQ_SWAP : constant := 3;  --  zmq.h:173
+      ZMQ_AFFINITY : constant := 4;  --  zmq.h:174
+      ZMQ_IDENTITY : constant := 5;  --  zmq.h:175
+      ZMQ_SUBSCRIBE : constant := 6;  --  zmq.h:176
+      ZMQ_UNSUBSCRIBE : constant := 7;  --  zmq.h:177
+      ZMQ_RATE : constant := 8;  --  zmq.h:178
+      ZMQ_RECOVERY_IVL : constant := 9;  --  zmq.h:179
+      ZMQ_MCAST_LOOP : constant := 10;  --  zmq.h:180
+      ZMQ_SNDBUF : constant := 11;  --  zmq.h:181
+      ZMQ_RCVBUF : constant := 12;  --  zmq.h:182
+      ZMQ_RCVMORE : constant := 13;  --  zmq.h:183
 
-      ZMQ_POLLIN     : constant := 1;  --  zmq.h:190
-      ZMQ_POLLOUT    : constant := 2;  --  zmq.h:191
+      ZMQ_NOBLOCK : constant := 1;  --  zmq.h:186
+      ZMQ_SNDMORE : constant := 2;  --  zmq.h:187
+
+      ZMQ_MORE : constant := 2;  --  zmq.h:189
+
+      ZMQ_POLLIN : constant := 1;  --  zmq.h:206
+      ZMQ_POLLOUT : constant := 2;  --  zmq.h:207
+      ZMQ_POLLERR : constant := 4;  --  zmq.h:208
+
+      ZMQ_STREAMER : constant := 1;  --  zmq.h:228
+      ZMQ_FORWARDER : constant := 2;  --  zmq.h:229
+      ZMQ_QUEUE : constant := 3;  --  zmq.h:230
+
    end defs;
 
    function zmq_strerror (errnum : int) return Interfaces.C.Strings.chars_ptr;  -- zmq.h:82:48
@@ -148,6 +162,14 @@ package ZMQ.Low_Level is
       optvallen : Natural) return int;  -- zmq.h:179:21
    pragma Import (C, zmq_setsockopt, "zmq_setsockopt");
 
+   function zmq_getsockopt
+     (arg1 : System.Address;
+      arg2 : int;
+      arg3 : System.Address;
+      arg4 : access Natural) return int;  -- zmq.h:195:16
+
+   pragma Import (C, zmq_getsockopt, "zmq_getsockopt");
+
    function zmq_bind (s : System.Address; addr : Interfaces.C.Strings.chars_ptr) return int;  -- zmq.h:180:51
    pragma Import (C, zmq_bind, "zmq_bind");
 
@@ -159,9 +181,6 @@ package ZMQ.Low_Level is
       msg   : access zmq_msg_t;
       flags : int) return int;  -- zmq.h:182:60
    pragma Import (C, zmq_send, "zmq_send");
-
-   function zmq_flush (s : System.Address) return int;  -- zmq.h:183:34
-   pragma Import (C, zmq_flush, "zmq_flush");
 
    function zmq_recv
      (s     : System.Address;
@@ -184,6 +203,13 @@ package ZMQ.Low_Level is
       nitems  : int;
       timeout : long) return int;  -- zmq.h:205:73
    pragma Import (C, zmq_poll, "zmq_poll");
+
+   function zmq_device
+     (arg1 : int;
+      arg2 : System.Address;
+      arg3 : System.Address) return int;  -- zmq.h:232:16
+   pragma Import (C, zmq_device, "zmq_device");
+
 
    function zmq_stopwatch_start return System.Address;  -- zmq.h:215:39
    pragma Import (C, zmq_stopwatch_start, "zmq_stopwatch_start");
