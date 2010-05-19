@@ -30,6 +30,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+-- The contents of this file is derived from zmq.h using the
+--  -fdump-ada-spec switch for gcc.
+
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Strings;
 with System;

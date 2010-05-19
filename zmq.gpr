@@ -109,7 +109,7 @@ project ZMQ is
    end Check;
 
    package Ide is
-      for Vcs_Kind use "Auto";
+      for Vcs_Kind use "git";
    end Ide;
 end ZMQ;
 
