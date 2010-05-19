@@ -10,13 +10,13 @@ project ZMQ.Examples is
 
    for Object_Dir use ".obj";
    for Exec_Dir use "bin";
+
    package Builder is
       for Executable("zmq-examples-client.adb") use "client";
       for Executable("zmq-examples-display.adb") use "display";
       for Executable("zmq-examples-prompt.adb") use "prompt";
       for Executable("zmq-examples-server.adb") use "server";
       for Executable("zmq-examples-multi_thread_server.adb") use "multi_thread_server";
-
    end Builder;
 
 
@@ -32,7 +32,7 @@ project ZMQ.Examples is
       for Default_Switches ("ada") use ("-rules", "-from=" & ZMQ'Project_Dir & "/zmq.rules");
    end Check;
 
-
+   package Make renames ZMQ.Make;
    package Ide renames ZMQ.Ide;
 
 end ZMQ.Examples;
