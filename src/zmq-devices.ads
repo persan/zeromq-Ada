@@ -2,7 +2,7 @@ private with Interfaces.C;
 with ZMQ.Sockets;
 package ZMQ.devices is
    type device is tagged private;
-   type Device_Kind is (Streamer, forwarder, queue);
+   type Device_Kind is (Streamer, Forwarder, Queue);
    procedure initialize (this : in out device;
                          Kind      : Device_Kind;
                          insocket  : ZMQ.Sockets.Socket;

@@ -16,7 +16,7 @@ begin
 
    --   Bind to the TCP transport and port 5555 on the 'lo' interface
    s.Connect ("tcp://localhost:5555");
-   for i in  1 .. 5 loop
+   for i in  1 .. 10 loop
       declare
          query_string : constant String := "SELECT * FROM mytable";
          query        : ZMQ.Messages.Message;

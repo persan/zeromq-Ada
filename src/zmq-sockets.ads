@@ -165,8 +165,8 @@ package ZMQ.Sockets is
 
    --  Send the message over the socet
 
---     not overriding
---     procedure flush (This    : in out Socket);
+   --     not overriding
+   --     procedure flush (This    : in out Socket);
 
    not overriding
    procedure recv (This    : in Socket;
@@ -199,7 +199,7 @@ private
    end record;
    function img (item : Ada.Streams.Stream_Element_Array) return String;
 
-      type Socket_Opt is
+   type Socket_Opt is
      (HWM,   -- Set high water mark
       LWM,   -- Set low water mark
       SWAP,
