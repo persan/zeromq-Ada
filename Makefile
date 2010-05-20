@@ -35,4 +35,6 @@ generate:
 	(cd .temp;gcc  -c -fdump-ada-spec x.c)
 	cat .temp/zmq_h.ads | sed "s-/usr/local/include/--" >src/zmq_h.ads
 
+setup:
+	${MAKE} -C eBindings install
 
