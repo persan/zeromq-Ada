@@ -26,7 +26,7 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.Ctx.Initialize (1, 1, 0);
+      T.Ctx.Initialize (1);
       T.pub.Initialize (T.Ctx, Sockets.PUB);
 
       T.Sub.Initialize (T.Ctx, Sockets.SUB);

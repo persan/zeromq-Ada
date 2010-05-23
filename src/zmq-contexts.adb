@@ -45,9 +45,7 @@ package body ZMQ.Contexts is
 
    not overriding procedure Initialize
      (This        : in out Context;
-      App_Threads : Positive;
-      IO_Threads  : Positive;
-      Flags       : Context_Flags := No_Flags)
+      App_Threads : Positive)
    is
    begin
       Validate_Library_Version;
@@ -55,17 +53,11 @@ package body ZMQ.Contexts is
          raise ZMQ_Error with "Alredy Initialized";
       end if;
       This.c := Low_Level.zmq_init
-        (int (App_Threads), int (IO_Threads), int (Flags));
+        (int (App_Threads), 1, 0);
       if This.c = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
          GNAT.Source_Info.Enclosing_Entity;
       end if;
-   end Initialize;
-
-   overriding
-   procedure Initialize (This : in out Context) is
-   begin
-      This.c := Null_Address;
    end Initialize;
 
    --------------
@@ -77,7 +69,7 @@ package body ZMQ.Contexts is
    is
       rc : int;
    begin
-      if This.c /= Null_Address then
+      if This.Is_Connected then
          rc := Low_Level.zmq_term (This.c);
          This.c := Null_Address;
          if rc  /= 0 then

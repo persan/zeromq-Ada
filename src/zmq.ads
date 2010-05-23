@@ -39,7 +39,7 @@ package ZMQ is
       Patch : Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (0, 0, 1);
+   Binding_Version : constant Version_Type := (2, 0, 7);
    function Library_Version return Version_Type;
 
    function image (item : Version_Type) return String;

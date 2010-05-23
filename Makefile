@@ -38,3 +38,5 @@ generate:
 setup:
 	${MAKE} -C eBindings install
 
+test:
+	${MAKE} -C tests
