@@ -9,7 +9,7 @@ procedure ZMQ.examples.Display is
 
 begin
 
-   Context.Initialize (1, 1);
+   Context.Initialize (1);
    Socket.Initialize (Context, Sockets.SUB);
    Socket.setsockopt_SUBSCRIBE ("");
    Socket.Bind ("tcp://lo:5555");

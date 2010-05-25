@@ -34,7 +34,7 @@ procedure ZMQ.examples.Multi_Thread_Server is
 begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
-   ctx.Initialize (servers'Length + 1, 1, 0);
+   ctx.Initialize (servers'Length + 1);
 
    --   Create a ZMQ_REP socket to receive requests and send replies
    workers.Initialize (ctx, Sockets.XREQ);
