@@ -1,0 +1,19 @@
+with "dl.gpr";
+with "aunit.gpr";
+project Dl.test is
+
+   for Source_Dirs use ("tests");
+   for Object_Dir use "tests/.obj";
+   for Exec_Dir use "tests/bin";
+   for Main use ("dl-test_all.adb");
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnatf", "-gnat05");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+end Dl.test;
+

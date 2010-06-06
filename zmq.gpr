@@ -100,8 +100,7 @@ project ZMQ is
    end Naming;
 
    package Make is
-      for Directory use project'Project_Dir;
-      for Makefile  use "Makefile";
+      for Makefile  use project'Project_dir & "Makefile";
    end Make;
 
    package Check is

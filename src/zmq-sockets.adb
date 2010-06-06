@@ -42,7 +42,6 @@ package body ZMQ.Sockets is
    type Map_Array is  array (Socket_Opt) of int;
    Map :  constant Map_Array  :=
            (HWM          => Low_Level.defs.ZMQ_HWM,   -- Set high water mark
-            LWM          => Low_Level.defs.ZMQ_LWM,   -- Set low water mark
             SWAP         => Low_Level.defs.ZMQ_SWAP,
             AFFINITY     => Low_Level.defs.ZMQ_AFFINITY,
             IDENTITY     => Low_Level.defs.ZMQ_IDENTITY,
@@ -386,12 +385,6 @@ package body ZMQ.Sockets is
       This.setsockopt (HWM, Value);
    end setsockopt_HWM;
 
-   not overriding
-   procedure  setsockopt_LWM (This       : in out Socket;
-                              Value      : Natural) is
-   begin
-      This.setsockopt (LWM, Value);
-   end setsockopt_LWM;
 
    not overriding
    procedure  setsockopt_SWAP (This       : in out Socket;

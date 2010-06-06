@@ -42,13 +42,19 @@ package body ZMQ is
       s : constant String := no'Img;
    begin
       return "[" &  s (s'First + 1 .. s'Last) & "] " &
-      Interfaces.C.Strings.Value (Low_Level.zmq_strerror (int (no)));
+      Interfaces.C.Strings.Value (Low_Level.Zmq_Strerror (int (no)));
    end Error_Message;
 
    function Library_Version return Version_Type is
+      Major : aliased int;
+      Minor : aliased int;
+      Patch : aliased int;
    begin
       return ret : Version_Type do
-         ret := (2, 0, 6); --#TODO fetch from library
+         Low_Level.Zmq_Version (Major'Access,
+                                Minor'Access,
+                                Patch'Access); --#TODO fetch from library
+         ret := (Natural (Major), Natural (Minor), Natural (Patch));
       end return;
    end Library_Version;
 

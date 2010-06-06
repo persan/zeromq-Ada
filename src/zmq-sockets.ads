@@ -74,9 +74,6 @@ package ZMQ.Sockets is
    procedure  setsockopt_HWM (This       : in out Socket;
                               Value      : Natural);
    not overriding
-   procedure  setsockopt_LWM (This       : in out Socket;
-                              Value      : Natural);
-   not overriding
    procedure  setsockopt_SWAP (This       : in out Socket;
                                Value      : Boolean);
    not overriding
@@ -201,7 +198,6 @@ private
 
    type Socket_Opt is
      (HWM,   -- Set high water mark
-      LWM,   -- Set low water mark
       SWAP,
       AFFINITY,
       IDENTITY,

@@ -53,7 +53,7 @@ package body ZMQ.Contexts is
          raise ZMQ_Error with "Alredy Initialized";
       end if;
       This.c := Low_Level.zmq_init
-        (int (App_Threads), 1, 0);
+        (int (App_Threads));
       if This.c = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
          GNAT.Source_Info.Enclosing_Entity;

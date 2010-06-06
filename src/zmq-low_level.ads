@@ -59,7 +59,6 @@ package ZMQ.Low_Level is
       ZMQ_POLL : constant := 1;  --  zmq.h:148
 
       ZMQ_PAIR : constant := 0;  --  zmq.h:159
-      ZMQ_P2P : constant := 0;  --  zmq.h:160
       ZMQ_PUB : constant := 1;  --  zmq.h:161
       ZMQ_SUB : constant := 2;  --  zmq.h:162
       ZMQ_REQ : constant := 3;  --  zmq.h:163
@@ -70,7 +69,6 @@ package ZMQ.Low_Level is
       ZMQ_DOWNSTREAM : constant := 8;  --  zmq.h:168
 
       ZMQ_HWM : constant := 1;  --  zmq.h:171
-      ZMQ_LWM : constant := 2;  --  zmq.h:172
       ZMQ_SWAP : constant := 3;  --  zmq.h:173
       ZMQ_AFFINITY : constant := 4;  --  zmq.h:174
       ZMQ_IDENTITY : constant := 5;  --  zmq.h:175
@@ -98,8 +96,11 @@ package ZMQ.Low_Level is
 
    end defs;
 
-   function zmq_strerror (errnum : int) return Interfaces.C.Strings.chars_ptr;  -- zmq.h:82:48
-   pragma Import (C, zmq_strerror, "zmq_strerror");
+   procedure Zmq_Version (Major : not null access int; Minor : not null access int; Patch : not null access int);  -- zmq.h:48
+   pragma Import (C, Zmq_Version, "zmq_version");
+
+   function Zmq_Strerror (Errnum : int) return Interfaces.C.Strings.chars_ptr;  -- zmq.h:82:48
+   pragma Import (C, Zmq_Strerror, "zmq_strerror");
 
    type zmq_msg_t_vsm_data_array is array (0 .. 29) of aliased unsigned_char;
    type zmq_msg_t is record
@@ -144,9 +145,7 @@ package ZMQ.Low_Level is
    pragma Import (C, zmq_msg_size, "zmq_msg_size");
 
    function zmq_init
-     (app_threads : int;
-      io_threads  : int;
-      flags       : int) return System.Address;  -- zmq.h:130:70
+     (app_threads : int) return System.Address;  -- zmq.h:130:70
    pragma Import (C, zmq_init, "zmq_init");
 
    function zmq_term (context : System.Address) return int;  -- zmq.h:131:39
