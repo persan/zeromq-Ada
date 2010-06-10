@@ -186,6 +186,7 @@ package ZMQ.Sockets is
 
    overriding
    procedure Finalize (this : in out Socket);
+   procedure close (this : in out Socket) renames Finalize;
 
 
    --  function "=" (Left, Right : in Context) return Boolean;
