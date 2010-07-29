@@ -45,7 +45,7 @@ package body ZMQ.Contexts is
 
    not overriding procedure Initialize
      (This        : in out Context;
-      App_Threads : Positive)
+      App_Threads : Natural)
    is
    begin
       Validate_Library_Version;

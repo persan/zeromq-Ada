@@ -40,7 +40,7 @@ package ZMQ.Contexts is
 
    not overriding
    procedure Initialize (This : in out Context;
-                         App_Threads : Positive);
+                         App_Threads : Natural);
 
    overriding
    procedure Finalize (This : in out Context);
