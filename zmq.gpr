@@ -96,7 +96,7 @@ project ZMQ is
 
    package Naming is
       -- for Spec("Makefile") use "Makefile";
-      -- for Body_Suffix("Project File") use ".gpr";
+      for Body_Suffix("Project File") use ".gpr";
    end Naming;
 
    package Make is
