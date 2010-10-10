@@ -41,17 +41,17 @@ package body ZMQ.Sockets is
    use Ada.Streams;
    type Map_Array is  array (Socket_Opt) of int;
    Map :  constant Map_Array  :=
-           (HWM          => Low_Level.defs.ZMQ_HWM,   -- Set high water mark
-            SWAP         => Low_Level.defs.ZMQ_SWAP,
-            AFFINITY     => Low_Level.defs.ZMQ_AFFINITY,
-            IDENTITY     => Low_Level.defs.ZMQ_IDENTITY,
-            SUBSCRIBE    => Low_Level.defs.ZMQ_SUBSCRIBE,
-            UNSUBSCRIBE  => Low_Level.defs.ZMQ_UNSUBSCRIBE,
-            RATE         => Low_Level.defs.ZMQ_RATE,
-            RECOVERY_IVL => Low_Level.defs.ZMQ_RECOVERY_IVL,
-            MCAST_LOOP   => Low_Level.defs.ZMQ_MCAST_LOOP,
-            SNDBUF       => Low_Level.defs.ZMQ_SNDBUF,
-            RCVBUF       => Low_Level.defs.ZMQ_RCVBUF);
+           (HWM          => Low_Level.Defs.ZMQ_HWM,   -- Set high water mark
+            SWAP         => Low_Level.Defs.ZMQ_SWAP,
+            AFFINITY     => Low_Level.Defs.ZMQ_AFFINITY,
+            IDENTITY     => Low_Level.Defs.ZMQ_IDENTITY,
+            SUBSCRIBE    => Low_Level.Defs.ZMQ_SUBSCRIBE,
+            UNSUBSCRIBE  => Low_Level.Defs.ZMQ_UNSUBSCRIBE,
+            RATE         => Low_Level.Defs.ZMQ_RATE,
+            RECOVERY_IVL => Low_Level.Defs.ZMQ_RECOVERY_IVL,
+            MCAST_LOOP   => Low_Level.Defs.ZMQ_MCAST_LOOP,
+            SNDBUF       => Low_Level.Defs.ZMQ_SNDBUF,
+            RCVBUF       => Low_Level.Defs.ZMQ_RCVBUF);
 
 
    function img (item : Ada.Streams.Stream_Element_Array) return String is
@@ -131,7 +131,7 @@ package body ZMQ.Sockets is
         (This.c,
          Map (Option),
          Value,
-         Value_Size);
+         size_t (Value_Size));
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
          GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";

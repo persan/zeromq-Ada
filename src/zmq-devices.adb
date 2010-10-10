@@ -40,9 +40,9 @@ package body ZMQ.devices is
    ----------------
 
    map : constant array (Device_Kind) of int :=
-           (Streamer  => Low_Level.defs.ZMQ_STREAMER,
-            Forwarder => Low_Level.defs.ZMQ_FORWARDER,
-            Queue     => Low_Level.defs.ZMQ_QUEUE);
+           (Streamer  => Low_Level.Defs.ZMQ_STREAMER,
+            Forwarder => Low_Level.Defs.ZMQ_FORWARDER,
+            Queue     => Low_Level.Defs.ZMQ_QUEUE);
    procedure initialize
      (this : in out device;
       Kind      : Device_Kind;

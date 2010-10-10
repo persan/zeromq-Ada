@@ -59,7 +59,7 @@ package body ZMQ.Messages is
    procedure Initialize (Self : in out Message; Size : Natural) is
       ret : int;
    begin
-      ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, Size);
+      ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, size_t (Size));
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
          GNAT.Source_Info.Enclosing_Entity;
@@ -113,7 +113,7 @@ package body ZMQ.Messages is
    begin
       ret := Low_Level.zmq_msg_init_data (Self.Msg'Access,
                                           Message,
-                                          Size,
+                                          size_t (Size),
                                           Free,
                                           Hint);
       if ret /= 0 then
@@ -242,7 +242,7 @@ package body ZMQ.Messages is
    ---------------
    function getSize (Self : Message) return Natural is
    begin
-      return Low_Level.zmq_msg_size (Self.Msg'Unrestricted_Access);
+      return Natural (Low_Level.zmq_msg_size (Self.Msg'Unrestricted_Access));
    end getSize;
 
 
