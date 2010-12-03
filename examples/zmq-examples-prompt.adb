@@ -15,9 +15,9 @@ begin
    Read_Loop : loop
       Ada.Text_IO.Put (">");
       declare
-            textbuf : constant String :=  Ada.Text_IO.Get_Line;
+         textbuf : constant String :=  Ada.Text_IO.Get_Line;
       begin
-            exit Read_Loop when textbuf'Length = 0;
+         exit Read_Loop when textbuf'Length = 0;
          s.Send ("hej" & ASCII.NUL & GNAT.Sockets.Host_Name & ":" & textbuf);
          delay 0.02;
       end;

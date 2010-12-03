@@ -16,7 +16,7 @@ procedure ZMQ.examples.Multi_Thread_Server is
       s.Connect ("inproc://workers");
       loop
          msg := s.recv;
-         Append (msg, "<Served by threa:" & id'Img & ">");
+         Append (msg, "<Served by thread:" & id'Img & ">");
          s.Send (msg);
       end loop;
    end server_task;
