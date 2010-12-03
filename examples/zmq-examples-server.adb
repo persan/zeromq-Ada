@@ -24,7 +24,7 @@ begin
       begin
          query.Initialize;
          --  Receive a message, blocks until one is available
-         s.recv (query, 0);
+         s.recv (query);
          --  Process the query
          Put_Line (query.getData);
          declare
