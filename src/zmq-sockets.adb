@@ -41,17 +41,25 @@ package body ZMQ.Sockets is
    use Ada.Streams;
    type Map_Array is  array (Socket_Opt) of int;
    Map :  constant Map_Array  :=
-           (HWM          => Low_Level.Defs.ZMQ_HWM,   -- Set high water mark
-            SWAP         => Low_Level.Defs.ZMQ_SWAP,
-            AFFINITY     => Low_Level.Defs.ZMQ_AFFINITY,
-            IDENTITY     => Low_Level.Defs.ZMQ_IDENTITY,
-            SUBSCRIBE    => Low_Level.Defs.ZMQ_SUBSCRIBE,
-            UNSUBSCRIBE  => Low_Level.Defs.ZMQ_UNSUBSCRIBE,
-            RATE         => Low_Level.Defs.ZMQ_RATE,
-            RECOVERY_IVL => Low_Level.Defs.ZMQ_RECOVERY_IVL,
-            MCAST_LOOP   => Low_Level.Defs.ZMQ_MCAST_LOOP,
-            SNDBUF       => Low_Level.Defs.ZMQ_SNDBUF,
-            RCVBUF       => Low_Level.Defs.ZMQ_RCVBUF);
+           (HWM                          => Low_Level.Defs.ZMQ_HWM,
+            SWAP                         => Low_Level.Defs.ZMQ_SWAP,
+            AFFINITY                     => Low_Level.Defs.ZMQ_AFFINITY,
+            IDENTITY                     => Low_Level.Defs.ZMQ_IDENTITY,
+            SUBSCRIBE                    => Low_Level.Defs.ZMQ_SUBSCRIBE,
+            UNSUBSCRIBE                  => Low_Level.Defs.ZMQ_UNSUBSCRIBE,
+            RATE                         => Low_Level.Defs.ZMQ_RATE,
+            RECOVERY_IVL                 => Low_Level.Defs.ZMQ_RECOVERY_IVL,
+            MCAST_LOOP                   => Low_Level.Defs.ZMQ_MCAST_LOOP,
+            SNDBUF                       => Low_Level.Defs.ZMQ_SNDBUF,
+            RCVBUF                       => Low_Level.Defs.ZMQ_RCVBUF,
+            RCVMORE                      => Low_Level.Defs.ZMQ_RCVMORE,
+            FD                           => Low_Level.Defs.ZMQ_FD,
+            EVENTS                       => Low_Level.Defs.ZMQ_EVENTS,
+            GET_TYPE                     => Low_Level.Defs.ZMQ_TYPE,
+            LINGER                       => Low_Level.Defs.ZMQ_LINGER,
+            RECONNECT_IVL                => Low_Level.Defs.ZMQ_RECONNECT_IVL,
+            BACKLOG                      => Low_Level.Defs.ZMQ_BACKLOG
+           );
 
 
    function img (item : Ada.Streams.Stream_Element_Array) return String is
@@ -274,7 +282,7 @@ package body ZMQ.Sockets is
       This.Send
         (Msg'Address,
          (Msg'Size + Ada.Streams.Stream_Element'Size - 1) /
-                     Ada.Streams.Stream_Element'Size,
+           Ada.Streams.Stream_Element'Size,
          Flags);
    end Send_Generic;
 
@@ -293,21 +301,21 @@ package body ZMQ.Sockets is
    end Send;
 
 
---     -----------
---     -- flush --
---     -----------
---
---     not overriding procedure flush
---       (This    : in out Socket)
---     is
---        ret  : int;
---     begin
---        ret := Low_Level.zmq_flush (This.c);
---        if ret /= 0 then
---           raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
---             & GNAT.Source_Info.Enclosing_Entity;
---        end if;
---     end flush;
+   --     -----------
+   --     -- flush --
+   --     -----------
+   --
+   --     not overriding procedure flush
+   --       (This    : in out Socket)
+   --     is
+   --        ret  : int;
+   --     begin
+   --        ret := Low_Level.zmq_flush (This.c);
+   --        if ret /= 0 then
+   --           raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
+   --             & GNAT.Source_Info.Enclosing_Entity;
+   --        end if;
+   --     end flush;
 
    ----------
    -- recv --
@@ -379,101 +387,247 @@ package body ZMQ.Sockets is
 
    not overriding
 
-   procedure  setsockopt_HWM (This       : in out Socket;
-                              Value      : Natural) is
+   procedure  Set_high_water_mark (This       : in out Socket;
+                                   Value      : Natural) is
    begin
       This.setsockopt (HWM, Value);
-   end setsockopt_HWM;
+   end Set_high_water_mark;
 
 
    not overriding
-   procedure  setsockopt_SWAP (This       : in out Socket;
-                               Value      : Boolean) is
+   procedure  Set_disk_offload_size (This       : in out Socket;
+                                     Value      : Boolean) is
    begin
       This.setsockopt (SWAP, Boolean'Pos (Value));
-   end setsockopt_SWAP;
+   end Set_disk_offload_size;
    not overriding
-   procedure  setsockopt_AFFINITY (This       : in out Socket;
-                                   Value      : Natural) is
+   procedure  Set_IO_thread_affinity (This       : in out Socket;
+                                      Value      : Natural) is
    begin
       This.setsockopt (AFFINITY, Value);
-   end setsockopt_AFFINITY;
+   end Set_IO_thread_affinity;
 
    not overriding
-   procedure  setsockopt_IDENTITY (This       : in out Socket;
-                                   Value      : Natural) is
+   procedure  Set_socket_identity
+     (This       : in out Socket;
+      Value      : Ada.Streams.Stream_Element_Array) is
    begin
       This.setsockopt (IDENTITY, Value);
-   end setsockopt_IDENTITY;
+   end Set_socket_identity;
 
    not overriding
-   procedure  setsockopt_SUBSCRIBE (This       : in out Socket;
-                                    Value      : String) is
+   procedure  Establish_message_filter (This       : in out Socket;
+                                        Value      : String) is
    begin
       This.setsockopt (SUBSCRIBE, Value);
-   end setsockopt_SUBSCRIBE;
+   end Establish_message_filter;
 
    not overriding
 
-   procedure  setsockopt_SUBSCRIBE
+   procedure  Establish_message_filter
+     (This       : in out Socket;
+      Value      :  Ada.Streams.Stream_Element_Array) is
+   begin
+      This.setsockopt (SUBSCRIBE, Value);
+   end Establish_message_filter;
+
+   procedure  Establish_message_filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) is
    begin
       This.setsockopt (SUBSCRIBE, To_String (Value));
-   end setsockopt_SUBSCRIBE;
+   end Establish_message_filter;
 
    not overriding
 
-   procedure  setsockopt_UNSUBSCRIBE (This       : in out Socket;
-                                      Value      : String) is
+   procedure  Remove_message_filter (This       : in out Socket;
+                                     Value      : String) is
    begin
       This.setsockopt (UNSUBSCRIBE, Value);
-   end setsockopt_UNSUBSCRIBE;
+   end Remove_message_filter;
 
-   not overriding
-   procedure  setsockopt_UNSUBSCRIBE
+   procedure  Remove_message_filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) is
    begin
       This.setsockopt (UNSUBSCRIBE, To_String (Value));
-   end setsockopt_UNSUBSCRIBE;
-   not overriding
+   end Remove_message_filter;
 
-   procedure  setsockopt_RATE (This       : in out Socket;
-                               Value      : Natural) is
+   procedure  Remove_message_filter
+     (This       : in out Socket;
+      Value      : Ada.Streams.Stream_Element_Array) is
    begin
-      This.setsockopt (RATE, Value);
-   end setsockopt_RATE;
+      This.setsockopt (UNSUBSCRIBE, Value);
+   end Remove_message_filter;
 
    not overriding
-   procedure  setsockopt_RECOVERY_IVL (This       : in out Socket;
+   procedure  Set_multicast_data_rate (This       : in out Socket;
                                        Value      : Natural) is
    begin
-      This.setsockopt (RECOVERY_IVL, Value);
-   end setsockopt_RECOVERY_IVL;
+      This.setsockopt (RATE, Value);
+   end Set_multicast_data_rate;
+
    not overriding
-   procedure  setsockopt_MCAST_LOOP (This       : in out Socket;
-                                     Value      : Natural) is
+   procedure  set_multicast_recovery_interval (This       : in out Socket;
+                                               Value      : Duration) is
    begin
-      This.setsockopt (HWM, Value);
-   end setsockopt_MCAST_LOOP;
-   not overriding
-   procedure  setsockopt_SNDBUF (This       : in out Socket;
-                                 Value      : Natural) is
-   begin
-      This.setsockopt (SNDBUF, Value);
-   end setsockopt_SNDBUF;
+      This.setsockopt (RECOVERY_IVL, Integer (Value));
+   end set_multicast_recovery_interval;
    not overriding
 
-   procedure  setsockopt_RCVBUF (This       : in out Socket;
-                                 Value      : Natural) is
+   procedure  Set_multicast_loopback (This        : in out Socket;
+                                      Enable      : Boolean) is
+   begin
+      This.setsockopt (HWM, Enable);
+   end Set_multicast_loopback;
+   not overriding
+   procedure  Set_kernel_transmit_buffer_size (This       : in out Socket;
+                                               Value      : Natural) is
+   begin
+      This.setsockopt (SNDBUF, Value);
+   end Set_kernel_transmit_buffer_size;
+   not overriding
+
+   procedure  Set_kernel_receive_buffer_size (This       : in out Socket;
+                                              Value      : Natural) is
    begin
       This.setsockopt (RCVBUF, Value);
-   end setsockopt_RCVBUF;
+   end Set_kernel_receive_buffer_size;
 
    function get_impl (This : in Socket) return System.Address is
    begin
       return This.c;
    end get_impl;
+   -------------
+   function  getsockopt (This    : in Socket;
+                          Option  : Socket_Opt) return String is
+      pragma Unreferenced (This, Option);
+   begin
+      return ret : String (1 .. 0) do
+         raise Program_Error with "Not implemented";
+      end return;
+   end getsockopt;
+   not overriding
+   function  getsockopt (This    : in Socket;
+                         Option  : Socket_Opt) return Boolean is
+      pragma Unreferenced (This, Option);
+   begin
+      return ret : Boolean do
+         raise Program_Error with "Not implemented";
+      end return;
+   end getsockopt;
+
+   not overriding
+   function  getsockopt (This    : in Socket;
+                         Option  : Socket_Opt) return Natural is
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end getsockopt;
+   not overriding
+   function getsockopt
+     (This    : in  Socket;
+      Option  : Socket_Opt) return  Ada.Streams.Stream_Element_Array is
+   begin
+      return ret : Ada.Streams.Stream_Element_Array (1 .. 0) do
+         raise Program_Error with "Not implemented";
+      end return;
+   end getsockopt;
+
+   not overriding
+   procedure  getsockopt (This       : in out Socket;
+                          Option     : Socket_Opt;
+                          Value      : System.Address;
+                          Value_Size : Natural) is
+   begin
+         raise Program_Error with "Not implemented";
+   end getsockopt;
+
+
+
+   function More_message_parts_to_follow (This : Socket) return Boolean is
+      pragma Unreferenced (This);
+   begin
+      return ret : Boolean do
+         raise Program_Error with "Not implemented";
+      end return;
+   end More_message_parts_to_follow;
+
+   function Get_high_water_mark (This : Socket) return Natural is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_high_water_mark;
+
+   function Get_disk_offload_size (This : Socket) return Natural is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_disk_offload_size;
+
+   function Get_IO_thread_affinity (This : Socket) return Natural is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_IO_thread_affinity;
+
+   function Get_socket_identity
+     (This : Socket) return Ada.Streams.Stream_Element_Array  is
+      pragma Unreferenced (This);
+   begin
+      return ret : Ada.Streams.Stream_Element_Array (1 .. 0) do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_socket_identity;
+
+   function Get_multicast_data_rate (This : Socket) return Natural  is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_multicast_data_rate;
+
+   function Get_multicast_recovery_interval (This : Socket) return Duration is
+      pragma Unreferenced (This);
+   begin
+      return ret : Duration do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_multicast_recovery_interval;
+
+   function Get_multicast_loopback (This : Socket) return Boolean is
+      pragma Unreferenced (This);
+   begin
+      return ret : Boolean do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_multicast_loopback;
+
+   function Get_kernel_transmit_buffer_size (This : Socket) return Natural is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_kernel_transmit_buffer_size;
+
+   function Get_kernel_receive_buffer_size (This : Socket) return Natural is
+      pragma Unreferenced (This);
+   begin
+      return ret : Natural do
+         raise Program_Error with "Not implemented";
+      end return;
+   end Get_kernel_receive_buffer_size;
+   --------
+
+
 
 end ZMQ.Sockets;
