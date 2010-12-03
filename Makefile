@@ -32,7 +32,7 @@ examples:
 generate:
 	mkdir -p .temp
 	echo "#include <zmq.h>">.temp/x.c
-	(cd .temp;gcc  -c -fdump-ada-spec x.c)
+	(cd .temp;g++  -c -fdump-ada-spec x.c)
 	cat .temp/zmq_h.ads | sed "s-/usr/local/include/--" >src/zmq_h.ads
 
 setup:
