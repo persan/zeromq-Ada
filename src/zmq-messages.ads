@@ -36,6 +36,13 @@ with System;
 with Ada.Strings.Unbounded;
 
 package ZMQ.Messages is
+
+   --  A ØMQ message is a discrete unit of data passed between applications
+   --  or components of the same application.
+   --  ØMQ messages have no internal structure and from the point of view
+   --  of ØMQ itself they are considered to be opaque binary data.
+
+
    type Message is tagged limited private;
 
 

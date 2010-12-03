@@ -53,7 +53,7 @@ package body ZMQ is
       return ret : Version_Type do
          Low_Level.zmq_version (Major'Access,
                                 Minor'Access,
-                                Patch'Access); --#TODO fetch from library
+                                Patch'Access);
          ret := (Natural (Major), Natural (Minor), Natural (Patch));
       end return;
    end Library_Version;
