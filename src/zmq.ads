@@ -39,7 +39,7 @@ package ZMQ is
       Patch : Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (2, 0, 9);
+   Binding_Version : constant Version_Type := (2, 1, 0);
    function Library_Version return Version_Type;
 
    function image (item : Version_Type) return String;
@@ -48,4 +48,5 @@ private
    function Error_Message (no : Integer) return String;
    procedure Validate_Library_Version;
    --  Raiese ZMQ_Error if the underlaying library isent a valid version
+   pragma Linker_Options ("-lzmq");
 end ZMQ;
