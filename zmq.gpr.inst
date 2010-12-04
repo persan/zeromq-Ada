@@ -6,8 +6,8 @@ project Zmq is
 
    for Library_Name use "zmqAda";
    for Library_Dir use "../zmq/" & ZMQ_Kind;
-   for Source_Dirs use ("../../inlude/zmq");
-
+   for Source_Dirs use ("../../include/zmq");
+   for Externally_Built use "True";
    case ZMQ_Kind is
       when "static" =>
          for Library_Kind use "static";
