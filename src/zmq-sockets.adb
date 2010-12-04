@@ -400,6 +400,7 @@ package body ZMQ.Sockets is
    begin
       This.setsockopt (SWAP, Boolean'Pos (Value));
    end Set_disk_offload_size;
+
    not overriding
    procedure  Set_IO_thread_affinity (This       : in out Socket;
                                       Value      : Natural) is
@@ -498,22 +499,60 @@ package body ZMQ.Sockets is
    begin
       return This.c;
    end get_impl;
+
    -------------
-   function  getsockopt (This    : in Socket;
-                          Option  : Socket_Opt) return String is
-      pragma Unreferenced (This, Option);
+
+   not overriding
+   procedure  getsockopt (This       : in Socket;
+                          Option     : Socket_Opt;
+                          Value      : System.Address;
+                          Value_Size : out Natural) is
+      ret          : int;
+      Value_Size_i : aliased size_t;
    begin
-      return ret : String (1 .. 0) do
-         raise Program_Error with "Not implemented";
+      ret := Low_Level.zmq_getsockopt
+        (This.c,
+         Map (Option),
+         Value,
+         Value_Size_i'Access);
+      Value_Size := Natural (Value_Size_i);
+      if ret /= 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+         GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
+      end if;
+   end getsockopt;
+
+   not overriding
+   function  getsockopt (This    : in Socket;
+                         Option  : Socket_Opt) return unsigned_long is
+      Dummy_Value_Size : Natural;
+   begin
+      return ret : aliased unsigned_long do
+         This.getsockopt (Option, ret'Address, Dummy_Value_Size);
+         if Dummy_Value_Size /= 8 then
+            raise Program_Error with "Invalid getsockopt for this type";
+         end if;
       end return;
    end getsockopt;
+
+
+
+   function  getsockopt (This    : in Socket;
+                         Option  : Socket_Opt) return String is
+      Buffer     : aliased String (1 .. MAX_OPTION_SIZE);
+      Value_Size : Natural;
+
+   begin
+      This.getsockopt (Option, Buffer'Address, Value_Size);
+      return Buffer (1 .. Value_Size);
+   end getsockopt;
+
    not overriding
    function  getsockopt (This    : in Socket;
                          Option  : Socket_Opt) return Boolean is
-      pragma Unreferenced (This, Option);
    begin
       return ret : Boolean do
-         raise Program_Error with "Not implemented";
+         ret := unsigned_long'(This.getsockopt (Option)) /= 0;
       end return;
    end getsockopt;
 
@@ -522,112 +561,84 @@ package body ZMQ.Sockets is
                          Option  : Socket_Opt) return Natural is
    begin
       return ret : Natural do
-         raise Program_Error with "Not implemented";
+         ret := Natural (unsigned_long'(This.getsockopt (Option)));
       end return;
    end getsockopt;
    not overriding
+
    function getsockopt
      (This    : in  Socket;
       Option  : Socket_Opt) return  Ada.Streams.Stream_Element_Array is
-   begin
-      return ret : Ada.Streams.Stream_Element_Array (1 .. 0) do
-         raise Program_Error with "Not implemented";
-      end return;
-   end getsockopt;
+      Buffer     : aliased Stream_Element_Array (1 .. MAX_OPTION_SIZE);
+      Value_Size : Ada.Streams.Stream_Element_Offset;
 
-   not overriding
-   procedure  getsockopt (This       : in out Socket;
-                          Option     : Socket_Opt;
-                          Value      : System.Address;
-                          Value_Size : Natural) is
    begin
-         raise Program_Error with "Not implemented";
+      This.getsockopt (Option, Buffer'Address, Natural (Value_Size));
+      return Buffer (1 .. Value_Size);
    end getsockopt;
-
 
 
    function More_message_parts_to_follow (This : Socket) return Boolean is
-      pragma Unreferenced (This);
    begin
       return ret : Boolean do
-         raise Program_Error with "Not implemented";
+         ret := This.getsockopt (RCVMORE);
       end return;
    end More_message_parts_to_follow;
 
    function Get_high_water_mark (This : Socket) return Natural is
-      pragma Unreferenced (This);
    begin
       return ret : Natural do
-         raise Program_Error with "Not implemented";
+         ret := This.getsockopt (HWM);
       end return;
    end Get_high_water_mark;
 
    function Get_disk_offload_size (This : Socket) return Natural is
-      pragma Unreferenced (This);
    begin
       return ret : Natural do
-         raise Program_Error with "Not implemented";
+         ret := This.getsockopt (SWAP);
       end return;
    end Get_disk_offload_size;
 
-   function Get_IO_thread_affinity (This : Socket) return Natural is
-      pragma Unreferenced (This);
+   function Get_IO_thread_affinity (This : Socket) return Thread_Bitmap is
+      Value_Size : Natural;
    begin
-      return ret : Natural do
-         raise Program_Error with "Not implemented";
+      return ret : aliased Thread_Bitmap do
+         This.getsockopt (AFFINITY, ret'Address, Value_Size);
+         if Value_Size /= 8 then
+            raise Program_Error with "Invalid bitmap size " & Value_Size'Img;
+         end if;
       end return;
    end Get_IO_thread_affinity;
 
    function Get_socket_identity
      (This : Socket) return Ada.Streams.Stream_Element_Array  is
-      pragma Unreferenced (This);
    begin
-      return ret : Ada.Streams.Stream_Element_Array (1 .. 0) do
-         raise Program_Error with "Not implemented";
-      end return;
+      return This.getsockopt (IDENTITY);
    end Get_socket_identity;
 
    function Get_multicast_data_rate (This : Socket) return Natural  is
-      pragma Unreferenced (This);
    begin
-      return ret : Natural do
-         raise Program_Error with "Not implemented";
-      end return;
+      return This.getsockopt (RATE);
    end Get_multicast_data_rate;
 
    function Get_multicast_recovery_interval (This : Socket) return Duration is
-      pragma Unreferenced (This);
    begin
-      return ret : Duration do
-         raise Program_Error with "Not implemented";
-      end return;
+      return Duration (unsigned_long'(This.getsockopt (RECOVERY_IVL)));
    end Get_multicast_recovery_interval;
 
    function Get_multicast_loopback (This : Socket) return Boolean is
-      pragma Unreferenced (This);
    begin
-      return ret : Boolean do
-         raise Program_Error with "Not implemented";
-      end return;
+      return This.getsockopt (MCAST_LOOP);
    end Get_multicast_loopback;
 
    function Get_kernel_transmit_buffer_size (This : Socket) return Natural is
-      pragma Unreferenced (This);
    begin
-      return ret : Natural do
-         raise Program_Error with "Not implemented";
-      end return;
+      return This.getsockopt (SNDBUF);
    end Get_kernel_transmit_buffer_size;
 
    function Get_kernel_receive_buffer_size (This : Socket) return Natural is
-      pragma Unreferenced (This);
    begin
-      return ret : Natural do
-         raise Program_Error with "Not implemented";
-      end return;
+      return This.getsockopt (RCVBUF);
    end Get_kernel_receive_buffer_size;
-   --------
-
-
 
 end ZMQ.Sockets;

@@ -33,9 +33,11 @@
 with Ada.Streams;
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
-with System;
 with ZMQ.Messages;
 with ZMQ.Contexts;
+
+with System;
+private with Interfaces.C;
 package ZMQ.Sockets is
 
    type Socket_Type is
@@ -253,7 +255,9 @@ package ZMQ.Sockets is
    --   rather than held in memory.
    --  The value of defines the maximum size of the swap space in bytes.
 
-   function Get_IO_thread_affinity (This : Socket) return Natural;
+   type Thread_Bitmap is array (0 .. 63) of Boolean;
+   pragma Pack (Thread_Bitmap);
+   function Get_IO_thread_affinity (This : Socket) return Thread_Bitmap;
    --  Returns the I/O thread affinity for newly created connections
    --  on the specified socket.
    --  Affinity determines which threads from the ZMQ I/O thread pool
@@ -479,16 +483,21 @@ private
    function  getsockopt (This    : in Socket;
                          Option  : Socket_Opt) return Natural;
    not overriding
+   function  getsockopt
+     (This    : in Socket;
+      Option  : Socket_Opt) return Interfaces.C.unsigned_long;
+
+   not overriding
    function getsockopt
      (This    : in Socket;
       Option  : Socket_Opt) return Ada.Streams.Stream_Element_Array;
 
    not overriding
-   procedure  getsockopt (This       : in out Socket;
+   procedure  getsockopt (This       : in Socket;
                           Option     : Socket_Opt;
                           Value      : System.Address;
-                          Value_Size : Natural);
+                          Value_Size : out Natural);
 
-
+   MAX_OPTION_SIZE : constant := 256;
 
 end ZMQ.Sockets;
