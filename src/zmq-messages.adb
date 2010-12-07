@@ -269,4 +269,12 @@ package body ZMQ.Messages is
       return Self.Msg'Unrestricted_Access;
    end getImpl;
 
+   procedure process_data_generic
+     (Self   : Message;
+      Handle : access procedure (item : Element)) is
+      package conv is new System.Address_To_Access_Conversions (Element);
+   begin
+      Handle (conv.To_Pointer (Self.getData).all);
+   end process_data_generic;
+
 end ZMQ.Messages;

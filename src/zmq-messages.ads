@@ -92,7 +92,7 @@ package ZMQ.Messages is
    generic
       type Element is private;
       type Element_Access is access Element;
-      with procedure free (data : in out Element_Access);
+      with procedure free (data : in out Element_Access) is <>;
    procedure Initialize_Generic (Self   : in out Message;
                                  Data   : Element_Access);
 
@@ -103,7 +103,7 @@ package ZMQ.Messages is
       type Hint_Type is private;
       type Hint_Access is access Hint_Type;
       with procedure free
-        (data : in out Element_Access; hint : Hint_Access);
+        (data : in out Element_Access; hint : Hint_Access) is <>;
    procedure Initialize_Generic_With_Hint (Self  : in out Message;
                                            Data  : Element_Access;
                                            Hint  : Hint_Access);
@@ -129,10 +129,14 @@ package ZMQ.Messages is
       type Element is private;
    function  getData_Generic  (Self : Message)
                                return Element;
+   generic
+      type Element is private;
+   procedure process_data_generic
+     (Self   : Message;
+      Handle : access procedure (item : in Element));
 
    function getData (Self : Message) return System.Address;
    function getSize (Self : Message) return Natural;
-
 
 private
    type Message is tagged limited record
