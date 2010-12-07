@@ -10,7 +10,7 @@ compile:
 uninstall:
 	rm -rf ${PREFIX}/include/zmq ${PREFIX}/lib/zmq ${PREFIX}/lib/gnat/zmq.gpr
 
-install: uninstall
+install: compile uninstall
 	mkdir -p ${PREFIX}/include/zmq
 	mkdir -p ${PREFIX}/lib/zmq
 	mkdir -p ${PREFIX}/lib/gnat
