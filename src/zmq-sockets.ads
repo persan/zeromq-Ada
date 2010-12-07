@@ -58,6 +58,8 @@ package ZMQ.Sockets is
 
    function "+" (L, R : Socket_Flags) return Socket_Flags renames "or";
    No_Flags : constant Socket_Flags := 2#0000_0000_0000_0000#;
+   More     : constant Socket_Flags := 2#0000_0000_0000_0001#;
+   Shared   : constant Socket_Flags := 2#0000_0000_1000_0000#;
 
    not overriding
    procedure Initialize (This         : in out Socket;
@@ -91,7 +93,7 @@ package ZMQ.Sockets is
 
    not overriding
    procedure  Set_disk_offload_size (This       : in out Socket;
-                                     Value      : Boolean);
+                                     Value      : Natural);
    --  Sets the disk offload (swap) size < for the specified socket.
    --  A socket which has ZMQ_SWAP set to a non - zero value may exceed
 
@@ -118,6 +120,10 @@ package ZMQ.Sockets is
    --  See also zmq_init(3) for details on allocating the number
    --  of I/O threads for a specific context.
 
+   not overriding
+   procedure  Set_socket_identity
+     (This       : in out Socket;
+      Value      : String);
    not overriding
    procedure  Set_socket_identity
      (This       : in out Socket;
@@ -412,10 +418,14 @@ package ZMQ.Sockets is
                   Flags   : Socket_Flags := No_Flags)
                   return Ada.Strings.Unbounded.Unbounded_String;
 
+   procedure recv (This    : in Socket;
+                   Flags   : Socket_Flags := No_Flags);
+
+
    overriding
    procedure Finalize (this : in out Socket);
    procedure Close (this : in out Socket) renames Finalize;
-
+   --
 
 
    --  function "=" (Left, Right : in Context) return Boolean;

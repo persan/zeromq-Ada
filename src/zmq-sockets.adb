@@ -337,6 +337,16 @@ package body ZMQ.Sockets is
            & GNAT.Source_Info.Enclosing_Entity;
       end if;
    end recv;
+
+   procedure recv (This    : in Socket;
+      Flags   : Socket_Flags := No_Flags) is
+      dummy_Msg : Messages.Message;
+   begin
+      dummy_Msg.Initialize;
+      This.recv (dummy_Msg, Flags);
+      dummy_Msg.Finalize;
+   end recv;
+
    not overriding
    function recv (This    : in Socket;
                   Flags   : Socket_Flags := No_Flags) return String is
@@ -396,9 +406,9 @@ package body ZMQ.Sockets is
 
    not overriding
    procedure  Set_disk_offload_size (This       : in out Socket;
-                                     Value      : Boolean) is
+                                     Value      : Natural) is
    begin
-      This.setsockopt (SWAP, Boolean'Pos (Value));
+      This.setsockopt (SWAP, Value);
    end Set_disk_offload_size;
 
    not overriding
@@ -415,6 +425,14 @@ package body ZMQ.Sockets is
    begin
       This.setsockopt (IDENTITY, Value);
    end Set_socket_identity;
+
+   procedure  Set_socket_identity
+     (This       : in out Socket;
+      Value      : String) is
+   begin
+      This.setsockopt (IDENTITY, Value);
+   end Set_socket_identity;
+
 
    not overriding
    procedure  Establish_message_filter (This       : in out Socket;
