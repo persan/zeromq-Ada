@@ -27,6 +27,7 @@
 with Ada.Streams;
 with System;
 with Ada.Text_IO;
+with Ada.Finalization;
 package ZMQ.Utilities.Memory_Streams is
    use Ada;
    --  Memory_Streams implements stream functionality to be mapped to any
@@ -37,9 +38,12 @@ package ZMQ.Utilities.Memory_Streams is
    --     begin
    --        S.Set_Address (Real_Buffer'Address);
    --        S.Set_Length (Real_Buffer'Length);
-   --        S.Reset;
+   --
    --        String'Write (S'Access, "bulle");
-   --        S.Dump;
+   --        Integer'Write (S'Access, 123);
+   --
+   --        Memory_Stream'Write(Some_UDP_Stream, S);
+   --        -- Write the whole serialized buffer in one transaction.
    --     end;
 
    type Memory_Stream_Interface is limited interface;
@@ -135,20 +139,33 @@ package ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Dump
-     (This   : in Memory_Stream;
+     (This      : in Memory_Stream;
       Full_Buffer : in Boolean := False;
       Outf        : in Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output);
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
    overriding procedure Read
-     (Stream : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset);
 
    overriding procedure Write
-     (Stream : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : in Ada.Streams.Stream_Element_Array);
+
+
+   type Expand_Strategy is (As_Needed,
+                            Multiply_By_Two,
+                            Add_Initial_Size);
+   type Dynamic_Memory_Stream
+     (Initial_Size : Ada.Streams.Stream_Element_Offset;
+      Strategy     : Expand_Strategy) is new Memory_Stream with private;
+
+   overriding procedure Write
+     (This : in out Dynamic_Memory_Stream;
+      Item   : in Ada.Streams.Stream_Element_Array);
+
 
 private
    subtype large_buffer is
@@ -173,5 +190,43 @@ private
       Buffer_Length : Streams.Stream_Element_Count  := 0;
       Cursor        : Streams.Stream_Element_Offset := 0;
    end record;
+
+   procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : out Memory_Stream);
+   for Memory_Stream'Read use Read;
+
+   procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : in Memory_Stream);
+   for Memory_Stream'Write use Write;
+
+   type controler (controled : not null access Dynamic_Memory_Stream)
+     is new Ada.Finalization.Limited_Controlled with null record;
+
+   procedure Initialize (This : in out controler);
+   procedure Finalize   (This : in out controler);
+
+   type Dynamic_Memory_Stream
+     (Initial_Size : Streams.Stream_Element_Offset;
+      Strategy     : Expand_Strategy) is new Memory_Stream with record
+      C : controler (Dynamic_Memory_Stream'Access);
+   end record;
+
+   procedure Initialize (This : in out Dynamic_Memory_Stream);
+   procedure Finalize   (This : in out Dynamic_Memory_Stream);
+
+   procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : out Dynamic_Memory_Stream);
+   for Dynamic_Memory_Stream'Read use Read;
+
+   procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : in Dynamic_Memory_Stream);
+   for Dynamic_Memory_Stream'Write use Write;
+   procedure Expand
+     (This : in out Dynamic_Memory_Stream;
+      to_Size : Ada.Streams.Stream_Element_Offset);
 
 end ZMQ.Utilities.Memory_Streams;

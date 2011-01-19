@@ -27,6 +27,7 @@
 ------------------------------------------------------------------------------
 with Ada.IO_Exceptions;
 with GNAT.Memory_Dump;
+with System.Memory;
 package body ZMQ.Utilities.Memory_Streams is
 
    use Ada.Streams;
@@ -115,20 +116,20 @@ package body ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Read
-     (Stream : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : out Stream_Element_Array;
       Last   : out Stream_Element_Offset)
    is
       First : Stream_Element_Offset;
       LLast  : Stream_Element_Offset;
    begin
-      First :=  Stream.Cursor;
-      LLast := Stream.Cursor + Item'Length - 1;
-      if LLast > Stream.Buffer_Length then
+      First :=  This.Cursor;
+      LLast := This.Cursor + Item'Length - 1;
+      if LLast > This.Buffer_Length then
          raise  Ada.IO_Exceptions.End_Error;
       end if;
-      Item := Stream.Buffer.As_Pointer.all (First .. LLast);
-      Stream.Cursor := LLast + 1;
+      Item := This.Buffer.As_Pointer.all (First .. LLast);
+      This.Cursor := LLast + 1;
       Last := Item'Last;
    end Read;
 
@@ -138,19 +139,19 @@ package body ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Write
-     (Stream : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : in Stream_Element_Array)
    is
       First : Stream_Element_Offset;
       Last  : Stream_Element_Offset;
    begin
-      First :=  Stream.Cursor;
-      Last := Stream.Cursor + Item'Length - 1;
-      if Last > Stream.Buffer_Length then
+      First :=  This.Cursor;
+      Last := This.Cursor + Item'Length - 1;
+      if Last > This.Buffer_Length then
          raise  Ada.IO_Exceptions.Device_Error;
       end if;
-      Stream.Cursor := Last + 1;
-      Stream.Buffer.As_Pointer.all (First .. Last) := Item;
+      This.Cursor := Last + 1;
+      This.Buffer.As_Pointer.all (First .. Last) := Item;
    end Write;
 
    overriding
@@ -158,5 +159,96 @@ package body ZMQ.Utilities.Memory_Streams is
    begin
       This.Cursor := This.Buffer.As_Pointer.all'First;
    end Reset;
+
+   procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : out Memory_Stream) is
+   begin
+      raise Program_Error with
+        "Its not possible to read into a memory stream using 'read";
+   end Read;
+
+   procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : in Memory_Stream) is
+   begin
+      Ada.Streams.Stream_Element_Array'Write
+        (This,
+         Item.Buffer.As_Pointer.all
+           (Item.Buffer.As_Pointer.all'First .. Item.Cursor));
+   end Write;
+
+
+
+   procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : out Dynamic_Memory_Stream) is
+   begin
+      Read (This, Memory_Stream (Item));
+   end Read;
+
+   procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : in Dynamic_Memory_Stream) is
+   begin
+      Write (This, Memory_Stream (Item));
+   end Write;
+
+   procedure Write
+     (This : in out Dynamic_Memory_Stream;
+      Item   : in Ada.Streams.Stream_Element_Array) is
+   begin
+      if This.Cursor + Item'Length > This.Buffer_Length then
+         This.Expand (This.Cursor + Item'Length);
+      end if;
+      Memory_Stream (This).Write (Item);
+   end Write;
+
+   procedure Expand
+     (This : in out Dynamic_Memory_Stream;
+      to_Size : Ada.Streams.Stream_Element_Offset) is
+      new_Size : System.Memory.size_t := 0;
+      use System.Memory;
+   begin
+      while new_Size < size_t (to_Size) loop
+         case This.Strategy is
+         when As_Needed =>
+            new_Size := size_t (to_Size);
+         when Multiply_By_Two =>
+            new_Size := size_t (2 * This.Buffer_Length);
+         when Add_Initial_Size =>
+            new_Size := size_t (This.Buffer_Length + This.Initial_Size);
+         end case;
+      end loop;
+      This.Buffer.As_Address :=  System.Memory.Realloc
+        (This.Buffer.As_Address, new_Size);
+      This.Buffer_Length := Streams.Stream_Element_Count (new_Size);
+   end Expand;
+
+   procedure Initialize (This : in out Dynamic_Memory_Stream) is
+      use System.Memory;
+   begin
+      This.Buffer.As_Address :=
+        System.Memory.Alloc (size_t (This.Initial_Size));
+      This.Buffer_Length := This.Initial_Size;
+   end Initialize;
+
+   procedure Finalize   (This : in out Dynamic_Memory_Stream) is
+      use System.Memory;
+   begin
+      System.Memory.Free (This.Buffer.As_Address);
+   end Finalize;
+
+
+   procedure Initialize (This : in out controler) is
+      use System.Memory;
+   begin
+      This.controled.Initialize;
+   end Initialize;
+
+   procedure Finalize   (This : in out controler) is
+   begin
+      This.controled.Finalize;
+   end Finalize;
 
 end ZMQ.Utilities.Memory_Streams;
