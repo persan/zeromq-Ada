@@ -32,6 +32,7 @@
 
 with Interfaces.C.Strings;
 with ZMQ.Low_Level;
+with Ada.Assertions;
 package body ZMQ is
    use Interfaces.C;
    -------------------
@@ -68,8 +69,11 @@ package body ZMQ is
       s3 (s3'First + 1 .. s3'Last);
    end image;
    procedure Validate_Library_Version is
+      Lib_Version : constant Version_Type :=  Library_Version;
    begin
-      null;
+      Ada.Assertions.Assert ((Binding_Version.Major = Lib_Version.Major) and
+                               (Binding_Version.Minor = Lib_Version.Minor),
+                             "Incopatible Library" & image (Lib_Version));
    end Validate_Library_Version;
 
 end ZMQ;
