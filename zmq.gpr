@@ -97,9 +97,9 @@ project ZMQ is
       for Makefile  use project'Project_dir & "Makefile";
    end Make;
 
-   package Check is
-      for Default_Switches ("ada") use ("-rules", "-from=" & Project'Project_Dir & "/zmq.rules");
-   end Check;
+--   package Check is
+--      for Default_Switches ("ada") use ("-rules", "-from=" & Project'Project_Dir & "/zmq.rules");
+--   end Check;
 
    package Ide is
       for Vcs_Kind use "git";
