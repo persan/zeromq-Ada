@@ -2,27 +2,30 @@
 ifndef PREFIX
   PREFIX=$(dir $(shell dirname `which gnatls`))
 endif
+LIBDIR ?= ${PREFIX}/lib
 DESTDIR ?= 
 GNATFLAGS ?=
+ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
+GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
 compile:
-	gnatmake ${GNATFLAGS} -p -P zmq.gpr -XLIBRARY_TYPE=static
-	gnatmake  ${GNATFLAGS} -p -P zmq.gpr -XLIBRARY_TYPE=relocatable
+	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
+	 ${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=relocatable
 
 uninstall:
-	rm -rf ${DESTDIR}/${PREFIX}/include/zmq ${DESTDIR}/${PREFIX}/lib/zmq ${DESTDIR}/${PREFIX}/lib/gnat/zmq.gpr
+	rm -rf ${DESTDIR}/${PREFIX}/include/zmq ${DESTDIR}/${LIBDIR}/zmq ${DESTDIR}/${ADA_PROJECT_DIR}/zmq.gpr
 
 install: compile uninstall
 	mkdir -p ${DESTDIR}/${PREFIX}/include/zmq
-	mkdir -p ${DESTDIR}/${PREFIX}/lib/zmq
-	mkdir -p ${DESTDIR}/${PREFIX}/lib/gnat
+	mkdir -p ${DESTDIR}/${LIBDIR}/zmq
+	mkdir -p ${DESTDIR}/${ADA_PROJECT_DIR}
 
-	cp -r lib/* ${DESTDIR}/${PREFIX}/lib/zmq
+	cp -r lib/* ${DESTDIR}/${LIBDIR}/zmq
 
 	cp -f src/zmq.ad* ${DESTDIR}/${PREFIX}/include/zmq
 	cp -f src/zmq-*.ad* ${DESTDIR}/${PREFIX}/include/zmq
 	chmod -w ${DESTDIR}/${PREFIX}/include/zmq/*.ad?
 #	(cd ${DESTDIR}/${PREFIX}/lib; for i in `find -name lib*.so*`; do ln -s $$i ; done)s
-	cp zmq.gpr.inst ${DESTDIR}/${PREFIX}/lib/gnat/zmq.gpr
+	cp zmq.gpr.inst ${DESTDIR}/${ADA_PROJECT_DIR}/zmq.gpr
 
 	mkdir -p ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
 	cp examples/zmq-examples*.ad* ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
@@ -30,7 +33,7 @@ install: compile uninstall
 all: compile install
 
 samples:
-	gnatmake ${GNATFLAGS}  -p -P examples/zmq-examples.gpr
+	${GNATMAKE} -P examples/zmq-examples.gpr
 
 generate:
 	mkdir -p .temp
