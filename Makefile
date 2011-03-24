@@ -3,9 +3,10 @@ ifndef PREFIX
   PREFIX=$(dir $(shell dirname `which gnatls`))
 endif
 DESTDIR ?= 
+GNATFLAGS ?=
 compile:
-	gnatmake -p -P zmq.gpr -XLIBRARY_TYPE=static
-	gnatmake -p -P zmq.gpr -XLIBRARY_TYPE=relocatable
+	gnatmake ${GNATFLAGS} -p -P zmq.gpr -XLIBRARY_TYPE=static
+	gnatmake  ${GNATFLAGS} -p -P zmq.gpr -XLIBRARY_TYPE=relocatable
 
 uninstall:
 	rm -rf ${DESTDIR}/${PREFIX}/include/zmq ${DESTDIR}/${PREFIX}/lib/zmq ${DESTDIR}/${PREFIX}/lib/gnat/zmq.gpr
@@ -28,8 +29,8 @@ install: compile uninstall
 	cp examples/zmq-examples.gpr.inst ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada/zmq-examples.gpr
 all: compile install
 
-examples:
-	gnatmake -p -P examples/zmq-examples.gpr
+samples:
+	gnatmake ${GNATFLAGS}  -p -P examples/zmq-examples.gpr
 
 generate:
 	mkdir -p .temp
