@@ -30,7 +30,7 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       T.pub.Initialize (T.Ctx, Sockets.PUB);
 
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
-      T.Sub.setsockopt_SUBSCRIBE ("");
+      T.Sub.Establish_message_filter ("");
 
       T.Sub.Bind ("inproc://pub-sub");
       T.pub.Connect ("inproc://pub-sub");
