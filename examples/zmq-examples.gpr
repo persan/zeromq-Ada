@@ -32,7 +32,6 @@ project ZMQ.Examples is
       for Default_Switches ("ada") use ("-rules", "-from=" & ZMQ'Project_Dir & "/zmq.rules");
    end Check;
 
-   package Make renames ZMQ.Make;
    package Ide renames ZMQ.Ide;
 
 end ZMQ.Examples;
