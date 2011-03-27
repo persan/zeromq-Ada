@@ -36,7 +36,10 @@ generate:
 	echo "#include <zmq.h>">.temp/x.c
 	(cd .temp;g++  -c -fdump-ada-spec x.c)
 	cat .temp/zmq_h.ads | sed "s-/usr/local/include/--" >src/zmq_h.ads
-
+clean:
+	rm -rf .obj
+	${MAKE} -C tests clean
+	
 setup:
 	${MAKE} -C eBindings install
 
