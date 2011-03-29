@@ -31,7 +31,6 @@
 ------------------------------------------------------------------------------
 
 project ZMQ is
-   For Languages use ("Ada","Project File");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
@@ -59,12 +58,11 @@ project ZMQ is
 
       "zmq-utilities.ads",
       "zmq-utilities-memory_streams.adb",
-      "zmq-utilities-memory_streams.ads",
+      "zmq-utilities-memory_streams.ads"
 
       -- "Makefile",
       -- "README",
       -- "zmq.gpr.inst",
-      "zmq.gpr"
      );
    case ZMQ_Kind is
       when "static" =>
