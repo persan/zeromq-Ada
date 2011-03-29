@@ -6,10 +6,10 @@ LIBDIR ?= ${PREFIX}/lib
 DESTDIR ?= 
 GNATFLAGS ?=
 ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
-GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
+GNATMAKE = gnatmake -p -f -R 
 compile:
-	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
-	 ${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=relocatable
+	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static ${GNATFLAGS}
+	 ${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=relocatable ${GNATFLAGS}
 
 uninstall:
 	rm -rf ${DESTDIR}/${PREFIX}/include/zmq ${DESTDIR}/${LIBDIR}/zmq ${DESTDIR}/${ADA_PROJECT_DIR}/zmq.gpr
@@ -33,7 +33,7 @@ install: compile uninstall
 all: compile install
 
 samples:
-	${GNATMAKE} -P examples/zmq-examples.gpr
+	${GNATMAKE} -P examples/zmq-examples.gpr ${GNATFLAGS}
 
 generate:
 	mkdir -p .temp
@@ -45,4 +45,4 @@ setup:
 	${MAKE} -C eBindings install
 
 test:
-	${MAKE} -C tests
+	${MAKE} -C tests "GNATFLAGS=${GNATFLAGS}"
