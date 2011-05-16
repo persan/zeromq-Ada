@@ -31,7 +31,6 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
 
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
       T.Sub.Establish_message_filter("");
-
       T.Sub.Bind ("inproc://pub-sub");
       T.pub.Connect ("inproc://pub-sub");
    end initialize;
