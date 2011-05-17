@@ -8,6 +8,8 @@ project ZMQ.Examples is
                  "zmq-examples-server.adb",
                  "zmq-examples-publisher.adb",
                  "zmq-examples-subscriber.adb",
+                 "zmq-examples-push.adb",
+                 "zmq-examples-pull.adb",
                  "zmq-examples-multi_thread_server.adb");
 
    for Object_Dir use ".obj";
@@ -20,6 +22,8 @@ project ZMQ.Examples is
       for Executable("zmq-examples-server.adb") use "server";
       for Executable("zmq-examples-publisher.adb") use "publisher";
       for Executable("zmq-examples-subscriber.adb") use "subscriber";
+      for Executable("zmq-examples-push.adb") use "pusher";
+      for Executable("zmq-examples-pull.adb") use "puller";
       for Executable("zmq-examples-multi_thread_server.adb") use "multi_thread_server";
    end Builder;
 
