@@ -8,7 +8,7 @@ procedure ZMQ.examples.Publisher is
    publisher        : ZMQ.Sockets.Socket;
    resultset_string : constant String := "OK";
    Test             : String          := "Hello";
-   query_string : constant String := "Hello => FUCK" ;
+   query_string : constant String := "Hello => " ;
 begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
@@ -27,8 +27,7 @@ begin
        declare
            query        : ZMQ.Messages.Message;
        begin
-           put_line("FUCK");
-           query.Initialize (query_string);
+           query.Initialize (query_string & i'Img);
            publisher.send(query);
            query.Finalize;
        end;
