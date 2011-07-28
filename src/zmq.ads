@@ -48,5 +48,10 @@ private
    function Error_Message (no : Integer) return String;
    procedure Validate_Library_Version;
    --  Raiese ZMQ_Error if the underlaying library isent a valid version
+
    pragma Linker_Options ("-lzmq");
+   pragma Linker_Options ("-luuid");
+   pragma Linker_Options ("-lrt");
+   pragma Linker_Options ("-lpthread");
+
 end ZMQ;
