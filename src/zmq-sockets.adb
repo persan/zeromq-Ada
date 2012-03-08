@@ -119,7 +119,7 @@ package body ZMQ.Sockets is
       Free (addr);
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
    end Bind;
 
@@ -142,7 +142,7 @@ package body ZMQ.Sockets is
          size_t (Value_Size));
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
       end if;
    end setsockopt;
 
@@ -212,7 +212,7 @@ package body ZMQ.Sockets is
       Free (addr);
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
    end Connect;
 
@@ -238,7 +238,7 @@ package body ZMQ.Sockets is
       ret := Low_Level.zmq_send (This.c, Msg.getImpl, int (Flags));
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity;
+           GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Send;
 
@@ -339,7 +339,7 @@ package body ZMQ.Sockets is
    end recv;
 
    procedure recv (This    : in Socket;
-      Flags   : Socket_Flags := No_Flags) is
+                   Flags   : Socket_Flags := No_Flags) is
       dummy_Msg : Messages.Message;
    begin
       dummy_Msg.Initialize;
@@ -536,7 +536,7 @@ package body ZMQ.Sockets is
       Value_Size := Natural (Value_Size_i);
       if ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
       end if;
    end getsockopt;
 
@@ -545,7 +545,7 @@ package body ZMQ.Sockets is
                          Option  : Socket_Opt) return unsigned_long is
       Dummy_Value_Size : Natural;
    begin
-      return ret : aliased unsigned_long do
+      return ret : unsigned_long do
          This.getsockopt (Option, ret'Address, Dummy_Value_Size);
          if Dummy_Value_Size /= 8 then
             raise Program_Error with "Invalid getsockopt for this type";
@@ -620,7 +620,7 @@ package body ZMQ.Sockets is
    function Get_IO_thread_affinity (This : Socket) return Thread_Bitmap is
       Value_Size : Natural;
    begin
-      return ret : aliased Thread_Bitmap do
+      return ret :  Thread_Bitmap do
          This.getsockopt (AFFINITY, ret'Address, Value_Size);
          if Value_Size /= 8 then
             raise Program_Error with "Invalid bitmap size " & Value_Size'Img;

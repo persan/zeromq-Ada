@@ -56,7 +56,9 @@ package ZMQ.Sockets is
 
    type Socket_Flags is mod 2 ** 32;
 
+   pragma Warnings (off);
    function "+" (L, R : Socket_Flags) return Socket_Flags renames "or";
+   pragma Warnings (on);
    No_Flags : constant Socket_Flags := 2#0000_0000_0000_0000#;
    More     : constant Socket_Flags := 2#0000_0000_0000_0001#;
    Shared   : constant Socket_Flags := 2#0000_0000_1000_0000#;
