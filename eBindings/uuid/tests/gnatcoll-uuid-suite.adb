@@ -1,9 +1,9 @@
 
-with uuid.Test;
-package body uuid.Suite is
+with GNATCOLL.uuid.Test;
+package body GNATCOLL.uuid.Suite is
    use AUnit.Test_Suites;
    Result : aliased Test_Suite;
-   Test_1 : aliased Standard.uuid.Test.Test_Case;
+   Test_1 : aliased GNATCOLL.uuid.Test.Test_Case;
 
    -----------
    -- Suite --
@@ -15,4 +15,4 @@ package body uuid.Suite is
       return Result'Access;
    end Suite;
 
-end uuid.Suite;
+end GNATCOLL.uuid.Suite;

@@ -1,11 +1,7 @@
 with System;
-package body uuid is
+package body gnatcoll.uuid is
    use Interfaces.C;
    package bits_types_h is
-
-      subtype uu_time_t is long;  -- types.h:149:26
-
-      subtype uu_suseconds_t is long;  -- types.h:151:31
 
       type uu_timer_t is new System.Address;  -- types.h:161:27
    end bits_types_h;
@@ -26,15 +22,15 @@ package body uuid is
       TIMER_ABSTIME : constant := 1;  --  time.h:55
 
       type timeval is record
-         tv_sec  : aliased bits_types_h.uu_time_t;  -- time.h:71:14
-         tv_usec : aliased bits_types_h.uu_suseconds_t;  -- time.h:72:19
+         tv_sec  : aliased long;  -- time.h:71:14
+         tv_usec : aliased long;  -- time.h:72:19
       end record;
       pragma Convention (C_Pass_By_Copy, timeval);  -- time.h:70:3
 
    end bits_time_h;
 
    package time_h is
-      subtype time_t is bits_types_h.uu_time_t;  -- time.h:76:18
+      subtype time_t is long;  -- time.h:76:18
    end time_h;
 
    package uuid_uuid_h is
@@ -116,89 +112,121 @@ package body uuid is
 
    -----------------------------------------------------
 
-   procedure Clear (arg1 : in out UUID) is
+   procedure Clear (this : in out UUID) is
    begin
-      null;
+      uuid_uuid_h.uuid_clear(this.data(this.data'First)'Unrestricted_Access);
    end Clear;
 
    function "<" (l, r : UUID) return Boolean is
    begin
-      return uuid_uuid_h.uuid_compare (l.data (1)'Unrestricted_Access,
-                                       r.data (1)'Unrestricted_Access) < 0;
+      return uuid_uuid_h.uuid_compare (l.data (l.data'first)'Unrestricted_Access,
+                                       r.data (r.data'first)'Unrestricted_Access) < 0;
    end "<";
    function ">" (l, r : UUID) return Boolean is
    begin
-      return uuid_uuid_h.uuid_compare (l.data (1)'Unrestricted_Access,
-                                       r.data (1)'Unrestricted_Access) > 0;
+      return uuid_uuid_h.uuid_compare (l.data (l.data'first)'Unrestricted_Access,
+                                       r.data(r.data'first)'Unrestricted_Access) > 0;
    end ">";
 
    function "=" (l, r : UUID) return Boolean is
    begin
-      return uuid_uuid_h.uuid_compare (l.data (1)'Unrestricted_Access,
-                                       r.data (1)'Unrestricted_Access) = 0;
+      return uuid_uuid_h.uuid_compare (l.data (l.data'first)'Unrestricted_Access,
+                                       r.data (r.data'first)'Unrestricted_Access) = 0;
    end "=";
 
 
+   function Generate return  UUID is
+   begin
+      return ret : UUID do
+         uuid_uuid_h.uuid_generate (ret.data (ret.data'First)'Unrestricted_Access);
+      end return;
+   end Generate;
+
    procedure Generate (this : out UUID) is
    begin
-      uuid_uuid_h.uuid_generate (this.data (this.data'First)'Access);
+      this := Generate;
    end Generate;
 
    function Generate_Random return  UUID is
    begin
       return ret : UUID do
-         uuid_uuid_h.uuid_generate_random (ret.data (ret.data'First)'Access);
+         uuid_uuid_h.uuid_generate_random (ret.data (ret.data'First)'Unrestricted_Access);
       end return;
    end Generate_Random;
+   procedure Generate_Random (this : out UUID) is
+   begin
+      this := Generate_Random;
+   end;
+
+   procedure Generate_Time (this : out UUID) is
+   begin
+      this := Generate_Time;
+   end;
 
    function Generate_Time return  UUID is
    begin
       return ret : UUID do
-         uuid_uuid_h.uuid_generate_time (ret.data (ret.data'First)'Access);
+         uuid_uuid_h.uuid_generate_time (ret.data (ret.data'First)'Unrestricted_Access);
       end return;
    end Generate_Time;
 
-   function Is_Null (arg1 : UUID) return Boolean is
+   function Is_Null (this : UUID) return Boolean is
    begin
-      return uuid_uuid_h.uuid_is_null (arg1.data (arg1.data'First)'Unrestricted_Access) /= 0;
+      return uuid_uuid_h.uuid_is_null (this.data (this.data'First)'Unrestricted_Access) /= 0;
    end Is_Null;
 
-   function Parse (arg2 : String) return UUID is
+   function Parse (data : String) return UUID is
+      ret : UUID;
+      L_Data : constant string := data & ascii.NUL;
+      res    : int;
    begin
-      return ret : UUID do
-         null;
-      end return;
+      res := uuid_uuid_h.uuid_parse (L_Data (L_Data'First)'unrestricted_access,
+                                     ret.data (ret.data'First)'unrestricted_access);
+      if res /= 0 then
+         raise PARSE_ERROR with "Unable to parse: '" & data & "'";
+      else
+         return ret;
+      end if;
    end Parse;
 
-   function Unparse (arg1 : UUID) return String is
+   function Unparse (this : UUID) return String is
+      ret  : String (1 .. 37);
    begin
-      return "";
+      uuid_uuid_h.uuid_unparse (this.data (this.data'first)'Unrestricted_access, ret (1)'unrestricted_access);
+      return ret (1 .. 36);
    end Unparse;
 
-   function Unparse_Lower (arg1 : UUID) return String is
+   function Unparse_Lower (this : UUID) return String is
+      ret  : String (1 .. 37);
    begin
-      return "";
+      uuid_uuid_h.uuid_unparse_lower (this.data (this.data'first)'Unrestricted_access, ret (1)'unrestricted_access);
+      return ret(1..36);
    end Unparse_Lower;
 
-   function Unparse_Upper (arg1 : UUID) return String is
+   function Unparse_Upper (this : UUID) return String is
+      ret  : String (1 .. 37) ;
    begin
-      return "";
+      uuid_uuid_h.uuid_unparse_upper (this.data (this.data'first)'Unrestricted_access, ret (1)'unrestricted_access);
+      return ret (1 .. 36);
    end Unparse_Upper;
 
-   function time (arg1 : uuid;
-                  arg2 : access bits_time_h.timeval) return time_h.time_t is
-   begin
-      return time(arg1,arg2);
-   end time;
 
-   function Get_Type (arg1 : access UUID) return UUID_Type is
+   function Get_Type (this :  UUID) return UUID_Type is
+      ret : int := uuid_uuid_h.uuid_type (this.data (this.data'first)'Unrestricted_access);
    begin
-      return UUID_Type'First;
+      case ret is
+         when uuid_uuid_h.UUID_TYPE_DCE_TIME =>
+            return DCE_TIME;
+         when uuid_uuid_h.UUID_TYPE_DCE_RANDOM =>
+            return DCE_RANDOM;
+         when others =>
+            return DCE_UNDEFINED;
+      end case;
    end Get_Type;
 
-   function Get_Variant (arg1 : UUID) return UUID_Variant is
+   function Get_Variant (this : UUID) return UUID_Variant is
    begin
-      return UUID_Variant'First;
+      return UUID_Variant'Val (uuid_uuid_h.uuid_variant (this.data (this.data'first)'Unrestricted_access));
    end Get_Variant;
 
-end uuid;
+end gnatcoll.uuid;

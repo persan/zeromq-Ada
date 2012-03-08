@@ -4,7 +4,8 @@ project uuid.tests is
    for Languages use ("C","Ada");
    for source_dirs use (".","testcases");
    for object_dir use ".obj";
-   for main use ("uuid-test_main","ctest.c");
+   for exec_dir use "bin";
+   for main use ("gnatcoll-uuid-test_main","ctest.c");
    package compiler is
       for Default_Switches("Ada") use ("-gnatwa","-gnat05","-gnaty", "-gnaty-s");
    end compiler;

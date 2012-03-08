@@ -1,6 +1,6 @@
 with AUnit;
 with AUnit.Test_Cases;
-package uuid.Test is
+package GNATCOLL.uuid.Test is
 
    type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
 
@@ -11,4 +11,4 @@ package uuid.Test is
                   return AUnit.Test_String;
    --  Returns name identifying the test case
 
-end uuid.Test;
+end GNATCOLL.uuid.Test;

@@ -1,12 +1,24 @@
-with "libuuid";
+with "gnatcoll.gpr";
 project UUID is
+   Version := "1.0";
 
    for source_files use ("uuid.ads",
                          "uuid.adb");
    for Library_Name use "uuidAda";
-   for Library_Dir use "..";
-   for Library_Kind use "dynamic";
+
+   type UUID_Kind_Type is ("static", "relocatable");
+   UUID_Kind : UUID_Kind_Type :=  external ("LIBRARY_TYPE", "static");
    for Source_Dirs use ("../../include/uuid");
+   for Library_Kind use UUID_Kind;
+   for Library_Dir  use "../uuid/" & Project'Library_Kind;
+   for Library_Version use
+      "lib" & Project'Library_Name & ".so." & Version;
+
    for Externally_Built use "True";
+
+   package Linker is
+      for Linker_Options use ("-luuid");
+   end Linker;
+
 end UUID;
 

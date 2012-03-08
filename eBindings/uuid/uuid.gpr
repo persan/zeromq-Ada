@@ -1,18 +1,28 @@
-with "libuuid";
+with "gnatcoll";
 project UUID is
+   Version := "1.0";
 
    for Languages use ("C","Ada");
+   type UUID_Kind_Type is ("static", "relocatable");
+   UUID_Kind : UUID_Kind_Type :=  external ("LIBRARY_TYPE", "static");
 
    package Compiler is
       for Driver ("C") use "";
       for Default_Switches ("ada") use ("-g", "-O2", "-gnat05");
    end Compiler;
 
-   for Object_Dir use ".obj";
+   for Object_Dir use ".obj/" & UUID_Kind;
    for Library_Name use "uuidAda";
-   for Library_Dir use "lib";
-   for Library_Interface use ("uuid");
-   for Library_Kind use "dynamic";
+
+   for Library_Kind use UUID_Kind;
+   for Library_Dir  use "lib/" & Project'Library_Kind;
+   for Library_Version use
+     "lib" & Project'Library_Name & ".so." & Version;
+
+
+   package Linker is
+      for Linker_Options use ("-luuid");
+   end Linker;
 
 end UUID;
 

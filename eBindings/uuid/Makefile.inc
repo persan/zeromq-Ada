@@ -1,0 +1,1 @@
+PREFIX=/opt/GNAT/6.5.0w-20110122/bin/..
