@@ -1,18 +1,28 @@
-with "libdl.gpr";
+with "gnatcoll";
 project DL is
+   Version := "1.0";
 
    for Languages use ("C","Ada");
+   type DL_Kind_Type is ("static", "relocatable");
+   DL_Kind : DL_Kind_Type :=  external ("LIBRARY_TYPE", "static");
 
    package Compiler is
       for Driver ("C") use "";
       for Default_Switches ("ada") use ("-g", "-O2", "-gnat05");
    end Compiler;
 
-   for Object_Dir use ".obj";
+   for Object_Dir use ".obj/" & DL_Kind;
    for Library_Name use "dlAda";
-   for Library_Dir use "lib";
-   for Library_Interface use ("dl");
-   for Library_Kind use "dynamic";
+
+   for Library_Kind use DL_Kind;
+   for Library_Dir  use "lib/" & Project'Library_Kind;
+   for Library_Version use
+     "lib" & Project'Library_Name & ".so." & Version;
+
+
+   package Linker is
+      for Linker_Options use ("-ldl");
+   end Linker;
 
 end DL;
 

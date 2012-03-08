@@ -1,12 +1,14 @@
 with System;
-package Dl is
+package gnatcoll.Dl is
    pragma Preelaborate;
 
    type Dynamic_Library is tagged private;
 
-   type Flag is private;
-   function "+" (L , R Flag) return Flag;
-   function "or" (L , R Flag) return Flag;
+   type Flag is mod 2**32;
+
+   pragma warnings(off, """Or"" is being renamed as a different operator");
+   function "+" (L , R :Flag) return Flag renames "or";
+   pragma warnings(on, """Or"" is being renamed as a different operator");
 
    RTLD_LAZY : constant Flag;
    --  Perform lazy binding.
@@ -55,6 +57,9 @@ package Dl is
                    File_Name  : String;
                    Flags      : Flag := RTLD_LAZY);
 
+   function Open (File_Name  : String;
+                  Flags      : Flag := RTLD_LAZY) return Dynamic_Library;
+
    procedure Close (This : Dynamic_Library);
 
    function Sym (This        : Dynamic_Library;
@@ -68,7 +73,6 @@ private
    end record;
    function Error return String;  -- dlfcn.h:83:14
 
-   type Flag is mod 2**32;
    RTLD_LAZY     : constant Flag := 2#0000_0000_0000_0001#;
    RTLD_NOW      : constant Flag := 2#0000_0000_0000_0010#;
    RTLD_GLOBAL   : constant Flag := 2#0000_0001_0000_0000#;
@@ -76,4 +80,5 @@ private
    RTLD_NODELETE : constant Flag := 2#0001_0000_0000_0000#;
    RTLD_NOLOAD   : constant Flag := 2#0000_0000_0000_0100#;
    RTLD_DEEPBIND : constant Flag := 2#0000_0000_0000_1000#;
-end Dl;
+end gnatcoll.Dl;
+
