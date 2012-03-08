@@ -6,4 +6,8 @@ new\ file
 .temp
 gen
 ctest.c
+bin
+a.out
+err.ad?
+err-main.*
 

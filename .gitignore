@@ -7,4 +7,7 @@ new\ file
 make
 default.gpr
 temp_
+metrix.xml
+gnatcheck.out
+gnatcheck-source-list.out
 
