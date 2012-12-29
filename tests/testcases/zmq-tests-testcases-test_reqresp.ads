@@ -2,7 +2,7 @@ with AUnit;
 with AUnit.Test_Cases;
 with ZMQ.Contexts;
 with ZMQ.Sockets;
-package ZMQ.Tests.Testcases.Test_Pubsub is
+package ZMQ.Tests.Testcases.Test_REQRESP is
    type Test_Case;
 
    type Test_Case is new AUnit.Test_Cases.Test_Case with record
@@ -18,4 +18,4 @@ package ZMQ.Tests.Testcases.Test_Pubsub is
                   return AUnit.Message_String;
    --  Returns name identifying the test case
 
-end ZMQ.Tests.TestCases.Test_Pubsub;
+end ZMQ.Tests.TestCases.Test_REQRESP;

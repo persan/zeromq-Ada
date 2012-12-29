@@ -1,7 +1,7 @@
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
-package body ZMQ.Tests.Testcases.Test_Pubsub is
+package body ZMQ.Tests.Testcases.Test_REQRESP is
    use AUnit;
    use Ada.Strings.Unbounded;
 
@@ -28,13 +28,14 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       T : Test_Case renames Test_Case (Test);
    begin
       T.Ctx.Initialize;
-      T.Pub.Initialize (T.Ctx, Sockets.PUB);
 
-      T.Sub.Initialize (T.Ctx, Sockets.SUB);
-      T.Sub.Establish_Message_Filter ("");
+      T.Sub.Initialize (T.Ctx, Sockets.REP);
+      T.Sub.Bind ("inproc://req");
 
-      T.Sub.Bind ("inproc://pub-sub");
-      T.Pub.Connect ("inproc://pub-sub");
+      T.Pub.Initialize (T.Ctx, Sockets.REQ);
+      T.Pub.Connect ("inproc://req");
+
+
    end Initialize;
 
    -------------------------
@@ -46,6 +47,8 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    begin
       T.Pub.Send (MSG_STRING);
       T.Sub.Recv (Msg);
+      T.Sub.Send (Msg);
+      T.Pub.Recv (Msg);
       Assert (Msg = MSG_STRING, "Error");
    end Send;
 
@@ -72,4 +75,4 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       Register_Routine (T, Finalize'Access, "Finalize");
    end Register_Tests;
 
-end ZMQ.Tests.TestCases.Test_Pubsub;
+end ZMQ.Tests.TestCases.Test_REQRESP;

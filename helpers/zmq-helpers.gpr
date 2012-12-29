@@ -1,5 +1,5 @@
 with "../zmq.gpr";
-project Zmq.helpers is
+project ZMQ.helpers is
    for Main use ("getinfo.adb");
    for Object_Dir use ".obj";
    for Exec_Dir use ".";
@@ -8,5 +8,5 @@ project Zmq.helpers is
    --  package Binder   renames zmq.Binder;
    package IDE renames zmq.IDE;
 
-end Zmq.helpers;
+end ZMQ.helpers;
 

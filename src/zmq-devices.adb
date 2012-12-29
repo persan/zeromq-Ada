@@ -33,27 +33,27 @@
 with ZMQ.Low_Level;
 with Interfaces.C; use Interfaces.C;
 
-package body ZMQ.devices is
+package body ZMQ.Devices is
 
    ----------------
    -- initialize --
    ----------------
-
-   map : constant array (Device_Kind) of int :=
-           (Streamer  => Low_Level.Defs.ZMQ_STREAMER,
-            Forwarder => Low_Level.Defs.ZMQ_FORWARDER,
-            Queue     => Low_Level.Defs.ZMQ_QUEUE);
-   procedure initialize
-     (this : in out device;
-      Kind      : Device_Kind;
-      insocket  : ZMQ.Sockets.Socket;
-      outsocket : ZMQ.Sockets.Socket)
+   type Device_Kind_map is array (Device_Kind) of int;
+   Map : constant Device_Kind_map :=
+           (Streamer  => Low_Level.ZMQ_STREAMER,
+            Forwarder => Low_Level.ZMQ_FORWARDER,
+            Queue     => Low_Level.ZMQ_QUEUE);
+   procedure Initialize
+     (This      : in out Device;
+                         Kind      : Device_Kind;
+                         In_Socket  : ZMQ.Sockets.Socket;
+      Out_Ocket  : ZMQ.Sockets.Socket)
    is
    begin
-      this.impl :=
-        Low_Level.zmq_device (map (Kind),
-                              insocket.get_impl,
-                              outsocket.get_impl);
-   end initialize;
+      This.Impl :=
+        Low_Level.Zmq_Device (Map (Kind),
+                              In_Socket.Get_Impl,
+                              Out_Ocket.Get_Impl);
+   end Initialize;
 
-end ZMQ.devices;
+end ZMQ.Devices;

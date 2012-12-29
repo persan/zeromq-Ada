@@ -4,7 +4,7 @@ all:install
 
 install:
 	mkdir -p ${PREFIX}/lib/gnat
-	cp libzmq.gpr ${PREFIX}/lib/gnat
+	cp -f libzmq.gpr ${PREFIX}/lib/gnat
 	chmod -w ${PREFIX}/lib/gnat/libzmq.gpr
 
 clean:

@@ -29,6 +29,7 @@ package body ZMQ.Pollsets is
    ------------
 
    procedure append (this : in out Pollset; item : pollitem'Class) is
+      pragma Unreferenced (this, item);
    begin
       --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "append unimplemented");
@@ -40,6 +41,7 @@ package body ZMQ.Pollsets is
    ------------
 
    procedure remove (this : in out Pollset; item : pollitem'Class) is
+      pragma Unreferenced (this, item);
    begin
       --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "remove unimplemented");
@@ -54,6 +56,7 @@ package body ZMQ.Pollsets is
      (this    : in out Pollset;
       Timeout : Duration)
    is
+      pragma Unreferenced (this, Timeout);
    begin
       --  Generated stub: replace with real body!
       pragma Compile_Time_Warning (Standard.True, "poll unimplemented");

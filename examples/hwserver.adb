@@ -1,12 +1,5 @@
 -------------------------------------------------------------------------------
---                                                                           --
---                             0MQ Ada-binding                               --
---                                                                           --
---                                   Z M Q                                   --
---                                                                           --
---                                  S p e c                                  --
---                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--                   Copyright (c) 2010 Per Sandberg                         --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -29,29 +22,35 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
+--  Hello World server in Ada
+--  Binds REP socket to tcp:--*:5555
+--  Expects "Hello" from client, replies with "World"
 
-package ZMQ is
-   pragma Preelaborate;
-   ZMQ_Error : exception;
-   type Version_Type is record
-      Major : aliased Natural;
-      Minor : aliased Natural;
-      Patch : aliased Natural;
-   end record;
 
-   Binding_Version : constant Version_Type := (3, 3, 0);
-   function Library_Version return Version_Type;
+with ZMQ.Sockets;
+with ZMQ.Contexts;
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-   function Image (Item : Version_Type) return String;
+procedure HWServer is
+   Context  : ZMQ.Contexts.Context;
+   Socket   : ZMQ.Sockets.Socket;
+   inbuffer : Ada.Strings.Unbounded.Unbounded_String;
+begin
+   --  Prepare our context and socket
+   Context.Initialize (1);
+   Socket.Initialize (Context, ZMQ.Sockets.REP);
+   Socket.Bind ("tcp://*:5555");
 
-private
-   function Error_Message (No : Integer) return String;
-   procedure Validate_Library_Version;
-   --  Raiese ZMQ_Error if the underlaying library isent a valid version
+   loop
+      --  Wait for next request from client
+      inbuffer := Socket.recv;
+      Put_Line ("Received request:" & To_String (inbuffer));
 
-   pragma Linker_Options ("-lzmq");
-   pragma Linker_Options ("-luuid");
-   pragma Linker_Options ("-lrt");
-   pragma Linker_Options ("-lpthread");
+      --  Do some 'work'
+      delay 1.0;
 
-end ZMQ;
+      --  Send reply back to client
+      Socket.Send ("World");
+   end loop;
+end HWServer;

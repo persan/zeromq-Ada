@@ -1,0 +1,9 @@
+with "libzmq.gpr";
+project generate is
+   for languages use ("C++");
+   for object_dir use ".temp";
+   for source_Dirs use (".temp");
+   package compiler is
+      for Default_Switches("C++") use ("-fdump-ada-spec");
+   end compiler;
+end generate;

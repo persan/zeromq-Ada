@@ -33,23 +33,43 @@
 with Ada.Finalization;
 with System;
 package ZMQ.Contexts is
+   IO_THREADS_DFLT  : constant := 1;
+   MAX_SOCKETS_DFLT : constant := 1024;
 
    type Context is new Ada.Finalization.Limited_Controlled with private;
    type Any_Context is access all Context'Class;
 
 
-   not overriding
-   procedure Initialize (This : in out Context;
-                         App_Threads : Natural);
+
+   procedure Set_Number_Of_IO_Threads
+     (This : Context; Number_Of_IO_Threads : Positive := IO_THREADS_DFLT);
+   --  specifies the size of the ØMQ thread pool to handle I/O operations.
+   --  If your application is using only the inproc transport for messaging
+   --  you may set this to zero, otherwise set it to at least one.
+   --  This option only applies before creating any sockets on the context.
+
+   procedure  Set_Maximum_Number_Of_Sockets
+     (This : Context; Number_Of_Sockets : Positive := MAX_SOCKETS_DFLT);
+   --  Sets the maximum number of sockets allowed on the context.
+
+   function Get_Number_Of_IO_Threads
+     (This : Context)  return Positive;
+   --  Returns the size of the ØMQ thread pool for this context.
+
+   function  Get_Maximum_Number_Of_Sockets
+     (This : Context) return Positive;
+   --  Returns the maximum number of sockets allowed for this context.
+
+   function GetImpl (This : Context) return System.Address;
+   --  "Private" function to get lowlevel implementation handle.
+
+private
+   type Context is new Ada.Finalization.Limited_Controlled with record
+      C : System.Address := System.Null_Address;
+   end record;
+   overriding
+   procedure Initialize (This : in out Context);
 
    overriding
    procedure Finalize (This : in out Context);
-
-   function Is_Connected (This : Context) return Boolean;
-
-   function GetImpl (This : Context) return System.Address;
-private
-   type Context is new Ada.Finalization.Limited_Controlled with record
-      c : System.Address := System.Null_Address;
-   end record;
 end ZMQ.Contexts;

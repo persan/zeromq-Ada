@@ -37,9 +37,14 @@ samples:
 
 generate:
 	mkdir -p .temp
-	echo "#include <zmq.h>">.temp/x.c
-	(cd .temp;g++  -c -fdump-ada-spec x.c)
-	cat .temp/zmq_h.ads | sed "s-/usr/local/include/--" >src/zmq_h.ads
+	echo "#include <zmq.h>">.temp/x.cpp
+	gprbuild -p -c -Pgenerate.gpr x.cpp
+
+	python renames.py .temp/zmq_h.ads
+	gnatchop -w -gnat05 .temp/zmq_h.ads  src
+	gnatpp  -rnb -M127 src/zmq-low_level.ads -cargs -gnat05
+
+        
 clean:
 	rm -rf .obj
 	${MAKE} -C tests clean
