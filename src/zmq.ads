@@ -30,6 +30,10 @@
 -------------------------------------------------------------------------------
 
 
+
+--  This is the Ada binding to 0MQ  The Intelligent Transport Layer
+--  http://www.zeromq.org/
+
 package ZMQ is
    pragma Preelaborate;
    ZMQ_Error : exception;
@@ -39,7 +43,7 @@ package ZMQ is
       Patch : aliased Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (3, 3, 0);
+   Binding_Version : constant Version_Type := (3, 2, 0);
    function Library_Version return Version_Type;
 
    function Image (Item : Version_Type) return String;
@@ -48,10 +52,5 @@ private
    function Error_Message (No : Integer) return String;
    procedure Validate_Library_Version;
    --  Raiese ZMQ_Error if the underlaying library isent a valid version
-
-   pragma Linker_Options ("-lzmq");
-   pragma Linker_Options ("-luuid");
-   pragma Linker_Options ("-lrt");
-   pragma Linker_Options ("-lpthread");
 
 end ZMQ;
