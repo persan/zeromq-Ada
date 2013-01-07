@@ -29,6 +29,12 @@ def rename(p):
 
    buffer=buffer.split("\n")
    ret=[]
+   ret.append('--------------------------------------------------------------------')
+   ret.append('--                                                                --')
+   ret.append('--  Do not edit, this file is automaticly generated from "zmq.h"  --')
+   ret.append('--                                                                --')
+   ret.append('--------------------------------------------------------------------')
+   ret.append('')
    for line in buffer:
       ret.append(fix(line))
       if re.match("^package.*is",line):

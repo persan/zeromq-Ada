@@ -33,6 +33,7 @@ with ZMQ.Low_Level;
 with Interfaces.C.Strings;
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with System.Address_To_Access_Conversions;
 package body ZMQ.Sockets is
    use Interfaces.C.Strings;
    use Interfaces.C;
@@ -40,70 +41,55 @@ package body ZMQ.Sockets is
    use Ada.Streams;
    type Map_Array is  array (Socket_Opt) of int;
    Map :  constant Map_Array  :=
-           (AFFINITY                     => Low_Level.ZMQ_AFFINITY,
-            IDENTITY                     => Low_Level.ZMQ_IDENTITY,
-            SUBSCRIBE                    => Low_Level.ZMQ_SUBSCRIBE,
-            UNSUBSCRIBE                  => Low_Level.ZMQ_UNSUBSCRIBE,
-            RATE                         => Low_Level.ZMQ_RATE,
-            RECOVERY_IVL                 => Low_Level.ZMQ_RECOVERY_IVL,
-            SNDBUF                       => Low_Level.ZMQ_SNDBUF,
-            RCVBUF                       => Low_Level.ZMQ_RCVBUF,
-            RCVMORE                      => Low_Level.ZMQ_RCVMORE,
-            FD                           => Low_Level.ZMQ_FD,
-            EVENTS                       => Low_Level.ZMQ_EVENTS,
-            GET_TYPE                     => Low_Level.ZMQ_TYPE,
-            LINGER                       => Low_Level.ZMQ_LINGER,
-            RECONNECT_IVL                => Low_Level.ZMQ_RECONNECT_IVL,
-            BACKLOG                      => Low_Level.ZMQ_BACKLOG,
-            RECONNECT_IVL_MAX            => Low_Level.ZMQ_RECONNECT_IVL_MAX,
-            MAXMSGSIZE                   => Low_Level.ZMQ_MAXMSGSIZE,
-            SNDHWM                       => Low_Level.ZMQ_SNDHWM,
-            RCVHWM                       => Low_Level.ZMQ_RCVHWM,
-            MULTICAST_HOPS               => Low_Level.ZMQ_MULTICAST_HOPS,
-            RCVTIMEO                     => Low_Level.ZMQ_RCVTIMEO,
-            SNDTIMEO                     => Low_Level.ZMQ_SNDTIMEO,
-            IPV4ONLY                     => Low_Level.ZMQ_IPV4ONLY,
-            LAST_ENDPOINT                => Low_Level.ZMQ_LAST_ENDPOINT,
-            ROUTER_BEHAVIOR              => Low_Level.ZMQ_ROUTER_BEHAVIOR,
-            TCP_KEEPALIVE                => Low_Level.ZMQ_TCP_KEEPALIVE,
-            TCP_KEEPALIVE_CNT            => Low_Level.ZMQ_TCP_KEEPALIVE_CNT,
-            TCP_KEEPALIVE_IDLE           => Low_Level.ZMQ_TCP_KEEPALIVE_IDLE,
-            TCP_KEEPALIVE_INTVL          => Low_Level.ZMQ_TCP_KEEPALIVE_INTVL,
-            TCP_ACCEPT_FILTER            => Low_Level.ZMQ_TCP_ACCEPT_FILTER,
-            DELAY_ATTACH_ON_CONNECT      => Low_Level.ZMQ_DELAY_ATTACH_ON_CONNECT,
-            XPUB_VERBOSE                 => Low_Level.ZMQ_XPUB_VERBOSE
+           (ZMQ_TYPE                  => Low_Level.ZMQ_TYPE,
+            AFFINITY                  => Low_Level.ZMQ_AFFINITY,
+            IDENTITY                  => Low_Level.ZMQ_IDENTITY,
+            SUBSCRIBE                 => Low_Level.ZMQ_SUBSCRIBE,
+            UNSUBSCRIBE               => Low_Level.ZMQ_UNSUBSCRIBE,
+            RATE                      => Low_Level.ZMQ_RATE,
+            RECOVERY_IVL              => Low_Level.ZMQ_RECOVERY_IVL,
+            SNDBUF                    => Low_Level.ZMQ_SNDBUF,
+            RCVBUF                    => Low_Level.ZMQ_RCVBUF,
+            RCVMORE                   => Low_Level.ZMQ_RCVMORE,
+            FD                        => Low_Level.ZMQ_FD,
+            EVENTS                    => Low_Level.ZMQ_EVENTS,
+            GET_TYPE                  => Low_Level.ZMQ_TYPE,
+            LINGER                    => Low_Level.ZMQ_LINGER,
+            RECONNECT_IVL             => Low_Level.ZMQ_RECONNECT_IVL,
+            BACKLOG                   => Low_Level.ZMQ_BACKLOG,
+            RECONNECT_IVL_MAX         => Low_Level.ZMQ_RECONNECT_IVL_MAX,
+            MAXMSGSIZE                => Low_Level.ZMQ_MAXMSGSIZE,
+            SNDHWM                    => Low_Level.ZMQ_SNDHWM,
+            RCVHWM                    => Low_Level.ZMQ_RCVHWM,
+            MULTICAST_HOPS            => Low_Level.ZMQ_MULTICAST_HOPS,
+            RCVTIMEO                  => Low_Level.ZMQ_RCVTIMEO,
+            SNDTIMEO                  => Low_Level.ZMQ_SNDTIMEO,
+            IPV4ONLY                  => Low_Level.ZMQ_IPV4ONLY,
+            LAST_ENDPOINT             => Low_Level.ZMQ_LAST_ENDPOINT,
+            ROUTER_MANDATORY          => Low_Level.ZMQ_ROUTER_MANDATORY,
+            TCP_KEEPALIVE             => Low_Level.ZMQ_TCP_KEEPALIVE,
+            TCP_KEEPALIVE_CNT         => Low_Level.ZMQ_TCP_KEEPALIVE_CNT,
+            TCP_KEEPALIVE_IDLE        => Low_Level.ZMQ_TCP_KEEPALIVE_IDLE,
+            TCP_KEEPALIVE_INTVL       => Low_Level.ZMQ_TCP_KEEPALIVE_INTVL,
+            TCP_ACCEPT_FILTER         => Low_Level.ZMQ_TCP_ACCEPT_FILTER,
+            DELAY_ATTACH_ON_CONNECT   => Low_Level.ZMQ_DELAY_ATTACH_ON_CONNECT,
+            XPUB_VERBOSE              => Low_Level.ZMQ_XPUB_VERBOSE
            );
 
 
-   function Img (Item : Ada.Streams.Stream_Element_Array) return String is
-      Ret    : String (1 .. Item'Length * 2);
-      Cursor : Natural := 1;
-      type Map_String is array (Stream_Element (0) ..
-                                  Stream_Element (15)) of Character;
-      Hex    : constant Map_String := ('0', '1', '2', '3',
-                                        '4', '5', '6', '7',
-                                        '8', '9', 'A', 'B',
-                                        'C', 'D', 'E', 'F');
-   begin
-      for I in Item'Range loop
-         Ret (Cursor) := Hex (Item (I) / 16);
-         Cursor := Cursor + 1;
-         Ret (Cursor) := Hex (Item (I) mod 16);
-         Cursor := Cursor + 1;
-      end loop;
-      return Ret;
-   end Img;
 
    ----------------
    -- Initialize --
    ----------------
-   overriding procedure Initialize
-     (This         : in out Socket)
+   not overriding procedure Initialize
+     (This         : in out Socket;
+      With_Context : Contexts.Context;
+      Kind         : Socket_Type)
    is
    begin
 
-      This.C := Low_Level.zmq_socket (This.With_Context.GetImpl,
-                                      Socket_Type'Pos (This.Kind));
+      This.C := Low_Level.zmq_socket (With_Context.GetImpl,
+                                      Socket_Type'Pos (Kind));
       if This.C = Null_Address then
          raise ZMQ_Error with "Unable to initialize";
       end if;
@@ -272,21 +258,35 @@ package body ZMQ.Sockets is
    not overriding
 
 
-   procedure Send (This           : in out Socket;
-                   Msg_Addres     : System.Address;
-                   Msg_Length     : Natural;
-                   Flags          : Socket_Flags := No_Flags) is
+   procedure Send (This            : in out Socket;
+                   Msg_Address     : System.Address;
+                   Msg_Length      : Natural;
+                   Flags           : Socket_Flags := No_Flags) is
       Ret  : int;
    begin
-      Ret := Low_Level.zmq_send (This.C, Msg_Addres,
+      Ret := Low_Level.zmq_send (This.C, Msg_Address,
                                  size_t (Msg_Length),
                                  int (Flags));
-      if Ret /= 0 then
+      if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Send;
 
+   not overriding procedure Send
+     (This       : in out Socket;
+      Msg        : ZMQ.Messages.Message'Class;
+      Flags      : Socket_Flags := No_Flags) is
+      Ret  : int;
+   begin
+      Ret := Low_Level.zmq_msg_send (Msg.GetImpl, This.C,
+                                     int (Flags));
+      if Ret = -1 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+           GNAT.Source_Info.Enclosing_Entity;
+      end if;
+
+   end Send;
 
    --     -----------
    --     -- flush --
@@ -310,16 +310,16 @@ package body ZMQ.Sockets is
 
    not overriding procedure Recv
      (This    : in Socket;
-      Msg     : Messages.Message'Class;
+      Msg     : in out Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags)
    is
       Ret  : int;
    begin
-      Ret := Low_Level.zmq_recvmsg (This.C,
-                                    Msg.GetImpl,
-                                    int (Flags));
+      Ret := Low_Level.zmq_msg_recv (Msg.GetImpl,
+                                     This.C,
+                                     int (Flags));
 
-      if Ret /= 0 then
+      if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
            & GNAT.Source_Info.Enclosing_Entity;
       end if;
@@ -339,17 +339,28 @@ package body ZMQ.Sockets is
    function Recv (This       : in Socket;
                   Max_Length : Natural := 1024;
                   Flags      : Socket_Flags := No_Flags) return String is
-      Buffer : String (1 .. Max_Length);
+   --  Buffer : String (1 .. Max_Length);
    begin
-      This.Recv (Buffer'Address, Buffer'Length, Flags);
-
+      --  This.Recv (Buffer'Address, Buffer'Length, Flags);
+      raise Program_Error with "function Recv not implemented";
+      return "dummy";
    end Recv;
 
    procedure Recv (This    : in Socket;
                    Msg     : out Ada.Strings.Unbounded.Unbounded_String;
                    Flags   : Socket_Flags := No_Flags) is
+      Temp_Msg : Messages.Message;
    begin
-      Msg := Ada.Strings.Unbounded.To_Unbounded_String (This.Recv (Flags));
+      Temp_Msg.Initialize;
+      This.Recv (Temp_Msg, Flags);
+      declare
+         type Msg_Str is new String (1 .. Temp_Msg.GetSize);
+         package Conv is new System.Address_To_Access_Conversions (Msg_Str);
+      begin
+         Set_Unbounded_String
+           (Msg, String (Conv.To_Pointer (Temp_Msg.GetData).all));
+      end;
+      Temp_Msg.Finalize;
    end Recv;
 
 
@@ -382,13 +393,31 @@ package body ZMQ.Sockets is
    end Finalize;
 
 
+   not overriding
+   procedure Set_High_Water_Mark_For_Outbound_Messages
+     (This     : in out Socket;
+      Messages : Positive := 1000) is
+   begin
+      This.Setsockopt (Option => SNDHWM,
+                       Value  => Messages);
+
+   end Set_High_Water_Mark_For_Outbound_Messages;
+
+   not overriding
+   procedure Set_High_Water_Mark_For_Inbound_Messages
+     (This     : in out Socket;
+      Messages : Positive := 1000) is
+   begin
+      This.Setsockopt (Option => RCVHWM,
+                       Value  => Messages);
+   end Set_High_Water_Mark_For_Inbound_Messages;
 
 
    not overriding
-   procedure  Set_IO_Thread_Affinity (This       : in out Socket;
-                                      Value      : Natural) is
+   procedure  Set_IO_Thread_Affinity (This  : in out Socket;
+                                      Value : Thread_Bitmap) is
    begin
-      This.Setsockopt (AFFINITY, Value);
+      This.Setsockopt (AFFINITY, Value'Address, (Thread_Bitmap'Size + 1) / 8);
    end Set_IO_Thread_Affinity;
 
    not overriding
@@ -406,29 +435,36 @@ package body ZMQ.Sockets is
       This.Setsockopt (IDENTITY, Value);
    end Set_Socket_Identity;
 
+   not overriding
+   procedure Set_Socket_Identity
+     (This  : in out Socket;
+      Value : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.Set_Socket_Identity (Ada.Strings.Unbounded.To_String (Value));
+   end Set_Socket_Identity;
 
    not overriding
-   procedure  Establish_Message_Filter (This       : in out Socket;
+   procedure  Set_Message_Filter (This       : in out Socket;
                                         Value      : String) is
    begin
       This.Setsockopt (SUBSCRIBE, Value);
-   end Establish_Message_Filter;
+   end Set_Message_Filter;
 
    not overriding
 
-   procedure  Establish_Message_Filter
+   procedure  Set_Message_Filter
      (This       : in out Socket;
       Value      :  Ada.Streams.Stream_Element_Array) is
    begin
       This.Setsockopt (SUBSCRIBE, Value);
-   end Establish_Message_Filter;
+   end Set_Message_Filter;
 
-   procedure  Establish_Message_Filter
+   procedure  Set_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) is
    begin
       This.Setsockopt (SUBSCRIBE, To_String (Value));
-   end Establish_Message_Filter;
+   end Set_Message_Filter;
 
    not overriding
 
@@ -453,39 +489,296 @@ package body ZMQ.Sockets is
    end Remove_Message_Filter;
 
    not overriding
-   procedure  Set_Multicast_Data_Rate (This       : in out Socket;
-                                       Value      : Natural) is
+   procedure  Set_Multicast_Data_Rate
+     (This                : in out Socket;
+      Kilobits_Per_Second : Natural := 100) is
    begin
-      This.Setsockopt (RATE, Value);
+      This.Setsockopt (RATE, Kilobits_Per_Second);
    end Set_Multicast_Data_Rate;
 
    not overriding
-   procedure  Set_Multicast_Recovery_Interval (This       : in out Socket;
-                                               Value      : Duration) is
+   procedure  Set_Multicast_Recovery_Interval (This     : in out Socket;
+                                               Interval : Duration) is
    begin
-      This.Setsockopt (RECOVERY_IVL, Integer (Value));
+      This.Setsockopt (RECOVERY_IVL, Integer (Interval));
    end Set_Multicast_Recovery_Interval;
    not overriding
 
-   procedure  Set_Kernel_Transmit_Buffer_Size (This       : in out Socket;
-                                               Value      : Natural) is
+   procedure  Set_Kernel_Transmit_Buffer_Size (This  : in out Socket;
+                                               Size  : Natural) is
    begin
-      This.Setsockopt (SNDBUF, Value);
+      This.Setsockopt (SNDBUF, Size);
    end Set_Kernel_Transmit_Buffer_Size;
    not overriding
 
-   procedure  Set_Kernel_Receive_Buffer_Size (This       : in out Socket;
-                                              Value      : Natural) is
+   procedure  Set_Kernel_Receive_Buffer_Size (This  : in out Socket;
+                                              Size  : Natural) is
    begin
-      This.Setsockopt (RCVBUF, Value);
+      This.Setsockopt (RCVBUF, Size);
    end Set_Kernel_Receive_Buffer_Size;
+   --<<
+   not overriding
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This   : in out Socket;
+      Period : Duration) is
+   begin
+      This.Set_Linger_Period_For_Socket_Shutdown (Integer (Period * 1000.0));
+   end Set_Linger_Period_For_Socket_Shutdown;
+   not overriding
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This   : in out Socket;
+      Period : Ada.Real_Time.Time_Span) is
+   begin
+      This.Set_Linger_Period_For_Socket_Shutdown
+        (Ada.Real_Time.To_Duration (Period));
+   end Set_Linger_Period_For_Socket_Shutdown;
+   not overriding
+
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This        : in out Socket;
+      Miliseconds : Integer) is
+   begin
+      This.Setsockopt (Option => LINGER,
+                       Value  => Integer'Max (-1, Miliseconds));
+   end Set_Linger_Period_For_Socket_Shutdown;
+
+
+   procedure Set_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Duration) is
+   begin
+      This.Set_Reconnection_Interval (Integer (Interval * 1000.0));
+   end Set_Reconnection_Interval;
+
+   not overriding
+   procedure Set_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Ada.Real_Time.Time_Span) is
+   begin
+      This.Set_Reconnection_Interval
+        (Ada.Real_Time.To_Duration (Interval));
+   end Set_Reconnection_Interval;
+   not overriding
+
+   procedure Set_Reconnection_Interval
+     (This        : in out Socket;
+      Miliseconds : Integer) is
+   begin
+      This.Setsockopt (Option => RECONNECT_IVL,
+                       Value  => Integer'Max (-1, Miliseconds));
+   end Set_Reconnection_Interval;
+
+   procedure Set_Maximum_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Duration := 0.0) is
+   begin
+      This.Set_Maximum_Reconnection_Interval (Integer (Interval * 1000.0));
+   end Set_Maximum_Reconnection_Interval;
+
+   not overriding
+   procedure Set_Maximum_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Ada.Real_Time.Time_Span := Ada.Real_Time.Time_Span_Zero) is
+   begin
+      This.Set_Maximum_Reconnection_Interval
+        (Ada.Real_Time.To_Duration (Interval));
+   end Set_Maximum_Reconnection_Interval;
+
+   not overriding
+   procedure Set_Maximum_Reconnection_Interval
+     (This        : in out Socket;
+      Miliseconds : Integer := 0) is
+   begin
+      This.Setsockopt (Option => RECONNECT_IVL_MAX,
+                       Value  => Integer'Max (-1, Miliseconds));
+   end Set_Maximum_Reconnection_Interval;
+
+   procedure Set_Maximum_Queue_Length_Of_Outstanding_Connections
+     (This        : in out Socket;
+      Connections : Positive) is
+   begin
+      This.Setsockopt (Option => BACKLOG,
+                       Value  => Connections);
+   end Set_Maximum_Queue_Length_Of_Outstanding_Connections;
+
+   procedure Set_Maximum_Acceptable_Inbound_Message_Size
+     (This  : in out Socket;
+      Size  : Integer) is
+   begin
+      This.Setsockopt (Option => MAXMSGSIZE,
+                       Value  => Integer'Max (-1, Size));
+   end Set_Maximum_Acceptable_Inbound_Message_Size;
+
+   procedure Set_Maximum_Network_Hops_For_Multicast_Packets
+     (This      : in out Socket;
+      Max_Hops  : Positive := 1)
+   is
+   begin
+      This.Setsockopt (Option => MULTICAST_HOPS,
+                       Value  => Max_Hops);
+   end Set_Maximum_Network_Hops_For_Multicast_Packets;
+
+
+   procedure Set_Recieve_Time_Out
+     (This      : in out Socket;
+      Time      : Duration) is
+   begin
+      This.Set_Recieve_Time_Out (Integer (Time * 1000.0));
+   end Set_Recieve_Time_Out;
+   procedure Set_Recieve_Time_Out
+     (This      : in out Socket;
+      Time      : Ada.Real_Time.Time_Span) is
+   begin
+      This.Set_Recieve_Time_Out (Ada.Real_Time.To_Duration (Time));
+   end Set_Recieve_Time_Out;
+   procedure Set_Recieve_Time_Out
+     (This         : in out Socket;
+      Milliseconds : Integer) is
+   begin
+      This.Setsockopt (Option => RCVTIMEO,
+                       Value  => Integer'Max (-1, Milliseconds));
+   end Set_Recieve_Time_Out;
+
+   procedure Set_Send_Time_Out
+     (This      : in out Socket;
+      Time      : Duration) is
+   begin
+      This.Set_Send_Time_Out (Integer (Time * 1000.0));
+   end Set_Send_Time_Out;
+   procedure Set_Send_Time_Out
+     (This      : in out Socket;
+      Time      : Ada.Real_Time.Time_Span) is
+   begin
+      This.Set_Send_Time_Out (Ada.Real_Time.To_Duration (Time));
+   end Set_Send_Time_Out;
+   procedure Set_Send_Time_Out
+     (This         : in out Socket;
+      Milliseconds : Integer) is
+   begin
+      This.Setsockopt (Option => SNDTIMEO,
+                       Value  => Integer'Max (-1, Milliseconds));
+   end Set_Send_Time_Out;
+
+   not overriding
+   procedure Use_IPv4_Sockets_Only
+     (This         : in out Socket;
+      Value        : Boolean) is
+   begin
+      This.Setsockopt (Option => IPV4ONLY,
+                       Value  => Value);
+   end Use_IPv4_Sockets_Only;
+
+   not overriding
+   procedure Accept_Messages_Only_When_Connections_Are_Made
+     (This         : in out Socket;
+      Value        : Boolean) is
+   begin
+      This.Setsockopt (Option => DELAY_ATTACH_ON_CONNECT,
+                       Value  => Value);
+   end Accept_Messages_Only_When_Connections_Are_Made;
+
+   procedure Set_Accept_Only_Routable_Messages_On_ROUTER_Sockets
+     (This         : in out Socket;
+      Value        : Boolean) is
+   begin
+      This.Setsockopt (Option => ROUTER_MANDATORY,
+                       Value  => Value);
+   end Set_Accept_Only_Routable_Messages_On_ROUTER_Sockets;
+
+   not overriding
+   procedure Provide_All_Subscription_Messages_On_XPUB_Sockets
+     (This         : in out Socket;
+      Value        : Boolean) is
+   begin
+      This.Setsockopt (Option => XPUB_VERBOSE,
+                       Value  => Value);
+   end Provide_All_Subscription_Messages_On_XPUB_Sockets;
+
+   not overriding
+   procedure Override_SO_KEEPALIVE_Socket_Option
+     (This  : in out Socket;
+      Value : SO_KEEPALIVE_Type) is
+      Map : constant array (SO_KEEPALIVE_Type) of Integer := (-1, 0, 1);
+   begin
+      This.Setsockopt (Option => TCP_KEEPALIVE,
+                       Value  => Map (Value));
+
+   end Override_SO_KEEPALIVE_Socket_Option;
+
+   not overriding
+   procedure Override_TCP_KEEPCNT_IDLE_Socket_Option
+     (This  : in out Socket;
+      Value : Integer := -1) is
+   begin
+      if Value < -1 or Value = 0 then
+         raise Constraint_Error with "Value out of bounds:" & Value'Img;
+      end if;
+      This.Setsockopt (Option => TCP_KEEPALIVE_IDLE,
+                       Value  => Value);
+   end Override_TCP_KEEPCNT_IDLE_Socket_Option;
+   not overriding
+
+   procedure Override_TCP_KEEPCNT_CNT_Socket_Option
+     (This  : in out Socket;
+      Value : Integer := -1) is
+   begin
+      if Value < -1 or Value = 0 then
+         raise Constraint_Error with "Value out of bounds:" & Value'Img;
+      end if;
+      This.Setsockopt (Option => TCP_KEEPALIVE_CNT,
+                       Value  => Value);
+   end Override_TCP_KEEPCNT_CNT_Socket_Option;
+
+
+   not overriding
+   procedure Override_TCP_KEEPINTVL_socket_option
+     (This  : in out Socket;
+      Value : Integer := -1) is
+   begin
+      if Value < -1 or Value = 0 then
+         raise Constraint_Error with "Value out of bounds:" & Value'Img;
+      end if;
+      This.Setsockopt (Option => TCP_KEEPALIVE_INTVL,
+                       Value  => Value);
+
+   end Override_TCP_KEEPINTVL_socket_option;
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This   : in out Socket;
+      Filter : String) is
+   begin
+      This.Setsockopt (Option => TCP_ACCEPT_FILTER,
+                       Value  => Filter);
+   end Assign_Filters_To_Allow_New_TCP_Connections;
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This   : in out Socket;
+      Filter : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.Setsockopt (Option => TCP_ACCEPT_FILTER,
+                       Value  => To_String (Filter));
+   end Assign_Filters_To_Allow_New_TCP_Connections;
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This   : in out Socket;
+      Filter : Ada.Streams.Stream_Element_Array) is
+   begin
+      This.Setsockopt (Option => TCP_ACCEPT_FILTER,
+                       Value  => Filter);
+   end Assign_Filters_To_Allow_New_TCP_Connections;
+
+
+   --=======================================================================
+   --=======================================================================
+
 
    function Get_Impl (This : in Socket) return System.Address is
    begin
       return This.C;
    end Get_Impl;
 
-   -------------
+   --=======================================================================
+   --=======================================================================
 
    not overriding
    procedure  Getsockopt (This       : in Socket;
@@ -550,7 +843,6 @@ package body ZMQ.Sockets is
       end return;
    end Getsockopt;
    not overriding
-
    function Getsockopt
      (This    : in  Socket;
       Option  : Socket_Opt) return  Ada.Streams.Stream_Element_Array is
@@ -563,12 +855,34 @@ package body ZMQ.Sockets is
    end Getsockopt;
 
 
+   not overriding
+   function Retrieve_Socket_Type (This : Socket) return Socket_Type is
+   begin
+      return Socket_Type'Val (Natural'(This.Getsockopt (ZMQ_TYPE)));
+   end Retrieve_Socket_Type;
+
+   not overriding
    function More_Message_Parts_To_Follow (This : Socket) return Boolean is
    begin
       return Ret : Boolean do
          Ret := This.Getsockopt (RCVMORE);
       end return;
    end More_Message_Parts_To_Follow;
+
+
+   not overriding
+   function Get_High_Water_Mark_For_Outbound_Messages
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (SNDHWM);
+   end Get_High_Water_Mark_For_Outbound_Messages;
+
+   not overriding
+   function Get_High_Water_Mark_For_Inbound_Messages
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (RCVHWM);
+   end Get_High_Water_Mark_For_Inbound_Messages;
 
    function Get_IO_Thread_Affinity (This : Socket) return Thread_Bitmap is
       Value_Size : Natural;
@@ -586,6 +900,21 @@ package body ZMQ.Sockets is
    begin
       return This.Getsockopt (IDENTITY);
    end Get_Socket_Identity;
+   not overriding
+   function Get_Socket_Identity
+     (This : Socket)
+      return String is
+   begin
+      return This.Getsockopt (IDENTITY);
+   end Get_Socket_Identity;
+   not overriding
+   function Get_Socket_Identity
+     (This : Socket)
+      return Ada.Strings.Unbounded.Unbounded_String  is
+   begin
+      return To_Unbounded_String (String'(This.Getsockopt (IDENTITY)));
+   end Get_Socket_Identity;
+
 
    function Get_Multicast_Data_Rate (This : Socket) return Natural  is
    begin
@@ -607,4 +936,224 @@ package body ZMQ.Sockets is
       return This.Getsockopt (RCVBUF);
    end Get_Kernel_Receive_Buffer_Size;
 
+
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown
+     (This : Socket) return Duration is
+   begin
+      return Natural'(This.Get_Linger_Period_For_Socket_Shutdown) * 1000.0;
+   end Get_Linger_Period_For_Socket_Shutdown;
+
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown
+     (This : Socket) return Ada.Real_Time.Time_Span is
+   begin
+      return Ada.Real_Time.To_Time_Span
+        (This.Get_Linger_Period_For_Socket_Shutdown);
+   end Get_Linger_Period_For_Socket_Shutdown;
+
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (LINGER);
+   end Get_Linger_Period_For_Socket_Shutdown;
+
+
+   not overriding
+   function Get_Reconnection_Interval
+     (This : Socket) return Duration is
+   begin
+      return Natural'(This.Get_Reconnection_Interval) * 1000.0;
+   end Get_Reconnection_Interval;
+
+   not overriding
+   function Get_Reconnection_Interval
+     (This : Socket) return Ada.Real_Time.Time_Span is
+   begin
+      return Ada.Real_Time.To_Time_Span
+        (This.Get_Reconnection_Interval);
+   end Get_Reconnection_Interval;
+
+   not overriding
+   function Get_Reconnection_Interval
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (RECONNECT_IVL);
+   end Get_Reconnection_Interval;
+
+
+
+
+   not overriding
+   function Get_Maximum_Reconnection_Interval
+     (This : Socket) return Duration is
+   begin
+      return Natural'(This.Get_Maximum_Reconnection_Interval) * 1000.0;
+   end Get_Maximum_Reconnection_Interval;
+
+   not overriding
+   function Get_Maximum_Reconnection_Interval
+     (This : Socket) return Ada.Real_Time.Time_Span is
+   begin
+      return Ada.Real_Time.To_Time_Span
+        (This.Get_Maximum_Reconnection_Interval);
+   end Get_Maximum_Reconnection_Interval;
+
+   not overriding
+   function Get_Maximum_Reconnection_Interval
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (RECONNECT_IVL_MAX);
+   end Get_Maximum_Reconnection_Interval;
+
+   not overriding
+   function Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
+     (This : Socket) return Natural is
+   begin
+      return This.Getsockopt (BACKLOG);
+   end Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections;
+
+   not overriding
+   function Get_Maximum_Acceptable_Inbound_Message_Size
+     (This : Socket) return Integer  is
+   begin
+      return This.Getsockopt (MAXMSGSIZE);
+   end Get_Maximum_Acceptable_Inbound_Message_Size;
+
+   not overriding
+   function Get_Maximum_Network_Hops_For_Multicast_Packets
+     (This : Socket) return Positive  is
+   begin
+      return This.Getsockopt (MULTICAST_HOPS);
+   end Get_Maximum_Network_Hops_For_Multicast_Packets;
+
+   not overriding
+   function Get_Recieve_Timeout
+     (This : Socket) return Duration is
+      Temp : constant Integer := This.Get_Recieve_Timeout;
+   begin
+      if Temp < 0 then
+         return  Duration'Last;
+      else
+         return 1000.0 * Temp;
+      end if;
+   end Get_Recieve_Timeout;
+
+   not overriding
+   function Get_Recieve_Timeout
+     (This : Socket) return Ada.Real_Time.Time_Span is
+   begin
+      return Ada.Real_Time.To_Time_Span (This.Get_Recieve_Timeout);
+   end Get_Recieve_Timeout;
+
+   not overriding
+   function Get_Recieve_Timeout  -- Millisecond
+     (This : Socket) return Integer is
+   begin
+      return This.Getsockopt (RCVTIMEO);
+   end Get_Recieve_Timeout;
+
+
+   not overriding
+   function Get_Send_Timeout
+     (This : Socket) return Duration is
+      Temp : constant Integer := This.Get_Send_Timeout;
+   begin
+      if Temp < 0 then
+         return  Duration'Last;
+      else
+         return 1000.0 * Temp;
+      end if;
+   end Get_Send_Timeout;
+
+   not overriding
+   function Get_Send_Timeout
+     (This : Socket) return Ada.Real_Time.Time_Span is
+   begin
+      return Ada.Real_Time.To_Time_Span (This.Get_Send_Timeout);
+   end Get_Send_Timeout;
+
+   not overriding
+   function Get_Send_Timeout  -- Millisecond
+     (This : Socket) return Integer is
+   begin
+      return This.Getsockopt (SNDTIMEO);
+   end Get_Send_Timeout;
+
+   not overriding
+   function Get_IPv4_only_socket_override
+     (This : Socket) return Boolean is
+   begin
+      return This.Getsockopt (IPV4ONLY);
+   end Get_IPv4_only_socket_override;
+
+   not overriding
+   function Get_Attach_On_Connect
+     (This : Socket) return Boolean is
+   begin
+      return This.Getsockopt (DELAY_ATTACH_ON_CONNECT);
+   end Get_Attach_On_Connect;
+
+   not overriding
+   function Get_File_Descriptor
+     (This : Socket) return GNAT.OS_Lib.File_Descriptor is
+   begin
+      return GNAT.OS_Lib.File_Descriptor
+        (Interfaces.C.unsigned_long'(This.Getsockopt (FD)));
+   end Get_File_Descriptor;
+
+   not overriding
+   function Get_Last_Endpoint_Set
+     (This : Socket) return String is
+   begin
+      return This.Getsockopt (LAST_ENDPOINT);
+   end Get_Last_Endpoint_Set;
+
+   not overriding
+   function Get_Last_Endpoint_Set
+     (This : Socket) return Ada.Strings.Unbounded.Unbounded_String is
+   begin
+      return Ret : Ada.Strings.Unbounded.Unbounded_String do
+         Set_Unbounded_String (Ret, This.Get_Last_Endpoint_Set);
+      end return;
+   end Get_Last_Endpoint_Set;
+
+   not overriding
+   function Get_SO_KEEPALIVE_Socket_Option
+     (This : in Socket) return SO_KEEPALIVE_Type is
+      Map : constant array (-1 .. 1) of SO_KEEPALIVE_Type :=
+              (OS_Default, Disable, Enable);
+   begin
+      return Map (This.Getsockopt (LAST_ENDPOINT));
+   end Get_SO_KEEPALIVE_Socket_Option;
+
+   not overriding
+   function Get_TCP_KEEPCNT_IDLE_socket_option
+     (This : in Socket) return Integer is
+   begin
+      return This.Getsockopt (TCP_KEEPALIVE_IDLE);
+   end Get_TCP_KEEPCNT_IDLE_socket_option;
+
+   not overriding
+   function Get_TCP_KEEPCNT_CNT_socket_option
+     (This : in Socket) return Integer is
+   begin
+      return This.Getsockopt (TCP_KEEPALIVE_CNT);
+   end Get_TCP_KEEPCNT_CNT_socket_option;
+
+   not overriding
+   function Get_TCP_KEEPINTVL_Socket_Option
+     (This : in Socket) return Integer is
+   begin
+      return This.Getsockopt (TCP_KEEPALIVE_INTVL);
+   end Get_TCP_KEEPINTVL_Socket_Option;
+
+
+   procedure Set_Monitor
+     (This    : Socket;
+      Monitor : Any_Socket_Monitor) is
+   begin
+      null;
+   end Set_Monitor;
 end ZMQ.Sockets;

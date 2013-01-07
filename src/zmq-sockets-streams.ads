@@ -3,9 +3,7 @@ with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
 package ZMQ.Sockets.Streams is
    type Stream_Access is access all Root_Stream_Type'Class;
 
-   type Stream_Socket (With_Context : Contexts.Any_Context;
-                       Kind         : Socket_Type;
-                       Buffer_Size  : Positive) is new Socket with private;
+   type Stream_Socket (Buffer_Size  : Positive) is new Socket with private;
 
    function stream (this : Stream_Socket) return Stream_Access;
 
@@ -32,9 +30,7 @@ package ZMQ.Sockets.Streams is
 
 private
    type Stream_Socket
-     (With_Context : Contexts.Any_Context;
-      Kind         : Socket_Type;
-      Buffer_Size  : Positive) is new Socket (With_Context, Kind) with
+     (Buffer_Size  : Positive) is new Socket with
      null record;
 end ZMQ.Sockets.Streams;
 

@@ -32,7 +32,6 @@ procedure ZMQ.examples.prompt is
    s   : Sockets.Socket;
 
 begin
-   ctx.Initialize (1);
    s.Initialize (ctx, Sockets.PUB);
    s.Connect ("tcp://localhost:5555");
 

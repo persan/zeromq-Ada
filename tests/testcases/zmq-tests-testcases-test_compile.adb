@@ -4,6 +4,8 @@ with ZMQ.Contexts;
 with ZMQ.Sockets;
 with ZMQ.Messages;
 with ZMQ.Low_Level;
+with ZMQ.Proxys;
+with ZMQ.Devices;
 package body ZMQ.Tests.Testcases.Test_Compile is
    use AUnit;
 

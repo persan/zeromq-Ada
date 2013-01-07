@@ -34,7 +34,7 @@
 private with Interfaces.C;
 with ZMQ.Sockets;
 package ZMQ.Devices is
-   pragma Obsolescent ("Use ZMQ.Proxys");
+   pragma Obsolescent ("Use ZMQ.Proxys;");
 
    --  Devices are building blocks intended to serve as intermediate nodes
    --  in complex messaging topologies.

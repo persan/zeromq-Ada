@@ -51,7 +51,7 @@ package body ZMQ.Devices is
    is
    begin
       This.Impl :=
-        Low_Level.Zmq_Device (Map (Kind),
+        Low_Level.zmq_device (Map (Kind),
                               In_Socket.Get_Impl,
                               Out_Ocket.Get_Impl);
    end Initialize;

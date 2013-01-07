@@ -26,7 +26,6 @@
 
 with Ada.Streams;
 with System;
-with Ada.Text_IO;
 with Ada.Finalization;
 package ZMQ.Utilities.Memory_Streams is
    use Ada;
@@ -50,6 +49,15 @@ package ZMQ.Utilities.Memory_Streams is
    type Any_Memory_Stream_Interface is access
      all Memory_Stream_Interface'Class;
    --
+   procedure Read
+     (This : in out Memory_Stream_Interface;
+      Item   : out Ada.Streams.Stream_Element_Array;
+      Last   : out Ada.Streams.Stream_Element_Offset) is abstract;
+
+   procedure Write
+     (This : in out Memory_Stream_Interface;
+      Item   : in Ada.Streams.Stream_Element_Array) is abstract;
+
    function Get_Address
      (This : in Memory_Stream_Interface) return System.Address is abstract;
    --  Returns the Address to the real buffer
@@ -87,8 +95,7 @@ package ZMQ.Utilities.Memory_Streams is
 
    procedure Dump
      (This        : in Memory_Stream_Interface;
-      Full_Buffer : in Boolean := False;
-      Outf        : in Text_IO.File_Access := Text_IO.Standard_Output) is null;
+      Full_Buffer : in Boolean := False) is null;
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
@@ -140,8 +147,7 @@ package ZMQ.Utilities.Memory_Streams is
    overriding
    procedure Dump
      (This      : in Memory_Stream;
-      Full_Buffer : in Boolean := False;
-      Outf        : in Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output);
+      Full_Buffer : in Boolean := False);
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 

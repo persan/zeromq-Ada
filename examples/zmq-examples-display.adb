@@ -32,15 +32,13 @@ procedure ZMQ.examples.Display is
 
 
 begin
-
-   Context.Initialize (1);
    Socket.Initialize (Context, Sockets.SUB);
-   Socket.Establish_message_filter ("");
+   Socket.Establish_Message_Filter ("");
    Socket.Bind ("tcp://lo:5555");
    Ada.Text_IO.Put_Line ("Connected");
    Read_Loop : loop
       declare
-         Buffer : constant String := Socket.recv;
+         Buffer : constant String := Socket.Recv;
       begin
          Ada.Text_IO.Put_Line (Buffer);
          exit Read_Loop when Buffer = END_MESSAGE;

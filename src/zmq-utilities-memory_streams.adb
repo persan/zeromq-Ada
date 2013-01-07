@@ -34,9 +34,7 @@ package body ZMQ.Utilities.Memory_Streams is
    overriding
    procedure Dump
      (This        : in Memory_Stream;
-      Full_Buffer : in Boolean := False;
-      Outf        : in Text_IO.File_Access := Text_IO.Standard_Output) is
-      pragma Unreferenced (Outf);
+      Full_Buffer : in Boolean := False) is
       Buffer : Large_Buffer_Access renames This.Buffer.As_Pointer;
    begin
       if Full_Buffer then

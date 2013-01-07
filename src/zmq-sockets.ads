@@ -36,7 +36,8 @@ with ZMQ.Contexts;
 with ZMQ.Messages;
 with System;
 with GNAT.OS_Lib;
-private with Interfaces.C;
+with Interfaces.C;
+with Ada.Real_Time;
 package ZMQ.Sockets is
 
    type Socket_Type is
@@ -52,13 +53,11 @@ package ZMQ.Sockets is
       XPUB,
       XSUB);
 
-   type Socket
-     (With_Context : Contexts.Any_Context;
-      Kind         : Socket_Type) is
+   type Socket is
      new Ada.Finalization.Limited_Controlled  with private;
+   type Any_Socket is access all Socket'Class;
 
-
-
+   Null_Socket : constant Socket;
 
    type Socket_Flags is mod 2 ** 32;
 
@@ -69,6 +68,11 @@ package ZMQ.Sockets is
    More     : constant Socket_Flags := 2#0000_0000_0000_0001#;
    Shared   : constant Socket_Flags := 2#0000_0000_1000_0000#;
 
+   not overriding
+   procedure Initialize
+     (This         : in out Socket;
+      With_Context : Contexts.Context;
+      Kind         : Socket_Type);
 
    not overriding
    procedure Bind
@@ -80,11 +84,38 @@ package ZMQ.Sockets is
      (This    : in out Socket;
       Address : Ada.Strings.Unbounded.Unbounded_String);
 
+   type Thread_Bitmap is array (0 .. 63) of Boolean;
+   pragma Pack (Thread_Bitmap);
+
+   not overriding
+   procedure Set_High_Water_Mark_For_Outbound_Messages
+     (This  : in out Socket;
+      Messages : Positive := 1000);
+   --  Sets the high water mark for outbound messages on the specified socket.
+   --  The high water mark is a hard limit on the maximum number of outstanding
+   --  messages ØMQ shall queue in memory for any single peer that the
+   --  specified socket is communicating with.
+   --  If this limit has been reached the socket enters an exceptional state
+   --  and depending on the socket type, ØMQ will take appropriate action
+   --  such as blocking or dropping sent messages.
+
+   not overriding
+   procedure Set_High_Water_Mark_For_Inbound_Messages
+     (This  : in out Socket;
+      Messages : Positive := 1000);
+   --  Sets the high water mark for inbound messages on the specified socket.
+   --  The high water mark is a hard limit on the maximum number of outstanding
+   --  messages ØMQ shall queue in memory for any single peer that the
+   --  specified socket is communicating with.
+   --  If this limit has been reached the socket enters an exceptional state
+   --  and depending on the socket type, ØMQ will take appropriate action
+   --  such as blocking or dropping sent messages.
+
 
    not overriding
    procedure Set_IO_Thread_Affinity
      (This  : in out Socket;
-      Value : Natural);
+      Value : Thread_Bitmap);
    --  Sets the I/O thread affinity for newly created connections on the
    --  specified socket.
    --  Affinity determines which threads from the 0MQ I/O thread pool
@@ -107,6 +138,10 @@ package ZMQ.Sockets is
    not overriding
    procedure Set_Socket_Identity
      (This  : in out Socket;
+      Value : Ada.Strings.Unbounded.Unbounded_String);
+   not overriding
+   procedure Set_Socket_Identity
+     (This  : in out Socket;
       Value : Ada.Streams.Stream_Element_Array);
    --  Sets the identity of the specified socket.
    --  Socket identity determines if existing 0MQ infastructure
@@ -124,15 +159,15 @@ package ZMQ.Sockets is
    --  by 0MQ infrastructure.
 
    not overriding
-   procedure Establish_Message_Filter
+   procedure Set_Message_Filter
      (This  : in out Socket;
       Value : String);
    not overriding
-   procedure Establish_Message_Filter
+   procedure Set_Message_Filter
      (This  : in out Socket;
       Value : Ada.Strings.Unbounded.Unbounded_String);
    not overriding
-   procedure Establish_Message_Filter
+   procedure Set_Message_Filter
      (This  : in out Socket;
       Value : Ada.Streams.Stream_Element_Array);
    --  Establishes a new message filter on a SUB socket.
@@ -168,15 +203,15 @@ package ZMQ.Sockets is
 
    not overriding
    procedure Set_Multicast_Data_Rate
-     (This  : in out Socket;
-      Value : Natural);
+     (This                : in out Socket;
+      Kilobits_Per_Second : Natural := 100);
    --  Sets the maximum send or receive data rate for multicast transports
    --  such as PGM using the specified socket.
 
    not overriding
    procedure Set_Multicast_Recovery_Interval
-     (This  : in out Socket;
-      Value : Duration);
+     (This     : in out Socket;
+      Interval : Duration);
    --  Sets the recovery interval in seconds for multicast transports using
    --  the specified socket.
    --  The recovery interval determines the maximum time in seconds that a
@@ -192,7 +227,7 @@ package ZMQ.Sockets is
    not overriding
    procedure Set_Kernel_Transmit_Buffer_Size
      (This  : in out Socket;
-      Value : Natural);
+      Size  : Natural);
    --  Sets the underlying kernel transmit buffer size for the socket
    --  to the specified size in bytes.
    --  A value of zero means leave the OS default unchanged.
@@ -202,30 +237,270 @@ package ZMQ.Sockets is
    not overriding
    procedure Set_Kernel_Receive_Buffer_Size
      (This  : in out Socket;
-      Value : Natural);
+      Size  : Natural);
    --  Sets the underlying kernel receive buffer size for the socket to
    --  the specified size in bytes.
    --  A value of zero means leave the OS default unchanged.
    --  For details refer to your operating system documentation for the
    --  SO_RCVBUF socket option.
 
+   not overriding
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This   : in out Socket;
+      Period : Duration);
+   not overriding
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This   : in out Socket;
+      Period : Ada.Real_Time.Time_Span);
+   not overriding
+   procedure Set_Linger_Period_For_Socket_Shutdown
+     (This        : in out Socket;
+      Miliseconds : Integer);
+   --  The linger period determines how long pending messages which have yet
+   --    to be sent to a peer shall linger in memory after a socket is closed.
+   --    and further affects the termination of the socket's context.
+   --  The following outlines the different behaviours:
+   --    The default value of 'first specifies an infinite linger period.
+   --      Pending messages shall not be discarded after a call to close;
+   --      attempting to terminate the socket's context blocks until all
+   --      pending messages have been sent to a peer.
+   --    The value of 0 specifies no linger period.
+   --      Pending messages shall be discarded immediately when the
+   --      socket is closed.
+   --      Positive values specify an upper bound for the linger period.
+   --      Pending messages shall not be discarded after a call to close();
+   --      attempting to terminate the socket's context blocks until either
+   --      all pending messages have been sent to a peer,
+   --      or the linger period expires, after which any pending
+   --      messages are discarded.
 
 
+   not overriding
+   procedure Set_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Duration);
+   not overriding
+   procedure Set_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Ada.Real_Time.Time_Span);
+   not overriding
+   procedure Set_Reconnection_Interval
+     (This        : in out Socket;
+      Miliseconds : Integer);
+   --  Set the initial reconnection interval for the specified socket.
+   --   The reconnection interval is the period ØMQ shall wait between attempts
+   --   to reconnect disconnected peers when using connection-oriented
+   --   transports.
+   --  A negative value means no reconnection.
+
+   not overriding
+   procedure Set_Maximum_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Duration := 0.0);
+   not overriding
+   procedure Set_Maximum_Reconnection_Interval
+     (This     : in out Socket;
+      Interval : Ada.Real_Time.Time_Span := Ada.Real_Time.Time_Span_Zero);
+   not overriding
+   procedure Set_Maximum_Reconnection_Interval
+     (This        : in out Socket;
+      Miliseconds : Integer := 0);
+   --  Set the maximum reconnection interval for the specified socket.
+   --  This is the maximum period ØMQ shall wait between attempts to reconnect.
+   --  On each reconnect attempt, the previous interval shall be doubled untill
+   --   Maximum_Reconnection_Interval is reached.
+   --  This allows for exponential backoff strategy.
+   --  Default value means no exponential backoff is performed and reconnect
+   --   interval calculations are only based on Reconnection_Interval.
+
+   not overriding
+   procedure Set_Maximum_Queue_Length_Of_Outstanding_Connections
+     (This        : in out Socket;
+      Connections : Positive);
+   --  Set the maximum length of the queue of outstanding peer connections
+   --  for the specified socket;
+   --  this only applies to connection-oriented transports.
+   --  For details refer to your operating system documentation for the
+   --  listen function.
+
+   not overriding
+   procedure Set_Maximum_Acceptable_Inbound_Message_Size
+     (This  : in out Socket;
+      Size  : Integer);
+   --  Limits the size of the inbound message.
+   --  If a peer sends a message larger than SIZE it is disconnected.
+   --  A negative means no limit.
+
+   not overriding
+   procedure Set_Maximum_Network_Hops_For_Multicast_Packets
+     (This      : in out Socket;
+      Max_Hops  : Positive := 1);
+   --  Sets the time-to-live field in every multicast packet sent
+   --  from this socket. The default is 1 which means that the
+   --  multicast packets don't leave the local network.
+
+   not overriding
+   procedure Set_Recieve_Time_Out
+     (This      : in out Socket;
+      Time      : Duration);
+   not overriding
+   procedure Set_Recieve_Time_Out
+     (This      : in out Socket;
+      Time      : Ada.Real_Time.Time_Span);
+   not overriding
+   procedure Set_Recieve_Time_Out
+     (This         : in out Socket;
+      Milliseconds : Integer);
+   --  Sets the timeout for receive operation on the socket.
+   --  If the value is 0, recv will fail immediately,
+   --  with a EAGAIN error if there is no message to receive.
+   --  If the value is Negative, it will block until a message is available.
+   --  For all other values, it will wait for a message for that amount of time
+   --   before Failing with an EAGAIN error.
+
+   not overriding
+   procedure Set_Send_Time_Out
+     (This      : in out Socket;
+      Time      : Duration);
+   not overriding
+   procedure Set_Send_Time_Out
+     (This      : in out Socket;
+      Time      : Ada.Real_Time.Time_Span);
+   not overriding
+   procedure Set_Send_Time_Out
+     (This         : in out Socket;
+      Milliseconds : Integer);
+   --  Sets the timeout for send operation on the socket.
+   --  If the value is zero, send will fail immediately, with a EAGAIN error
+   --  if the message cannot be sent.
+   --  If the value is negative, it will block until the message is sent.
+   --  For all other values, it will try to send the message for that amount
+   --  of time before failing with an EAGAIN error.
+
+   not overriding
+   procedure Use_IPv4_Sockets_Only
+     (This         : in out Socket;
+      Value        : Boolean);
+   --  Sets the underlying native socket type.
+   --  If set to True will use IPv4 sockets, while the value of False
+   --  will use IPv6 sockets.
+   --  An IPv6 socket lets applications connect to and accept connections
+   --  from both IPv4 and IPv6 hosts.
+
+   not overriding
+   procedure Accept_Messages_Only_When_Connections_Are_Made
+     (This         : in out Socket;
+      Value        : Boolean);
+   --  If set , will delay the attachment of a pipe on connect until
+   --  the underlying connection has completed.
+   --  This will cause the socket to block if there are no other connections,
+   --  but will prevent queues from filling on pipes awaiting connection.
 
 
 
    not overriding
+   procedure Set_Accept_Only_Routable_Messages_On_ROUTER_Sockets
+     (This         : in out Socket;
+      Value        : Boolean);
+   --  Sets the ROUTER socket behavior when an unroutable message is
+   --  encountered. A value of False is the default and discards the
+   --  message silently when it cannot be routed.
+   --  A value of True Raises EHOSTUNREACH  if the message cannot be routed.
+
+
+   not overriding
+   procedure Provide_All_Subscription_Messages_On_XPUB_Sockets
+     (This         : in out Socket;
+      Value        : Boolean);
+   --  Sets the XPUB socket behavior on new subscriptions and unsubscriptions.
+   --  A value of False is the default and passes only new
+   --  subscription messages to upstream.
+   --  A value of True passes all subscription messages upstream.
+
+
+
+   type SO_KEEPALIVE_Type is (OS_Default, Disable, Enable);
+   not overriding
+   procedure Override_SO_KEEPALIVE_Socket_Option
+     (This : in out Socket;
+      Value : SO_KEEPALIVE_Type);
+   --  Override TCP_KEEPCNT(or TCP_KEEPALIVE on some OS) socket option
+   --  (where supported by OS).
+
+   not overriding
+   procedure Override_TCP_KEEPCNT_IDLE_Socket_Option
+     (This : in out Socket;
+      Value : Integer := -1);
+   --  Override TCP_KEEPCNT socket option(where supported by OS).
+   --  The default value of -1 means to skip any overrides and leave it
+   --  to OS default.
+
+   not overriding
+   procedure Override_TCP_KEEPCNT_CNT_Socket_Option
+     (This : in out Socket;
+      Value : Integer := -1);
+   --  Override TCP_KEEPCNT(or TCP_KEEPALIVE on some OS)
+   --  socket option(where supported by OS).
+   --  The default value of -1 means to skip any overrides and leave it to
+   --  OS default.
+
+   not overriding
+   procedure Override_TCP_KEEPINTVL_socket_option
+     (This : in out Socket;
+      Value : Integer := -1);
+   --  Override TCP_KEEPINTVL socket option(where supported by OS).
+   --  The default value of -1 means to skip any overrides and leave it to
+   --  OS default.
+
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This : in out Socket;
+      Filter : String);
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This : in out Socket;
+      Filter : Ada.Strings.Unbounded.Unbounded_String);
+   not overriding
+   procedure  Assign_Filters_To_Allow_New_TCP_Connections
+     (This : in out Socket;
+      Filter : Ada.Streams.Stream_Element_Array);
+   --  Assign arbitrary number of filters that will be applied for
+   --  each new TCP transport connection on a listening socket.
+   --  If no filters applied, then TCP transport allows connections from
+   --  any ip.
+   --  If at least one filter is applied then new connection source ip
+   --  should be matched. To clear all filters call
+   --  Assign_Filters_To_Allow_New_TCP_Connections(socket, "").
+   --  Filter is a null-terminated string with ipv6 or ipv4 CIDR.
+
+
+   --=======================================================================
+   --=======================================================================
+
+   not overriding
+   function Retrieve_Socket_Type (This : Socket) return Socket_Type;
+   --  Retrieve the socket type for the specified socket.
+   --  The socket type is specified at socket creation time and
+   --  cannot be modified afterwards.
+
+   not overriding
    function More_Message_Parts_To_Follow (This : Socket) return Boolean;
-   --  Returns True if the multi-part message currently being read from the
-   --  specified socket has more message parts to follow.
-   --  If there are no message parts to follow or if the message currently
-   --  being read is not a multi-part message a value of True will be returned.
-   --  Otherwise, False will be returned.
+   --  returns True if the message part last received from the socket was
+   --  a data part with more parts to follow.
 
 
+   not overriding
+   function Get_High_Water_Mark_For_Outbound_Messages
+     (This : Socket) return Natural;
+   --  Returns the high water mark for outbound messages on the
+   --  specified socket.
 
-   type Thread_Bitmap is array (0 .. 63) of Boolean;
-   pragma Pack (Thread_Bitmap);
+   not overriding
+   function Get_High_Water_Mark_For_Inbound_Messages
+     (This : Socket) return Natural;
+   --  Return the high water mark for inbound messages on the specified socket.
+
+   not overriding
    function Get_IO_Thread_Affinity (This : Socket) return Thread_Bitmap;
    --  Returns the I/O thread affinity for newly created connections
    --  on the specified socket.
@@ -239,6 +514,15 @@ package ZMQ.Sockets is
    --  a value of 3 specifies that subsequent connections on socket shall be
    --  handled exclusively by I/O threads 1 and 2.
 
+   not overriding
+   function Get_Socket_Identity
+     (This : Socket)
+      return String;
+   not overriding
+   function Get_Socket_Identity
+     (This : Socket)
+      return Ada.Strings.Unbounded.Unbounded_String;
+   not overriding
    function Get_Socket_Identity
      (This : Socket)
       return Ada.Streams.Stream_Element_Array;
@@ -257,10 +541,12 @@ package ZMQ.Sockets is
    --  Identities starting with binary zero are reserved for use by the
    --   ZMQ infrastructure.
 
+   not overriding
    function Get_Multicast_Data_Rate (This : Socket) return Natural;
    --  Returns the maximum send or receive data rate for multicast transports
    --  using the specified socket.
 
+   not overriding
    function Get_Multicast_Recovery_Interval (This : Socket) return Duration;
    --  Retrieves the recovery interval for multicast transports using the
    --  specified socket.
@@ -268,6 +554,7 @@ package ZMQ.Sockets is
    --  a receiver can be absent from a multicast group before unrecoverable
    --  data loss will occur.
 
+   not overriding
    function Get_Kernel_Transmit_Buffer_Size (This : Socket) return Natural;
    --  Returns the underlying kernel transmit buffer size for the
    --  specified socket.
@@ -275,6 +562,7 @@ package ZMQ.Sockets is
    --  For details refer to your operating system documentation for
    --   the SO_SNDBUF socket option.
 
+   not overriding
    function Get_Kernel_Receive_Buffer_Size (This : Socket) return Natural;
    --  Returns the underlying kernel receive buffer size for the
    --  specified socket.
@@ -282,37 +570,167 @@ package ZMQ.Sockets is
    --  For details refer to your operating system documentation
    --  for the SO_RCVBUF socket option
 
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown
+     (This : Socket) return Duration;
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown
+     (This : Socket) return Ada.Real_Time.Time_Span;
+   not overriding
+   function Get_Linger_Period_For_Socket_Shutdown   -- Millisecond
+     (This : Socket) return Natural;
+   --  Retrieves the linger period for the specified socket.
 
 
-   not overriding procedure Connect
+   not overriding
+   function Get_Reconnection_Interval
+     (This : Socket) return Duration;
+   not overriding
+   function Get_Reconnection_Interval
+     (This : Socket) return Ada.Real_Time.Time_Span;
+   not overriding
+   function Get_Reconnection_Interval  -- Millisecond
+     (This : Socket) return Natural;
+   --  Retrieves the initial reconnection interval for the specified socket.
+
+   not overriding
+   function Get_Maximum_Reconnection_Interval
+     (This : Socket) return Duration;
+   not overriding
+   function Get_Maximum_Reconnection_Interval
+     (This : Socket) return Ada.Real_Time.Time_Span;
+   not overriding
+   function Get_Maximum_Reconnection_Interval  -- Millisecond
+     (This : Socket) return Natural;
+   --  Retrieves the maximum reconnection interval for the specified socket.
+
+   not overriding
+   function Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
+     (This : Socket) return Natural;
+   --  Retrieve the maximum length of the queue of outstanding peer connections
+   --  for the specified socket;
+   --    this only applies to connection-oriented transports.
+
+   not overriding
+   function Get_Maximum_Acceptable_Inbound_Message_Size
+     (This : Socket) return Integer;
+   --  Retrieves limit for the inbound messages.
+
+   not overriding
+   function Get_Maximum_Network_Hops_For_Multicast_Packets
+     (This : Socket) return Positive;
+   --  Retrieves time-to-live used for outbound multicast packets.
+
+   not overriding
+   function Get_Recieve_Timeout
+     (This : Socket) return Duration;
+   not overriding
+   function Get_Recieve_Timeout
+     (This : Socket) return Ada.Real_Time.Time_Span;
+   not overriding
+   function Get_Recieve_Timeout  -- Millisecond
+     (This : Socket) return Integer;
+   --  Retrieves the timeout for recv operation on the socket.
+
+   not overriding
+   function Get_Send_Timeout
+     (This : Socket) return Duration;
+   not overriding
+   function Get_Send_Timeout
+     (This : Socket) return Ada.Real_Time.Time_Span;
+   not overriding
+   function Get_Send_Timeout  -- Millisecond
+     (This : Socket) return Integer;
+   --  Retrieves the timeout for send operation on the socket.
+
+   not overriding
+   function Get_IPv4_only_socket_override
+     (This : Socket) return Boolean;
+   --   Retrives the underlying native socket type.
+
+   not overriding
+   function Get_Attach_On_Connect
+     (This : Socket) return Boolean;
+   --  Retrieves the state of the attach on connect value.
+
+   not overriding
+   function Get_File_Descriptor
+     (This : Socket) return GNAT.OS_Lib.File_Descriptor;
+   --  Retrieves the file descriptor associated with the specified socket.
+   --  The returned file descriptor can be used to integrate the socket
+   --  into an existing event loop;
+   --  the ØMQ library shall signal any pending events on the socket
+   --  in an edge-triggered fashion by making the file descriptor become
+   --  ready for reading..
+
+   not overriding
+   function Get_Last_Endpoint_Set
+     (This : Socket) return String;
+   not overriding
+   function Get_Last_Endpoint_Set
+     (This : Socket) return Ada.Strings.Unbounded.Unbounded_String;
+   --  Retrieves the last endpoint bound for TCP and IPC transports.
+   --  The returned value will be a string in the form of a ZMQ DSN.
+   --  Note that if the TCP host is INADDR_ANY, indicated by a *,
+   --  then the returned address will be 0.0.0.0 (for IPv4).
+
+   not overriding
+   function Get_SO_KEEPALIVE_Socket_Option
+     (This : in Socket) return SO_KEEPALIVE_Type;
+
+   not overriding
+   function Get_TCP_KEEPCNT_IDLE_socket_option
+     (This : in Socket) return Integer;
+
+   not overriding
+   function Get_TCP_KEEPCNT_CNT_socket_option
+     (This : in Socket) return Integer;
+
+   not overriding
+   function Get_TCP_KEEPINTVL_Socket_Option
+     (This : in Socket) return Integer;
+
+   not overriding
+   procedure Connect
      (This    : in out Socket;
       Address : String);
 
+   not overriding
    procedure Connect
      (This    : in out Socket;
       Address : Ada.Strings.Unbounded.Unbounded_String);
 
 
-   not overriding procedure Send
+   not overriding
+   procedure Send
      (This  : in out Socket;
       Msg   : String;
       Flags : Socket_Flags := No_Flags);
 
-   not overriding procedure Send
+   not overriding
+   procedure Send
      (This  : in out Socket;
       Msg   : Ada.Strings.Unbounded.Unbounded_String;
       Flags : Socket_Flags := No_Flags);
 
-   not overriding procedure Send
+   not overriding
+   procedure Send
      (This  : in out Socket;
       Msg   : Ada.Streams.Stream_Element_Array;
       Flags : Socket_Flags := No_Flags);
 
-   not overriding procedure Send
-     (This       : in out Socket;
-      Msg_Addres : System.Address;
-      Msg_Length : Natural;
-      Flags      : Socket_Flags := No_Flags);
+   not overriding
+   procedure Send
+     (This     : in out Socket;
+      Msg      : ZMQ.Messages.Message'Class;
+      Flags    : Socket_Flags := No_Flags);
+
+   not overriding
+   procedure Send
+     (This        : in out Socket;
+      Msg_Address : System.Address;
+      Msg_Length  : Natural;
+      Flags       : Socket_Flags := No_Flags);
    --  Queues the message referenced by the msg argument to be sent to socket
    --  The flags argument is a combination of the flags defined below:
    --   NOBLOCK
@@ -348,41 +766,57 @@ package ZMQ.Sockets is
 
    generic
       type Element is private;
+      pragma Compile_Time_Error
+        (Element'Has_Access_Values, "No access values allowed in Element");
    procedure Send_Generic
      (This  : in out Socket;
       Msg   : Element;
       Flags : Socket_Flags := No_Flags);
 
-   --     not overriding
-   --     procedure flush (This    : in out Socket);
+   --  generic
+   --     type Element is private;
+   --     with procedure Write (S : access Ada.Streams.Root_Stream_Type'Class;
+   --                           Data : Element);
+   --  procedure Send_Indefinite_Generic
+   --    (This  : in out Socket;
+   --     Msg   : Element;
+   --     Flags : Socket_Flags := No_Flags);
+   --  not overriding
+   --  procedure flush (This    : in out Socket);
 
 
+   not overriding
    procedure Recv
      (This  : in Socket;
       Msg   : out Ada.Strings.Unbounded.Unbounded_String;
       Flags : Socket_Flags := No_Flags);
 
-   not overriding function Recv
-     (This  : in Socket;
-      Flags : Socket_Flags := No_Flags)
+   not overriding
+   function Recv
+     (This       : in Socket;
+      Max_Length : Natural := 1024;
+      Flags      : Socket_Flags := No_Flags)
       return  String;
 
-   not overriding function Recv
+   not overriding
+   function Recv
      (This  : in Socket;
       Flags : Socket_Flags := No_Flags)
       return  Ada.Strings.Unbounded.Unbounded_String;
 
-   not overriding procedure Recv
+   not overriding
+   procedure Recv
      (This    : in Socket;
-      Msg     : Messages.Message'Class;
+      Msg     : in out Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags);
 
-   procedure Recv (This : in Socket; Flags : Socket_Flags := No_Flags);
+   not overriding
+   procedure Recv
+     (This  : in Socket;
+      Flags : Socket_Flags := No_Flags);
 
-
-
+   not overriding
    procedure Close (This : in out Socket) renames Finalize;
-   --
 
 
    type Socket_Monitor is limited interface;
@@ -396,7 +830,7 @@ package ZMQ.Sockets is
       Address : String;
       Err     : Integer) is null;
    procedure Connect_Retried
-     (This    : Socket_Monitor;
+     (This     : Socket_Monitor;
       Address  : String;
       Interval : Duration) is null;
    procedure Listening
@@ -428,27 +862,19 @@ package ZMQ.Sockets is
       Address : String;
       Fd      : GNAT.OS_Lib.File_Descriptor) is null;
 
-   procedure Set_Monitor (This : Socket;
-                           Monitor : Any_Socket_Monitor);
+   procedure Set_Monitor (This    : Socket;
+                          Monitor : Any_Socket_Monitor);
 
 
    --  function "=" (Left, Right : in Context) return Boolean;
    function Get_Impl (This : in Socket) return System.Address;
-private
-   type Socket
-     (With_Context : Contexts.Any_Context;
-      Kind         : Socket_Type)
-     is new Ada.Finalization.Limited_Controlled with record
-      C : System.Address := System.Null_Address;
-   end record;
-   function Img (Item : Ada.Streams.Stream_Element_Array) return String;
-   overriding
-   procedure Initialize
-     (This         : in out Socket);
-   overriding
-   procedure Finalize (This : in out Socket);
 
-   type Socket_Opt is (AFFINITY,
+   --
+   --  Low level setopt getopt operations.
+   --
+
+   type Socket_Opt is (ZMQ_TYPE,
+                       AFFINITY,
                        IDENTITY,
                        SUBSCRIBE,
                        UNSUBSCRIBE,
@@ -472,7 +898,7 @@ private
                        SNDTIMEO,
                        IPV4ONLY,
                        LAST_ENDPOINT,
-                       ROUTER_BEHAVIOR,
+                       ROUTER_MANDATORY,
                        TCP_KEEPALIVE,
                        TCP_KEEPALIVE_CNT,
                        TCP_KEEPALIVE_IDLE,
@@ -508,7 +934,6 @@ private
       Value_Size : Natural);
 
    --------------------------------------------------------
-   --------------------------------------------------------
 
    function Getsockopt
      (This   : in Socket;
@@ -538,6 +963,21 @@ private
       Value      : System.Address;
       Value_Size : out Natural);
 
+
+private
+   type Socket
+     is new Ada.Finalization.Limited_Controlled with record
+      C : System.Address := System.Null_Address;
+   end record;
+
+
+   overriding
+   procedure Finalize (This : in out Socket);
+
+
    MAX_OPTION_SIZE : constant := 256;
+   Null_Socket     : constant Socket :=
+                       (Ada.Finalization.Limited_Controlled with
+                                            C => System.Null_Address);
 
 end ZMQ.Sockets;

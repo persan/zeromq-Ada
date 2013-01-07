@@ -21,20 +21,21 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
 
 
 
+   Test_Port : constant String := "inproc://pub-sub";
+
    -------------------------
    --  initialize
    -------------------------
    procedure Initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.Ctx.Initialize;
       T.Pub.Initialize (T.Ctx, Sockets.PUB);
 
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
-      T.Sub.Establish_Message_Filter ("");
+      T.Sub.Set_Message_Filter ("");
 
-      T.Sub.Bind ("inproc://pub-sub");
-      T.Pub.Connect ("inproc://pub-sub");
+      T.Sub.Bind (Test_Port);
+      T.Pub.Connect (Test_Port);
    end Initialize;
 
    -------------------------
@@ -43,9 +44,19 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    procedure Send (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T     : Test_Case renames Test_Case (Test);
       Msg   : Ada.Strings.Unbounded.Unbounded_String;
+      task Rec is
+         entry Has_Data;
+      end Rec;
+      task body Rec is
+      begin
+         T.Sub.Recv (Msg);
+         accept Has_Data;
+      end Rec;
+
    begin
+      delay 0.01;
       T.Pub.Send (MSG_STRING);
-      T.Sub.Recv (Msg);
+      Rec.Has_Data;
       Assert (Msg = MSG_STRING, "Error");
    end Send;
 
@@ -57,7 +68,6 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
-      T.Ctx.Finalize;
    end Finalize;
    --------------------
    -- Register_Tests --

@@ -38,13 +38,12 @@ procedure HWServer is
    inbuffer : Ada.Strings.Unbounded.Unbounded_String;
 begin
    --  Prepare our context and socket
-   Context.Initialize (1);
    Socket.Initialize (Context, ZMQ.Sockets.REP);
    Socket.Bind ("tcp://*:5555");
 
    loop
       --  Wait for next request from client
-      inbuffer := Socket.recv;
+      inbuffer := Socket.Recv;
       Put_Line ("Received request:" & To_String (inbuffer));
 
       --  Do some 'work'

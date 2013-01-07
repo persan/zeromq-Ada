@@ -27,7 +27,6 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
    procedure Initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.Ctx.Initialize;
 
       T.Sub.Initialize (T.Ctx, Sockets.REP);
       T.Sub.Bind ("inproc://req");
@@ -60,7 +59,6 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
-      T.Ctx.Finalize;
    end Finalize;
    --------------------
    -- Register_Tests --

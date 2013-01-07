@@ -32,10 +32,6 @@ procedure ZMQ.examples.Server is
    s     : ZMQ.Sockets.Socket;
    resultset_string : constant String := "OK";
 begin
-   --  Initialise 0MQ context, requesting a single application thread
-   --  and a single I/O thread
-   ctx.Initialize (1);
-
    --   Create a ZMQ_REP socket to receive requests and send replies
    s.Initialize (ctx, Sockets.REP);
 
@@ -48,14 +44,14 @@ begin
       begin
          query.Initialize;
          --  Receive a message, blocks until one is available
-         s.recv (query);
+         s.Recv (query);
          --  Process the query
-         Put_Line (query.getData);
+         Put_Line (query.GetData);
          declare
             --  Allocate a response message and fill in an example response
             resultset : ZMQ.Messages.Message;
          begin
-            resultset.Initialize (query.getData & "->" & resultset_string);
+            resultset.Initialize (query.GetData & "->" & resultset_string);
             --   Send back our canned response
             s.Send (resultset);
             resultset.Finalize;

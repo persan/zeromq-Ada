@@ -1,0 +1,16 @@
+project libZMQ is
+   for Source_Files use ("zmq.h","zmq_utils.h");
+   for Languages use ("C");
+   ZMQ_PREFIX := external("ZMQ_PREFIX", project'Project_Dir & "../../");
+   for Source_Dirs use (ZMQ_PREFIX &"include");
+   for Externally_Built use "True";
+
+   package Linker is
+      for Linker_Options use ("-L" & ZMQ_PREFIX & "lib",
+                              "-lzmq",
+                              "-luuid",
+                              "-lrt",
+                              "-lpthread");
+   end Linker;
+
+end libZMQ;
