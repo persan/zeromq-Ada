@@ -44,16 +44,13 @@ begin
       begin
          query.Initialize (query_string & "(" & i'Img & ");");
          s.Send (query);
-         query.Finalize;
       end;
 
       declare
          resultset        : ZMQ.Messages.Message;
       begin
-         resultset.Initialize;
          s.Recv (resultset);
          Put_Line ('"' & resultset.GetData & '"');
-         resultset.Finalize;
       end;
    end loop;
 end ZMQ.Examples.Client;

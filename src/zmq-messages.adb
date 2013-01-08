@@ -52,6 +52,7 @@ package body ZMQ.Messages is
       end if;
    end Initialize;
 
+
    --  ========================================================================
    --  Initialize with size
    --  ========================================================================
@@ -252,12 +253,9 @@ package body ZMQ.Messages is
 
    procedure Finalize (Self : in out Message) is
       Ret : int;
+      pragma Unreferenced (Ret);
    begin
       Ret := Low_Level.zmq_msg_close (Self.Msg'Access);
-      if Ret /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
-      end if;
    end Finalize;
 
    -------------

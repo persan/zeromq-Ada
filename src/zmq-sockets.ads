@@ -71,7 +71,7 @@ package ZMQ.Sockets is
    not overriding
    procedure Initialize
      (This         : in out Socket;
-      With_Context : Contexts.Context;
+      With_Context : Contexts.Context'Class;
       Kind         : Socket_Type);
 
    not overriding
@@ -81,6 +81,16 @@ package ZMQ.Sockets is
 
    not overriding
    procedure Bind
+     (This    : in out Socket;
+      Address : Ada.Strings.Unbounded.Unbounded_String);
+
+   not overriding
+   procedure UnBind
+     (This    : in out Socket;
+      Address : String);
+
+   not overriding
+   procedure UnBind
      (This    : in out Socket;
       Address : Ada.Strings.Unbounded.Unbounded_String);
 
@@ -700,6 +710,16 @@ package ZMQ.Sockets is
      (This    : in out Socket;
       Address : Ada.Strings.Unbounded.Unbounded_String);
 
+   not overriding
+   procedure DisConnect
+     (This    : in out Socket;
+      Address : String);
+
+   not overriding
+   procedure DisConnect
+     (This    : in out Socket;
+      Address : Ada.Strings.Unbounded.Unbounded_String);
+
 
    not overriding
    procedure Send
@@ -861,12 +881,13 @@ package ZMQ.Sockets is
      (This    : Socket_Monitor;
       Address : String;
       Fd      : GNAT.OS_Lib.File_Descriptor) is null;
+   type Mask_Type is mod 2 ** 32;
+   procedure Set_Monitor
+     (This    : Socket;
+      Address : String;
+      Mask    : Mask_Type);
 
-   procedure Set_Monitor (This    : Socket;
-                          Monitor : Any_Socket_Monitor);
 
-
-   --  function "=" (Left, Right : in Context) return Boolean;
    function Get_Impl (This : in Socket) return System.Address;
 
    --

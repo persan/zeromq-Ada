@@ -33,6 +33,7 @@ with ZMQ.Low_Level;
 with Ada.Streams;
 with System;
 with Ada.Strings.Unbounded;
+with Ada.Finalization;
 
 package ZMQ.Messages is
 
@@ -45,11 +46,6 @@ package ZMQ.Messages is
    type Message is tagged limited private;
 
 
-   procedure Initialize (Self : in out Message);
-   --  Initialize empty 0MQ message
-   --  Initialize the message object referenced by msg to represent
-   --  an empty message.
-   --  This function is most useful when called before receiving a message.
 
    procedure Initialize (Self : in out Message; Size : Natural);
    procedure Initialize
@@ -109,7 +105,6 @@ package ZMQ.Messages is
    --
 
 
-   procedure Finalize   (Self : in out Message);
 
    type Zmq_Msg_T_Access is access all ZMQ.Low_Level.zmq_msg_t;
    function GetImpl (Self : Message) return not null Zmq_Msg_T_Access;
@@ -138,7 +133,10 @@ package ZMQ.Messages is
    function GetSize (Self : Message) return Natural;
 
 private
-   type Message is tagged limited record
+   type Message is new Ada.Finalization.Limited_Controlled with record
       Msg            : aliased ZMQ.Low_Level.zmq_msg_t;
    end record;
+   procedure Initialize (Self : in out Message);
+   procedure Finalize   (Self : in out Message);
+
 end ZMQ.Messages;

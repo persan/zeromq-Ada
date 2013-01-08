@@ -83,7 +83,7 @@ package body ZMQ.Sockets is
    ----------------
    not overriding procedure Initialize
      (This         : in out Socket;
-      With_Context : Contexts.Context;
+      With_Context : Contexts.Context'Class;
       Kind         : Socket_Type)
    is
    begin
@@ -119,6 +119,30 @@ package body ZMQ.Sockets is
    begin
       This.Bind (To_String (Address));
    end Bind;
+
+
+   not overriding
+   procedure UnBind
+     (This    : in out Socket;
+      Address : String) is
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
+   begin
+      Ret := Low_Level.zmq_unbind (This.C, Addr);
+      Free (Addr);
+      if Ret /= 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+      end if;
+   end UnBind;
+
+   not overriding
+   procedure UnBind
+     (This    : in out Socket;
+      Address : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.UnBind (To_String (Address));
+   end UnBind;
 
    procedure  Setsockopt (This       : in out Socket;
                           Option     : Socket_Opt;
@@ -214,6 +238,29 @@ package body ZMQ.Sockets is
       This.Connect (To_String (Address));
    end Connect;
 
+   not overriding
+   procedure DisConnect
+     (This    : in out Socket;
+      Address : String) is
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
+   begin
+      Ret := Low_Level.zmq_disconnect (This.C, Addr);
+      Free (Addr);
+      if Ret /= 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+      end if;
+   end DisConnect;
+
+
+   not overriding
+   procedure DisConnect
+     (This    : in out Socket;
+      Address : Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      This.DisConnect (To_String (Address));
+   end DisConnect;
 
    ----------
    -- Send --
@@ -329,9 +376,7 @@ package body ZMQ.Sockets is
                    Flags   : Socket_Flags := No_Flags) is
       Dummy_Msg : Messages.Message;
    begin
-      Dummy_Msg.Initialize;
       This.Recv (Dummy_Msg, Flags);
-      Dummy_Msg.Finalize;
    end Recv;
 
 
@@ -351,7 +396,6 @@ package body ZMQ.Sockets is
                    Flags   : Socket_Flags := No_Flags) is
       Temp_Msg : Messages.Message;
    begin
-      Temp_Msg.Initialize;
       This.Recv (Temp_Msg, Flags);
       declare
          type Msg_Str is new String (1 .. Temp_Msg.GetSize);
@@ -360,7 +404,6 @@ package body ZMQ.Sockets is
          Set_Unbounded_String
            (Msg, String (Conv.To_Pointer (Temp_Msg.GetData).all));
       end;
-      Temp_Msg.Finalize;
    end Recv;
 
 
@@ -1152,7 +1195,8 @@ package body ZMQ.Sockets is
 
    procedure Set_Monitor
      (This    : Socket;
-      Monitor : Any_Socket_Monitor) is
+      Address : String;
+      Mask    : Mask_Type) is
    begin
       null;
    end Set_Monitor;
