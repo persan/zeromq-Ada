@@ -110,7 +110,7 @@ package body ZMQ.Sockets is
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(""" & Address & """)";
       end if;
    end Bind;
 
@@ -132,7 +132,7 @@ package body ZMQ.Sockets is
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(""" & Address & """)";
       end if;
    end UnBind;
 
@@ -227,7 +227,7 @@ package body ZMQ.Sockets is
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(""" & Address & """)";
       end if;
    end Connect;
 
@@ -249,7 +249,7 @@ package body ZMQ.Sockets is
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+           GNAT.Source_Info.Enclosing_Entity & "(""" & Address & """)";
       end if;
    end DisConnect;
 
@@ -291,16 +291,6 @@ package body ZMQ.Sockets is
       This.Send (Ada.Strings.Unbounded.To_String (Msg), Flags);
    end Send;
 
-   procedure Send_Generic (This    : in out Socket;
-                           Msg     : Element;
-                           Flags   : Socket_Flags := No_Flags) is
-   begin
-      This.Send
-        (Msg'Address,
-         (Msg'Size + Ada.Streams.Stream_Element'Size - 1) /
-           Ada.Streams.Stream_Element'Size,
-         Flags);
-   end Send_Generic;
 
    not overriding
 
@@ -379,16 +369,58 @@ package body ZMQ.Sockets is
       This.Recv (Dummy_Msg, Flags);
    end Recv;
 
+   not overriding
+   function Recv
+     (This    : in Socket;
+      Flags   : Socket_Flags := No_Flags) return Messages.Message is
+   begin
+      return Ret : Messages.Message do
+         This.Recv (Ret, Flags);
+      end return;
+   end Recv;
 
+   not overriding
+   procedure Recv
+     (This    : in Socket;
+      Handler : not null access procedure (This : in Socket; Data : String);
+      Flags   : Socket_Flags := No_Flags) is
+      Msg     : Messages.Message := This.Recv (Flags);
+      type Msg_Str is new String (1 .. Msg.GetSize);
+      package Conv is new System.Address_To_Access_Conversions (Msg_Str);
+   begin
+      Handler (This, String (Conv.To_Pointer (Msg.GetData).all));
+   end Recv;
+
+   not overriding
+   procedure Recv
+     (This  : in Socket;
+      Msg_Address : System.Address;
+      Msg_Length  : Natural;
+      Flags       : Socket_Flags := No_Flags) is
+      Ret  : int;
+   begin
+      Ret := Low_Level.zmq_recv
+        (This.C,
+         buf   => Msg_Address,
+         len   => size_t (Msg_Length),
+         flags => int (Flags));
+      if Ret = -1 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
+           & GNAT.Source_Info.Enclosing_Entity;
+      end if;
+   end Recv;
    not overriding
    function Recv (This       : in Socket;
                   Max_Length : Natural := 1024;
                   Flags      : Socket_Flags := No_Flags) return String is
-   --  Buffer : String (1 .. Max_Length);
+      Msg : Messages.Message;
    begin
-      --  This.Recv (Buffer'Address, Buffer'Length, Flags);
-      raise Program_Error with "function Recv not implemented";
-      return "dummy";
+      This.Recv (Msg, Flags);
+      if Msg.GetSize > Max_Length then
+         raise Constraint_Error with
+           "Message to long " & Msg.GetSize'Img & ">" & Max_Length'Img & ".";
+      end if;
+      return Msg.GetData;
    end Recv;
 
    procedure Recv (This    : in Socket;
@@ -1196,8 +1228,15 @@ package body ZMQ.Sockets is
    procedure Set_Monitor
      (This    : Socket;
       Address : String;
-      Mask    : Mask_Type) is
+      Mask    : Event_Type) is
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
    begin
-      null;
+      Ret := Low_Level.zmq_socket_monitor (This.Get_Impl, Addr, int (Mask));
+      Free (Addr);
+      if Ret /= 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+           GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
+      end if;
    end Set_Monitor;
 end ZMQ.Sockets;

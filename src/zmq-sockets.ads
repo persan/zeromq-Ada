@@ -94,7 +94,7 @@ package ZMQ.Sockets is
      (This    : in out Socket;
       Address : Ada.Strings.Unbounded.Unbounded_String);
 
-   type Thread_Bitmap is array (0 .. 63) of Boolean;
+   type Thread_Bitmap is array (1 .. 64) of Boolean;
    pragma Pack (Thread_Bitmap);
 
    not overriding
@@ -784,25 +784,6 @@ package ZMQ.Sockets is
    --  this indicates that no more message parts are to follow.
    --  Creates a Message and sends it over the socket.
 
-   generic
-      type Element is private;
-      pragma Compile_Time_Error
-        (Element'Has_Access_Values, "No access values allowed in Element");
-   procedure Send_Generic
-     (This  : in out Socket;
-      Msg   : Element;
-      Flags : Socket_Flags := No_Flags);
-
-   --  generic
-   --     type Element is private;
-   --     with procedure Write (S : access Ada.Streams.Root_Stream_Type'Class;
-   --                           Data : Element);
-   --  procedure Send_Indefinite_Generic
-   --    (This  : in out Socket;
-   --     Msg   : Element;
-   --     Flags : Socket_Flags := No_Flags);
-   --  not overriding
-   --  procedure flush (This    : in out Socket);
 
 
    not overriding
@@ -830,6 +811,23 @@ package ZMQ.Sockets is
       Msg     : in out Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags);
 
+   function Recv
+     (This    : in Socket;
+      Flags   : Socket_Flags := No_Flags) return Messages.Message;
+
+   not overriding
+   procedure Recv
+     (This    : in Socket;
+      Handler : not null access procedure (This : in Socket; Data : String);
+      Flags   : Socket_Flags := No_Flags);
+
+   not overriding
+   procedure Recv
+     (This  : in Socket;
+      Msg_Address : System.Address;
+      Msg_Length  : Natural;
+      Flags : Socket_Flags := No_Flags);
+
    not overriding
    procedure Recv
      (This  : in Socket;
@@ -838,54 +836,23 @@ package ZMQ.Sockets is
    not overriding
    procedure Close (This : in out Socket) renames Finalize;
 
+   type Event_Type is mod 2 ** 32;
+   EVENT_CONNECTED       : constant Event_Type := 2#0000_0000_0001#;
+   EVENT_CONNECT_DELAYED : constant Event_Type := 2#0000_0000_0010#;
+   EVENT_CONNECT_RETRIED : constant Event_Type := 2#0000_0000_0100#;
+   EVENT_LISTENING       : constant Event_Type := 2#0000_0000_1000#;
+   EVENT_BIND_FAILED     : constant Event_Type := 2#0000_0001_0000#;
+   EVENT_ACCEPTED        : constant Event_Type := 2#0000_0010_0000#;
+   EVENT_ACCEPT_FAILED   : constant Event_Type := 2#0000_0100_0000#;
+   EVENT_CLOSED          : constant Event_Type := 2#0000_1000_0000#;
+   EVENT_CLOSE_FAILED    : constant Event_Type := 2#0001_0000_0000#;
+   EVENT_DISCONNECTED    : constant Event_Type := 2#0010_0000_0000#;
+   EVENT_ALL             : constant Event_Type := 2#0011_1111_1111#;
 
-   type Socket_Monitor is limited interface;
-   type Any_Socket_Monitor is access all Socket_Monitor'Class;
-   procedure Connected
-     (This    : Socket_Monitor;
-      Address : String;
-      Fd      : GNAT.OS_Lib.File_Descriptor) is null;
-   procedure Connect_Delayed
-     (This    : Socket_Monitor;
-      Address : String;
-      Err     : Integer) is null;
-   procedure Connect_Retried
-     (This     : Socket_Monitor;
-      Address  : String;
-      Interval : Duration) is null;
-   procedure Listening
-     (This    : Socket_Monitor;
-      Address : String;
-      Fd      : GNAT.OS_Lib.File_Descriptor) is null;
-   procedure Bind_Failed
-     (This    : Socket_Monitor;
-      Address : String;
-      Err     : Integer) is null;
-   procedure Accepted
-     (This    : Socket_Monitor;
-      Address : String;
-      Fd      : GNAT.OS_Lib.File_Descriptor) is null;
-   procedure Accept_Failed
-     (This    : Socket_Monitor;
-      Address : String;
-      Err     : Integer) is null;
-   procedure Closed
-     (This    : Socket_Monitor;
-      Address : String;
-      Fd      : GNAT.OS_Lib.File_Descriptor) is null;
-   procedure Close_Failed
-     (This    : Socket_Monitor;
-      Address : String;
-      Err     : Integer) is null;
-   procedure Disconnected
-     (This    : Socket_Monitor;
-      Address : String;
-      Fd      : GNAT.OS_Lib.File_Descriptor) is null;
-   type Mask_Type is mod 2 ** 32;
    procedure Set_Monitor
      (This    : Socket;
       Address : String;
-      Mask    : Mask_Type);
+      Mask    : Event_Type);
 
 
    function Get_Impl (This : in Socket) return System.Address;

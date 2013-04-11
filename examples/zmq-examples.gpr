@@ -1,6 +1,6 @@
 with "../zmq.gpr";
 with "xmlada.gpr";
---  with "gnatcoll.gpr";
+with "gnatcoll.gpr";
 
 project ZMQ.Examples is
    for Main use ("zmq-examples-client.adb",
@@ -22,7 +22,7 @@ project ZMQ.Examples is
 
 
    package Compiler is
-      for Default_Switches ("ada") use ZMQ.Compiler'Default_Switches ("ada");
+      for Default_Switches ("ada") use ZMQ.Compiler'Default_Switches ("ada") & ("-gnatyyM128");
    end Compiler;
 
    package Binder is

@@ -11,3 +11,5 @@ metrix.xml
 gnatcheck.out
 gnatcheck-source-list.out
 
+*.tgz
+.dist

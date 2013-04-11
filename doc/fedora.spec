@@ -1,5 +1,5 @@
 Name:		zeromq-ada
-Version:	2.0.10
+Version:	3.2.0
 Release:	1%{?dist}
 Summary:	Ada binding for zeromq
 
@@ -16,7 +16,7 @@ Requires:	zeromq >= %{version}
 Ada bindings for zeromq
 
 %prep
-%setup -q -n zeromq-Ada
+%setup -q -n zeromq-ada
 %patch0 -p1
 
 %build
@@ -39,7 +39,7 @@ rm -f %{buildroot}/usr/lib/zmq/static/libzmqAda.a
 %files
 %defattr(-,root,root,-)
 %doc README
-/usr/lib/zmq/relocatable/libzmqAda.so.2.1.0
+/usr/lib/zmq/relocatable/libzmqAda.so.%{version}
 
 
 %files devel

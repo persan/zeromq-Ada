@@ -5,7 +5,9 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
    use AUnit;
    use Ada.Strings.Unbounded;
 
-   MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
+   REQUEST_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
+   RESPONSE_STRING : constant Unbounded_String :=
+                       To_Unbounded_String ("Reply");
 
 
    ----------
@@ -44,11 +46,13 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
       T     : Test_Case renames Test_Case (Test);
       Msg   : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Pub.Send (MSG_STRING);
+      T.Pub.Send (REQUEST_STRING);
       T.Sub.Recv (Msg);
-      T.Sub.Send (Msg);
+      Assert (Msg = REQUEST_STRING, "Error");
+
+      T.Sub.Send (RESPONSE_STRING);
       T.Pub.Recv (Msg);
-      Assert (Msg = MSG_STRING, "Error");
+      Assert (Msg = RESPONSE_STRING, "Error");
    end Send;
 
    -------------------------

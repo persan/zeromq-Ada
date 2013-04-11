@@ -16,6 +16,7 @@ procedure getinfo is
       Put_Line
         (command_Name & " [options]" & LF &
          "Options:" & LF &
+         " --ada-library-version      Print Ada-Library version" & LF &
          " --binding-version      Print Binding version" & LF &
          " --library-version      Print version of the 0mq library." & LF &
          " -? | -h | --help       Print this text");
@@ -25,6 +26,7 @@ procedure getinfo is
 begin
    loop
       case Getopt ("-binding-version " &
+                   "-ada-library-version " &
                    "-library-version " &
                    "h ? -help") is  -- Accepts '-a', '-ad', or '-b argument'
          when ASCII.NUL => exit;
@@ -35,9 +37,11 @@ begin
 
          when '-' =>
             if Full_Switch = "-binding-version" then
-               Put_Line (ZMQ.image (ZMQ.Binding_Version));
+               Put_Line (ZMQ.Image (ZMQ.Binding_Version));
             elsif Full_Switch = "-library-version" then
-               Put_Line (ZMQ.image (ZMQ.Library_Version));
+               Put_Line (ZMQ.Image (ZMQ.Library_Version));
+            elsif Full_Switch = "-ada-library-version" then
+               Put_Line ($version);
             elsif Full_Switch = "-help" then
                help;
                return;

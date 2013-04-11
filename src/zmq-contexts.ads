@@ -36,7 +36,7 @@ package ZMQ.Contexts is
    IO_THREADS_DFLT  : constant := 1;
    MAX_SOCKETS_DFLT : constant := 1024;
 
-   type Context is tagged limited private;
+   type Context is  new Ada.Finalization.Limited_Controlled with private;
    type Any_Context is access all Context'Class;
 
 

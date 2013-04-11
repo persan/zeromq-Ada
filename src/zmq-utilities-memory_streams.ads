@@ -175,7 +175,7 @@ package ZMQ.Utilities.Memory_Streams is
 
 private
    subtype large_buffer is
-     Streams.Stream_Element_Array (1 .. Streams.Stream_Element_Offset'Last);
+     Streams.Stream_Element_Array (0 .. Streams.Stream_Element_Offset'Last);
    type Large_Buffer_Access is access large_buffer;
    for Large_Buffer_Access'Storage_Size use 0;
 
