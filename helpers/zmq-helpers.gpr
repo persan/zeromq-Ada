@@ -1,8 +1,13 @@
 with "../zmq.gpr";
 project ZMQ.helpers is
+
    for Main use ("getinfo.adb");
    for Object_Dir use ".obj";
    for Exec_Dir use ".";
+
+   package builder is
+      for Default_Switches ("ada") use ZMQ.Builder'Default_Switches ("ada") &  ("-s");
+   end builder;
 
    package Compiler is
       for Default_Switches ("ada") use ZMQ.Compiler'Default_Switches ("ada");

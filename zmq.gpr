@@ -35,7 +35,7 @@ project ZMQ is
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
-   Version := "3.2.0";
+   Version := "3.2.1";
 
    for Library_Name use "zmqAda";
    for Library_Version use "lib" & project'Library_Name & ".so." & Version;
@@ -43,7 +43,7 @@ project ZMQ is
    for Object_Dir use ".obj/" & ZMQ_Kind;
 
    for Source_Dirs use ("src");
-     -- ,"_src-exprimental");
+   -- ,"_src-exprimental");
 
    case ZMQ_Kind is
       when "static" =>
@@ -62,6 +62,9 @@ project ZMQ is
                                     "ZMQ.Utilities",
                                     "ZMQ.Utilities.Memory_Streams");
    end case;
+   package Builder is
+      for Default_Switches ("ada") use ("-k", "-j0");
+   end Builder;
 
    package Compiler is
 
@@ -77,7 +80,7 @@ project ZMQ is
    end Check;
 
    package Ide is
+      for gnatlist use project'project_dir & "proj.gnatls";
       for Vcs_Kind use "git";
    end Ide;
 end ZMQ;
-

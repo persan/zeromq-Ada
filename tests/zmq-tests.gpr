@@ -5,7 +5,9 @@ with "../examples/zmq-examples.gpr";
 
 project ZMQ.Tests is
 
-   for Main use ("zmq-tests-testharnesess-test_all.adb");
+   for Main use
+     ("zmq-tests-testharnesess-test_all.adb",
+      "zmq-examples-json_data-test.adb");
 
    for Source_Dirs use (".","testcases");
    for Object_Dir use ".obj";
@@ -13,7 +15,7 @@ project ZMQ.Tests is
 
    package Builder is
       for executable ("zmq-tests-testharnesess-test_all.adb") use "test_all";
-      for Default_Switches ("ada") use ("-k", "-j2");
+      for Default_Switches ("ada") use ZMQ.Builder'Default_Switches ("ada");
    end Builder;
 
    package Compiler is

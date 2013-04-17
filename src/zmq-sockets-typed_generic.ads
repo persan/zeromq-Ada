@@ -21,7 +21,7 @@ package ZMQ.Sockets.Typed_Generic is
    not overriding
    procedure Recv
      (This       : in Typed_Socket;
-      msg        : out Element_Type;
+      Msg        : out Element_Type;
       Flags      : Socket_Flags := No_Flags);
 private
    type Typed_Socket is new Socket with null record;

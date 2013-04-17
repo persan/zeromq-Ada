@@ -4,7 +4,8 @@ with Ada.Directories;
 with Ada.Command_Line;
 with GNAT.Command_Line;
 
-procedure getinfo is
+procedure Getinfo is
+
    use GNAT.Command_Line;
    use Ada.Text_IO;
    command_Name : constant String :=
@@ -21,13 +22,15 @@ procedure getinfo is
          " --library-version      Print version of the 0mq library." & LF &
          " -? | -h | --help       Print this text");
 
-   end help;
+   end Help;
 
 begin
+   Ada.Text_IO.Put_Line (Getinfo'Version);
    loop
       case Getopt ("-binding-version " &
                    "-ada-library-version " &
                    "-library-version " &
+                   "-compiler-version " &
                    "h ? -help") is  -- Accepts '-a', '-ad', or '-b argument'
          when ASCII.NUL => exit;
 
@@ -40,6 +43,8 @@ begin
                Put_Line (ZMQ.Image (ZMQ.Binding_Version));
             elsif Full_Switch = "-library-version" then
                Put_Line (ZMQ.Image (ZMQ.Library_Version));
+            elsif Full_Switch = "-compiler-version" then
+               Put_Line (Standard'Compiler_Version);
             elsif Full_Switch = "-ada-library-version" then
                Put_Line ($version);
             elsif Full_Switch = "-help" then

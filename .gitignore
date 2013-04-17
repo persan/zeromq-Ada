@@ -13,3 +13,4 @@ gnatcheck-source-list.out
 
 *.tgz
 .dist
+Makefile.config

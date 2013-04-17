@@ -7,17 +7,20 @@ project ZMQ.Examples is
                  "zmq-examples-display.adb",
                  "zmq-examples-prompt.adb",
                  "zmq-examples-server.adb",
+                 "zmq-examples-hwserver.adb",
                  "zmq-examples-multi_thread_server.adb");
 
    for Object_Dir use ".obj";
    for Exec_Dir use "bin";
 
    package Builder is
-      for Executable("zmq-examples-client.adb") use "client";
-      for Executable("zmq-examples-display.adb") use "display";
-      for Executable("zmq-examples-prompt.adb") use "prompt";
-      for Executable("zmq-examples-server.adb") use "server";
+      for Executable("zmq-examples-client.adb")     use "client";
+      for Executable("zmq-examples-display.adb")    use "display";
+      for Executable("zmq-examples-prompt.adb")     use "prompt";
+      for Executable("zmq-examples-server.adb")     use "server";
+      for Executable("zmq-examples-hwserver.adb")   use "hwserver";
       for Executable("zmq-examples-multi_thread_server.adb") use "multi_thread_server";
+      for Default_Switches ("ada") use ZMQ.Builder'Default_Switches ("ada");
    end Builder;
 
 

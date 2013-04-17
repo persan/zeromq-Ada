@@ -32,7 +32,7 @@ with ZMQ.Contexts;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-procedure HWServer is
+procedure ZMQ.Examples.HWServer is
    Context  : ZMQ.Contexts.Context;
    Socket   : ZMQ.Sockets.Socket;
    inbuffer : Ada.Strings.Unbounded.Unbounded_String;
@@ -52,4 +52,4 @@ begin
       --  Send reply back to client
       Socket.Send ("World");
    end loop;
-end HWServer;
+end ZMQ.Examples.HWServer;
