@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  S p e c                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -36,40 +36,50 @@ package ZMQ.Contexts is
    IO_THREADS_DFLT  : constant := 1;
    MAX_SOCKETS_DFLT : constant := 1024;
 
-   type Context is  new Ada.Finalization.Limited_Controlled with private;
+   type Context is new Ada.Finalization.Limited_Controlled with private;
    type Any_Context is access all Context'Class;
 
 
+   overriding
+   procedure Initialize (This : in out Context);
 
-   procedure Set_Number_Of_IO_Threads
-     (This : Context; Number_Of_IO_Threads : Positive := IO_THREADS_DFLT);
-   --  specifies the size of the ØMQ thread pool to handle I/O operations.
+   overriding
+   procedure Finalize (This : in out Context);
+
+   not overriding
+   procedure Set_number_of_IO_threads
+     (This : in out Context; Threads : Natural := 1);
+   not overriding
+   function get_number_of_IO_threads
+     (This : in out Context) return Natural;
+   --  Specifies the size of the ØMQ thread pool to handle I/O operations.
    --  If your application is using only the inproc transport for messaging
    --  you may set this to zero, otherwise set it to at least one.
    --  This option only applies before creating any sockets on the context.
 
-   procedure  Set_Maximum_Number_Of_Sockets
-     (This : Context; Number_Of_Sockets : Positive := MAX_SOCKETS_DFLT);
+   not overriding
+   procedure Set_maximum_number_of_sockets
+     (This : in out Context; Count : Positive := 1024);
+   not overriding
+   function Get_maximum_number_of_sockets
+     (This : in out Context) return Natural;
    --  Sets the maximum number of sockets allowed on the context.
 
-   function Get_Number_Of_IO_Threads
-     (This : Context)  return Positive;
-   --  Returns the size of the ØMQ thread pool for this context.
+   not overriding
+   procedure Set_IPv6
+     (This : in out Context; Enable : Boolean := False);
+   not overriding
+   function Get_IPv6 (This : in out Context) return Boolean;
+   --  When IPv6 is enabled, a socket will connect to,
+   --  or accept connections from, both IPv4 and IPv6 hosts.
 
-   function  Get_Maximum_Number_Of_Sockets
-     (This : Context) return Positive;
-   --  Returns the maximum number of sockets allowed for this context.
+   function Is_Connected (This : Context) return Boolean;
 
    function GetImpl (This : Context) return System.Address;
    --  "Private" function to get lowlevel implementation handle.
 
 private
    type Context is new Ada.Finalization.Limited_Controlled with record
-      C : System.Address := System.Null_Address;
+      c : System.Address := System.Null_Address;
    end record;
-   overriding
-   procedure Initialize (This : in out Context);
-
-   overriding
-   procedure Finalize (This : in out Context);
 end ZMQ.Contexts;

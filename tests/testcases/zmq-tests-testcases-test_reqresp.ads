@@ -7,8 +7,8 @@ package ZMQ.Tests.Testcases.Test_REQRESP is
 
    type Test_Case is new AUnit.Test_Cases.Test_Case with record
       Ctx : ZMQ.Contexts.Context;
-      Pub : ZMQ.Sockets.Socket;
-      Sub : ZMQ.Sockets.Socket;
+      REQ : ZMQ.Sockets.Socket;
+      RESP : ZMQ.Sockets.Socket;
    end record;
 
    procedure Register_Tests (T : in out Test_Case);

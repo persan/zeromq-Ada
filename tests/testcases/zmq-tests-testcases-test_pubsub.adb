@@ -4,7 +4,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 package body ZMQ.Tests.Testcases.Test_Pubsub is
    use AUnit;
    use Ada.Strings.Unbounded;
-
+   use GNAT.Source_Info;
    MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
 
 
@@ -26,38 +26,33 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    -------------------------
    --  initialize
    -------------------------
-   procedure Initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
+   procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
+      --  T.Ctx.Set_number_of_IO_threads (1);
       T.Pub.Initialize (T.Ctx, Sockets.PUB);
-
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
-      T.Sub.Set_Message_Filter ("");
-
-      T.Sub.Bind (Test_Port);
       T.Pub.Connect (Test_Port);
-   end Initialize;
+      T.Sub.Bind    (Test_Port);
+      T.Sub.Establish_message_filter ("");
+      delay 0.1;
+   end initialize;
 
    -------------------------
    --  Publish
    -------------------------
    procedure Send (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T     : Test_Case renames Test_Case (Test);
-      Msg   : Ada.Strings.Unbounded.Unbounded_String;
-      task Rec is
-         entry Has_Data;
-      end Rec;
-      task body Rec is
-      begin
-         T.Sub.Recv (Msg);
-         accept Has_Data;
-      end Rec;
+      msg   : Ada.Strings.Unbounded.Unbounded_String;
 
    begin
-      delay 0.01;
       T.Pub.Send (MSG_STRING);
-      Rec.Has_Data;
-      Assert (Msg = MSG_STRING, "Error");
+      delay 0.1;
+
+      T.Sub.Recv (msg);
+
+      Assert (msg = MSG_STRING, "Error");
+      delay 0.1;
    end Send;
 
    -------------------------
@@ -68,6 +63,8 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
+      T.Ctx.Finalize;
+      null;
    end Finalize;
    --------------------
    -- Register_Tests --
@@ -77,7 +74,7 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       use Test_Cases.Registration;
 
    begin
-      Register_Routine (T, Initialize'Access, "initialize");
+      Register_Routine (T, initialize'Access, "initialize");
       Register_Routine (T, Send'Access, "Send");
       Register_Routine (T, Finalize'Access, "Finalize");
    end Register_Tests;

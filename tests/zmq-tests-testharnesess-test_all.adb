@@ -27,6 +27,8 @@ with AUnit.Run;
 with AUnit.Reporter.XML;
 
 with ZMQ.Tests.TestSuits.Test_All;
+with GNAT.OS_Lib;
+with GNAT.IO;
 
 --------------------------------------
 -- Zmq.Tests.Testharnesess.Test_All --
@@ -38,7 +40,22 @@ procedure ZMQ.Tests.Testharnesess.Test_All is
      (ZMQ.Tests.TestSuits.Test_All.Suite);
    --  Reporter : AUnit.Reporter.Text.Text_Reporter;
    Reporter : AUnit.Reporter.XML.XML_Reporter;
+   task killer is
+      entry ok;
+   end killer;
+
+   task body killer is
+   begin
+      select
+         accept ok;
+      or
+         delay 5.0;
+         GNAT.IO.Put_Line ("Times up");
+         GNAT.OS_Lib.OS_Exit (-1);
+      end select;
+   end killer;
 
 begin
    Run (Reporter);
+   killer.ok;
 end ZMQ.Tests.TestHarnesess.Test_All;

@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  B o d y                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -252,10 +252,13 @@ package body ZMQ.Messages is
    --------------
 
    procedure Finalize (Self : in out Message) is
-      Ret : int;
-      pragma Unreferenced (Ret);
+      ret : int;
    begin
-      Ret := Low_Level.zmq_msg_close (Self.Msg'Access);
+      ret := Low_Level.zmq_msg_close (Self.Msg'Access);
+      if ret /= 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+           GNAT.Source_Info.Enclosing_Entity;
+      end if;
    end Finalize;
 
    -------------

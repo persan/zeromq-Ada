@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  B o d y                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -30,7 +30,6 @@
 -------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
-with ZMQ.Low_Level;
 with Interfaces.C; use Interfaces.C;
 
 package body ZMQ.Devices is
@@ -38,22 +37,15 @@ package body ZMQ.Devices is
    ----------------
    -- initialize --
    ----------------
-   type Device_Kind_map is array (Device_Kind) of int;
-   Map : constant Device_Kind_map :=
-           (Streamer  => Low_Level.ZMQ_STREAMER,
-            Forwarder => Low_Level.ZMQ_FORWARDER,
-            Queue     => Low_Level.ZMQ_QUEUE);
+
    procedure Initialize
-     (This      : in out Device;
-                         Kind      : Device_Kind;
-                         In_Socket  : ZMQ.Sockets.Socket;
+     (This       : in out Device;
+      Kind       : Device_Kind;
+      In_Socket  : ZMQ.Sockets.Socket;
       Out_Ocket  : ZMQ.Sockets.Socket)
    is
    begin
-      This.Impl :=
-        Low_Level.zmq_device (Map (Kind),
-                              In_Socket.Get_Impl,
-                              Out_Ocket.Get_Impl);
+      null;
    end Initialize;
 
 end ZMQ.Devices;

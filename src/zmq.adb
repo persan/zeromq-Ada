@@ -72,9 +72,16 @@ package body ZMQ is
    procedure Validate_Library_Version is
       Lib_Version : constant Version_Type :=  Library_Version;
    begin
-      Ada.Assertions.Assert ((Binding_Version.Major = Lib_Version.Major) and
-                               (Binding_Version.Minor = Lib_Version.Minor),
-                             "Incopatible Library " &  Image (Lib_Version));
+      Ada.Assertions.Assert
+        ((Binding_Version.Major = Lib_Version.Major) and
+             (Binding_Version.Minor = Lib_Version.Minor),
+         "Incompatible libzmq found: " & Image (Lib_Version) &
+           ", expected: " &Image (Binding_Version));
    end Validate_Library_Version;
+
+   function errno return Integer is
+   begin
+      return Integer (Low_Level.zmq_errno);
+   end errno;
 
 end ZMQ;

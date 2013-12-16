@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  B o d y                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -47,10 +47,13 @@ package body ZMQ.Contexts is
    is
    begin
       Validate_Library_Version;
-      This.C := Low_Level.zmq_ctx_new;
-      if This.C = Null_Address then
+      if This.c /= Null_Address then
+         raise ZMQ_Error with "Alredy Initialized";
+      end if;
+      This.c := Low_Level.zmq_ctx_new;
+      if This.c = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
+         GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Initialize;
 
@@ -61,67 +64,82 @@ package body ZMQ.Contexts is
    overriding procedure Finalize
      (This : in out Context)
    is
-      Rc : int;
+      rc : int;
    begin
-      Rc := Low_Level.zmq_term (This.C);
-      This.C := Null_Address;
-      if Rc  /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
+      if This.Is_Connected then
+         rc := Low_Level.zmq_ctx_destroy (This.c);
+         if rc  /= 0 then
+            raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
+            GNAT.Source_Info.Enclosing_Entity;
+         end if;
+         This.c := Null_Address;
       end if;
    end Finalize;
 
+   function Is_Connected (This : Context) return Boolean is
+   begin
+      return This.c /= Null_Address;
+   end Is_Connected;
 
    function GetImpl (This : Context) return System.Address is
    begin
-      return This.C;
+      return This.c;
    end GetImpl;
 
-   procedure Set_Number_Of_IO_Threads
-     (This : Context; Number_Of_IO_Threads : Positive := IO_THREADS_DFLT) is
-      Rc : int;
+
+   not overriding
+   procedure Set_number_of_IO_threads
+     (This : in out Context; Threads : Natural := 1) is
    begin
-      Rc := Low_Level.zmq_ctx_set
-        (context => This.GetImpl,
-         option  => Low_Level.ZMQ_IO_THREADS,
-         optval  => int (Number_Of_IO_Threads));
-      if Rc  /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
+      if Low_Level.zmq_ctx_set
+        (This.c, Low_Level.Defs.ZMQ_IO_THREADS, int (Threads)) /= 0 then
+         raise Program_Error with Error_Message (errno);
       end if;
-   end Set_Number_Of_IO_Threads;
+   end Set_number_of_IO_threads;
 
-   procedure  Set_Maximum_Number_Of_Sockets
-     (This : Context; Number_Of_Sockets : Positive := MAX_SOCKETS_DFLT) is
-      Rc : int;
+
+   not overriding
+   function get_number_of_IO_threads (This : in out Context) return Natural is
    begin
-      Rc := Low_Level.zmq_ctx_set
-        (context => This.GetImpl,
-         option  => Low_Level.ZMQ_MAX_SOCKETS,
-         optval  => int (Number_Of_Sockets));
-      if Rc  /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
+      return Natural
+        (Low_Level.zmq_ctx_get (This.c, Low_Level.Defs.ZMQ_IO_THREADS));
+   end get_number_of_IO_threads;
+
+   not overriding
+   procedure Set_maximum_number_of_sockets
+       (This : in out Context; Count : Positive := 1024) is
+   begin
+      if Low_Level.zmq_ctx_set
+        (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS, int (Count)) /= 0 then
+         raise Program_Error with Error_Message (errno);
       end if;
-   end Set_Maximum_Number_Of_Sockets;
+   end Set_maximum_number_of_sockets;
 
-   function Get_Number_Of_IO_Threads (This : Context)  return Positive is
-   begin
-      return Ret : Positive do
-         Ret := Positive
-           (Low_Level.zmq_ctx_get (context => This.GetImpl,
-                                   option  => Low_Level.ZMQ_IO_THREADS));
-      end return;
-   end Get_Number_Of_IO_Threads;
 
-   function  Get_Maximum_Number_Of_Sockets (This : Context) return Positive is
+   not overriding
+   function Get_maximum_number_of_sockets
+     (This : in out Context) return Natural is
    begin
-      return Ret : Positive do
-         Ret := Positive
-           (Low_Level.zmq_ctx_get (context => This.GetImpl,
-                                   option  => Low_Level.ZMQ_MAX_SOCKETS));
-      end return;
-   end Get_Maximum_Number_Of_Sockets;
+      return Natural
+        (Low_Level.zmq_ctx_get (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS));
+   end Get_maximum_number_of_sockets;
+
+   not overriding
+   procedure Set_IPv6
+     (This : in out Context; Enable : Boolean := False) is
+   begin
+      if Low_Level.zmq_ctx_set
+        (This.c, Low_Level.Defs.ZMQ_IPV6, Boolean'Pos (Enable)) /= 0 then
+         raise Program_Error with Error_Message (errno);
+      end if;
+   end Set_IPv6;
+
+   not overriding
+   function Get_IPv6 (This : in out Context) return Boolean is
+   begin
+      return Low_Level.zmq_ctx_get
+        (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS) = 1;
+   end Get_IPv6;
 
 
 end ZMQ.Contexts;

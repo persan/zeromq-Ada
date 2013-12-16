@@ -43,14 +43,15 @@ package ZMQ is
       Patch : aliased Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (3, 2, 0);
+   Binding_Version : constant Version_Type := (4, 0, 1);
    function Library_Version return Version_Type;
 
    function Image (Item : Version_Type) return String;
 
 private
+   function errno return Integer;
    function Error_Message (No : Integer) return String;
    procedure Validate_Library_Version;
-   --  Raiese ZMQ_Error if the underlaying library isent a valid version
+   --  Raiese ZMQ_Error if the underlaying library is'nt a valid version
 
 end ZMQ;

@@ -14,19 +14,19 @@ project ZMQ.Tests is
    for Exec_Dir use "bin";
 
    package Builder is
-      for executable ("zmq-tests-testharnesess-test_all.adb") use "test_all";
-      for Default_Switches ("ada") use ZMQ.Builder'Default_Switches ("ada");
+      for Executable ("zmq-tests-testharnesess-test_all.adb") use "test_all";
+      for Default_Switches ("ada") use ("-k", "-j0");
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use
-        ZMQ.Compiler'Default_Switches ("ada") & ("-gnaty-s");
+      for Default_Switches ("ada") use Zmq.Compiler'Default_Switches ("ada") & ("-gnaty-s","-gnata");
    end Compiler;
 
    package Binder is
       for Default_Switches ("ada") use ("-E");
    end Binder;
-   package Ide renames ZMQ.Ide;
+
+   package Ide renames Zmq.Ide;
 
 end ZMQ.Tests;
 

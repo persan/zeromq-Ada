@@ -34,7 +34,9 @@ package body ZMQ.Utilities.Memory_Streams is
    overriding
    procedure Dump
      (This        : in Memory_Stream;
-      Full_Buffer : in Boolean := False) is
+      Full_Buffer : in Boolean := False;
+      Outf        : in Text_IO.File_Access := Text_IO.Standard_Output) is
+      pragma Unreferenced (Outf);
       Buffer : Large_Buffer_Access renames This.Buffer.As_Pointer;
    begin
       if Full_Buffer then
@@ -114,11 +116,11 @@ package body ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Read
-     (This   : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : out Stream_Element_Array;
       Last   : out Stream_Element_Offset)
    is
-      First  : Stream_Element_Offset;
+      First : Stream_Element_Offset;
       LLast  : Stream_Element_Offset;
    begin
       First :=  This.Cursor;
@@ -137,7 +139,7 @@ package body ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Write
-     (This   : in out Memory_Stream;
+     (This : in out Memory_Stream;
       Item   : in Stream_Element_Array)
    is
       First : Stream_Element_Offset;
@@ -159,16 +161,15 @@ package body ZMQ.Utilities.Memory_Streams is
    end Reset;
 
    procedure Read
-     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Memory_Stream) is
-      pragma Unreferenced (This, Item);
    begin
       raise Program_Error with
         "Its not possible to read into a memory stream using 'read";
    end Read;
 
    procedure Write
-     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : in Memory_Stream) is
    begin
       Ada.Streams.Stream_Element_Array'Write
@@ -180,21 +181,21 @@ package body ZMQ.Utilities.Memory_Streams is
 
 
    procedure Read
-     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Dynamic_Memory_Stream) is
    begin
       Read (This, Memory_Stream (Item));
    end Read;
 
    procedure Write
-     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : in Dynamic_Memory_Stream) is
    begin
       Write (This, Memory_Stream (Item));
    end Write;
 
    procedure Write
-     (This   : in out Dynamic_Memory_Stream;
+     (This : in out Dynamic_Memory_Stream;
       Item   : in Ada.Streams.Stream_Element_Array) is
    begin
       if This.Cursor + Item'Length > This.Buffer_Length then
@@ -204,7 +205,7 @@ package body ZMQ.Utilities.Memory_Streams is
    end Write;
 
    procedure Expand
-     (This    : in out Dynamic_Memory_Stream;
+     (This : in out Dynamic_Memory_Stream;
       to_Size : Ada.Streams.Stream_Element_Offset) is
       new_Size : System.Memory.size_t := 0;
       use System.Memory;

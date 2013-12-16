@@ -6,7 +6,8 @@
 --                                                                           --
 --                                  S p e c                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
+--                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
 --  (the "Software"), to deal in the Software without restriction, including --
@@ -43,9 +44,14 @@ package ZMQ.Messages is
    --  of ØMQ itself they are considered to be opaque binary data.
 
 
-   type Message is tagged limited private;
+   type Message is new Ada.Finalization.Limited_Controlled with private;
 
 
+   procedure Initialize (Self : in out Message);
+   --  Initialize empty 0MQ message
+   --  Initialize the message object referenced by msg to represent
+   --  an empty message.
+   --  This function is most useful when called before receiving a message.
 
    procedure Initialize (Self : in out Message; Size : Natural);
    procedure Initialize
@@ -105,6 +111,7 @@ package ZMQ.Messages is
    --
 
 
+   procedure Finalize   (Self : in out Message);
 
    type Zmq_Msg_T_Access is access all ZMQ.Low_Level.zmq_msg_t;
    function GetImpl (Self : Message) return not null Zmq_Msg_T_Access;
@@ -136,7 +143,5 @@ private
    type Message is new Ada.Finalization.Limited_Controlled with record
       Msg            : aliased ZMQ.Low_Level.zmq_msg_t;
    end record;
-   procedure Initialize (Self : in out Message);
-   procedure Finalize   (Self : in out Message);
 
 end ZMQ.Messages;

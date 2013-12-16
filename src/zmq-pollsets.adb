@@ -1,5 +1,12 @@
 -------------------------------------------------------------------------------
---                   Copyright (c) 2011 Per Sandberg                         --
+--                                                                           --
+--                             0MQ Ada-binding                               --
+--                                                                           --
+--                          Z M Q . P O L L S E T S                          --
+--                                                                           --
+--                                  S p e c                                  --
+--                                                                           --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --

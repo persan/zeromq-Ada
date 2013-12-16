@@ -1,8 +1,7 @@
 with ZMQ.Utilities.Memory_Streams;
 package body ZMQ.Sockets.Indefinite_Typed_Generic is
 
-   use type Ada.Streams.Stream_Element_Offset;
-   Initial_Size : Ada.Streams.Stream_Element_Offset := 1024;
+   Acutal_Initial_Size : Ada.Streams.Stream_Element_Offset := Initial_Size;
    ----------
    -- Send --
    ----------
@@ -16,8 +15,8 @@ package body ZMQ.Sockets.Indefinite_Typed_Generic is
    begin
       Element_Type'Write (S'Access, Msg);
       This.Send (S.Get_Address, Integer (S.Get_Length));
-      if Initial_Size < S.Get_Length then
-         Initial_Size := S.Get_Length;
+      if Acutal_Initial_Size < S.Get_Length then
+         Acutal_Initial_Size := S.Get_Length;
       end if;
    end Send;
 

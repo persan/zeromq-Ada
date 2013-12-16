@@ -29,21 +29,19 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
-
-with ZMQ.Sockets;
-package ZMQ.Proxys is
+-------------------------------------------------------------------------------
 --  Proxys are building blocks intended to serve as intermediate nodes
 --  in complex messaging topologies.
 --
 --  Example usage
 --   Shared queue
 --    When the frontend is a ROUTER socket, and the backend is a DEALER socket,
---     the proxy shall act as a shared queue that collects requests from a set
---     of clients, and distributes these fairly among a set of services.
---     Requests shall be fair-queued from frontend connections and distributed
---     evenly across backend connections.
---     Replies shall automatically return to the client that made the original
---     request.
+--    the proxy shall act as a shared queue that collects requests from a set
+--    of clients, and distributes these fairly among a set ofservices.
+--    Requests shall be fair-queued from frontend connections and distributed
+--    evenly across backend connections.
+--    Replies shall automatically return to the client that made the original
+--    request.
 --   Forwarder
 --    When the frontend is a XSUB socket, and the backend is a XPUB socket,
 --    the proxy shall act as a message forwarder that collects messages from a
@@ -68,11 +66,15 @@ package ZMQ.Proxys is
 --       backend.bind ("tcp://*:5556");
 --       ZMQ.Proxys.Proxy(frontend,backend);
 --    end;
+-------------------------------------------------------------------------------
+with ZMQ.Sockets;
+package ZMQ.Proxys is
+
 
    procedure Proxy
-     (Frontend  : Sockets.Socket;
-      Backend   : Sockets.Socket;
-      Capture   : Sockets.Socket := Sockets.Null_Socket);
+     (Frontend  : not null access Sockets.Socket;
+      Backend   : not null access Sockets.Socket;
+      Capture   : access Sockets.Socket := null);
    --  starts the built-in ØMQ proxy in the current application thread.
    --  The proxy connects a frontend socket to a backend socket.S
    --  Conceptually, data flows from frontend to backend.

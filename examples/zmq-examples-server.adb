@@ -32,6 +32,10 @@ procedure ZMQ.examples.Server is
    s     : ZMQ.Sockets.Socket;
    resultset_string : constant String := "OK";
 begin
+   --  Initialise 0MQ context, requesting a single application thread
+   --  and a single I/O thread
+   ctx.Set_number_of_IO_threads (1);
+
    --   Create a ZMQ_REP socket to receive requests and send replies
    s.Initialize (ctx, Sockets.REP);
 

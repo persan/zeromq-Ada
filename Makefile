@@ -1,14 +1,12 @@
 
-
-include Makefile.config
-
+ifndef PREFIX
+  PREFIX=$(dir $(shell dirname `which gnatls`))
+endif
 LIBDIR ?= ${PREFIX}/lib
-DESTDIR ?=
+DESTDIR ?= 
 GNATFLAGS ?=
 ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
-GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R
-
-
+GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
 compile:
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=relocatable
@@ -38,14 +36,13 @@ samples:
 	${GNATMAKE} -P examples/zmq-examples.gpr
 
 generate:
-	mkdir -p .temp
-	echo "#include <zmq.h>">.temp/x.cpp
-	gprbuild -p -c -Pgenerate.gpr x.cpp
-
-	python renames.py .temp/zmq_h.ads
-	gnatchop -w -gnat05 .temp/zmq_h.ads  src
-	gnatpp  -rnb -M127 src/zmq-low_level.ads -cargs -gnat05
-
+	rm -rf src/gen/*
+	mkdir -p .temp src/gen
+	echo "#include <zmq.h>">.temp/x.c
+	(cd .temp;g++  -c -fdump-ada-spec x.c)
+	python rename.py .temp/zmq_h.ads
+	gnatchop -w -gnat12 .temp/zmq_h.ads src/gen
+	gnat pretty -P zmq.gpr -rf   -M128  src/gen/*.ads
 
 clean:
 	rm -rf .obj

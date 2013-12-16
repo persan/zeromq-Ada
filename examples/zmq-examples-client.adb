@@ -31,6 +31,9 @@ procedure ZMQ.examples.Client is
    ctx              : ZMQ.Contexts.Context;
    s                : ZMQ.Sockets.Socket;
 begin
+   --  Initialise 0MQ context, requesting a single application thread
+   --  and a single I/O thread
+   ctx.Set_number_of_IO_threads (1);
 
    --   Create a ZMQ_REP socket to receive requests and send replies
    s.Initialize (ctx, Sockets.REQ);
@@ -44,11 +47,13 @@ begin
       begin
          query.Initialize (query_string & "(" & i'Img & ");");
          s.Send (query);
+         query.Finalize;
       end;
 
       declare
          resultset        : ZMQ.Messages.Message;
       begin
+         resultset.Initialize;
          s.Recv (resultset);
          Put_Line ('"' & resultset.GetData & '"');
       end;

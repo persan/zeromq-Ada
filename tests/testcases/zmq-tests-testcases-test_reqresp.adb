@@ -1,13 +1,14 @@
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
+with GNAT.Spitbol; use GNAT.Spitbol;
 package body ZMQ.Tests.Testcases.Test_REQRESP is
    use AUnit;
    use Ada.Strings.Unbounded;
+   use GNAT.Source_Info;
 
-   REQUEST_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
-   RESPONSE_STRING : constant Unbounded_String :=
-                       To_Unbounded_String ("Reply");
+   REQUEST_STRING  : constant Unbounded_String := V ("Query");
+   RESPONSE_STRING : constant Unbounded_String := V ("Reply");
 
 
    ----------
@@ -26,16 +27,17 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
    -------------------------
    --  initialize
    -------------------------
+
+   addr : constant String := "tcp://127.0.0.1:5555";
    procedure Initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-
-      T.Sub.Initialize (T.Ctx, Sockets.REP);
-      T.Sub.Bind ("inproc://req");
-
-      T.Pub.Initialize (T.Ctx, Sockets.REQ);
-      T.Pub.Connect ("inproc://req");
-
+      T.RESP.Initialize (T.Ctx, Sockets.REP);
+      T.RESP.Bind (addr);
+      delay 0.1;
+      T.REQ.Initialize (T.Ctx, Sockets.REQ);
+      T.REQ.Connect (addr);
+      delay 0.1;
 
    end Initialize;
 
@@ -46,13 +48,17 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
       T     : Test_Case renames Test_Case (Test);
       Msg   : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Pub.Send (REQUEST_STRING);
-      T.Sub.Recv (Msg);
+      T.REQ.Send (REQUEST_STRING);
+
+      T.RESP.Recv (Msg);
       Assert (Msg = REQUEST_STRING, "Error");
 
-      T.Sub.Send (RESPONSE_STRING);
-      T.Pub.Recv (Msg);
+      T.RESP.Send (RESPONSE_STRING);
+
+      T.REQ.Recv (Msg);
       Assert (Msg = RESPONSE_STRING, "Error");
+
+
    end Send;
 
    -------------------------
@@ -61,8 +67,8 @@ package body ZMQ.Tests.Testcases.Test_REQRESP is
    procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T : Test_Case renames Test_Case (Test);
    begin
-      T.Pub.Finalize;
-      T.Sub.Finalize;
+      T.REQ.Finalize;
+      T.RESP.Finalize;
    end Finalize;
    --------------------
    -- Register_Tests --

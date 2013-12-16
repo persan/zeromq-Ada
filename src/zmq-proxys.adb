@@ -7,9 +7,9 @@ package body ZMQ.Proxys is
    -----------
 
    procedure Proxy
-     (Frontend  : Sockets.Socket;
-      Backend   : Sockets.Socket;
-      Capture   : Sockets.Socket := Sockets.Null_Socket)
+     (Frontend  : not null access Sockets.Socket;
+      Backend   : not null access Sockets.Socket;
+      Capture   : access Sockets.Socket := null)
    is
       Dummy : int;
       pragma Unreferenced (Dummy);

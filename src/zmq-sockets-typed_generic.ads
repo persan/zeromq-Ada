@@ -2,9 +2,8 @@ generic
    type Element_Type is private;
    pragma Compile_Time_Error
      (Element_Type'Has_Access_Values, "No access values allowed in Element");
-   type Socket is new ZMQ.Sockets.Socket with private;
 package ZMQ.Sockets.Typed_Generic is
-   type Typed_Socket is new Socket with private;
+   type Typed_Socket is new ZMQ.Sockets.Socket with private;
 
    not overriding
    procedure Send
@@ -24,5 +23,5 @@ package ZMQ.Sockets.Typed_Generic is
       Msg        : out Element_Type;
       Flags      : Socket_Flags := No_Flags);
 private
-   type Typed_Socket is new Socket with null record;
+   type Typed_Socket is new ZMQ.Sockets.Socket with null record;
 end  ZMQ.Sockets.Typed_Generic;

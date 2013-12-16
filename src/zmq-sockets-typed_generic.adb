@@ -38,7 +38,7 @@ package body ZMQ.Sockets.Typed_Generic is
       Flags      : Socket_Flags := No_Flags)
    is
    begin
-      This.Recv (Msg'Address, Msg'Size, Flags);
+      null; -- This.Recv (Msg'Address, Msg'Size, Flags);
    end Recv;
 
 end ZMQ.Sockets.Typed_Generic;

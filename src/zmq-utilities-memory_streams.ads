@@ -27,6 +27,7 @@
 with Ada.Streams;
 with System;
 with Ada.Finalization;
+with Ada.Text_IO;
 package ZMQ.Utilities.Memory_Streams is
    use Ada;
    --  Memory_Streams implements stream functionality to be mapped to any
@@ -95,7 +96,9 @@ package ZMQ.Utilities.Memory_Streams is
 
    procedure Dump
      (This        : in Memory_Stream_Interface;
-      Full_Buffer : in Boolean := False) is null;
+      Full_Buffer : in Boolean := False;
+      Outf        : in Ada.Text_IO.File_Access := Text_IO.Standard_Output)
+   is null;
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
@@ -115,7 +118,7 @@ package ZMQ.Utilities.Memory_Streams is
 
    overriding
    function Get_Length (This : in Memory_Stream)
-                                   return Ada.Streams.Stream_Element_Count;
+                        return Ada.Streams.Stream_Element_Count;
    --  Returns the full length of the buffer.
 
    overriding
@@ -147,7 +150,8 @@ package ZMQ.Utilities.Memory_Streams is
    overriding
    procedure Dump
      (This      : in Memory_Stream;
-      Full_Buffer : in Boolean := False);
+      Full_Buffer : in Boolean := False;
+      Outf        : in Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output);
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
@@ -175,7 +179,7 @@ package ZMQ.Utilities.Memory_Streams is
 
 private
    subtype large_buffer is
-     Streams.Stream_Element_Array (0 .. Streams.Stream_Element_Offset'Last);
+     Streams.Stream_Element_Array (1 .. Streams.Stream_Element_Offset'Last);
    type Large_Buffer_Access is access large_buffer;
    for Large_Buffer_Access'Storage_Size use 0;
 
@@ -208,7 +212,7 @@ private
    for Memory_Stream'Write use Write;
 
    type controler (controled : not null access Dynamic_Memory_Stream)
-     is new Ada.Finalization.Limited_Controlled with null record;
+   is new Ada.Finalization.Limited_Controlled with null record;
 
    procedure Initialize (This : in out controler);
    procedure Finalize   (This : in out controler);
