@@ -48,7 +48,7 @@ procedure ZMQ.examples.Multi_Thread_Server is
    ctx              : aliased ZMQ.Contexts.Context;
 
    Number_Of_Servers : constant := 10;
-   servers          : array (1 .. Number_Of_Servers) of access server_task;
+   servers           : array (1 .. Number_Of_Servers) of access server_task;
 
    workers          : ZMQ.Sockets.Socket;
    clients          : ZMQ.Sockets.Socket;

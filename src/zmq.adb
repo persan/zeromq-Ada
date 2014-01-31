@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  B o d y                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -43,7 +43,7 @@ package body ZMQ is
       s : constant String := No'Img;
    begin
       return "[" &  s (s'First + 1 .. s'Last) & "] " &
-      Interfaces.C.Strings.Value (Low_Level.zmq_strerror (int (No)));
+        Interfaces.C.Strings.Value (Low_Level.zmq_strerror (int (No)));
    end Error_Message;
 
    function Library_Version return Version_Type is
@@ -65,8 +65,8 @@ package body ZMQ is
       s3 : constant String := Item.Patch'Img;
    begin
       return s1 (s1'First + 1 .. s1'Last) & "." &
-      s2 (s2'First + 1 .. s2'Last) & "." &
-      s3 (s3'First + 1 .. s3'Last);
+        s2 (s2'First + 1 .. s2'Last) & "." &
+        s3 (s3'First + 1 .. s3'Last);
    end Image;
 
    procedure Validate_Library_Version is
@@ -76,7 +76,7 @@ package body ZMQ is
         ((Binding_Version.Major = Lib_Version.Major) and
              (Binding_Version.Minor = Lib_Version.Minor),
          "Incompatible libzmq found: " & Image (Lib_Version) &
-           ", expected: " &Image (Binding_Version));
+           ", expected: " & Image (Binding_Version));
    end Validate_Library_Version;
 
    function errno return Integer is

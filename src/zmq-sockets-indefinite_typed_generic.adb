@@ -1,7 +1,36 @@
+-------------------------------------------------------------------------------
+--                                                                           --
+--                             0MQ Ada-binding                               --
+--                                                                           --
+--  Z M Q . S O C K E T S . I N D E F I N I T E _ T Y P E D _ G E N E R I C  --
+--                                                                           --
+--                                B o d y                                    --
+--                                                                           --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
+--                                                                           --
+--  Permission is hereby granted, free of charge, to any person obtaining a  --
+--  copy of this software and associated documentation files                 --
+--  (the "Software"), to deal in the Software without restriction, including --
+--  without limitation the rights to use, copy, modify, merge, publish,      --
+--  distribute, sublicense, and / or sell copies of the Software, and to     --
+--  permit persons to whom the Software is furnished to do so, subject to    --
+--  the following conditions :                                               --
+--                                                                           --
+--  The above copyright notice and this permission notice shall be included  --
+--  in all copies or substantial portions of the Software.                   --
+--                                                                           --
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  --
+--  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               --
+--  MERCHANTABILITY,                                                         --
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  --
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR     --
+--  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,    --
+--  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
+--  OTHER DEALINGS IN THE SOFTWARE.                                          --
+-------------------------------------------------------------------------------
 with ZMQ.Utilities.Memory_Streams;
 package body ZMQ.Sockets.Indefinite_Typed_Generic is
 
-   Acutal_Initial_Size : Ada.Streams.Stream_Element_Offset := Initial_Size;
    ----------
    -- Send --
    ----------
@@ -15,8 +44,8 @@ package body ZMQ.Sockets.Indefinite_Typed_Generic is
    begin
       Element_Type'Write (S'Access, Msg);
       This.Send (S.Get_Address, Integer (S.Get_Length));
-      if Acutal_Initial_Size < S.Get_Length then
-         Acutal_Initial_Size := S.Get_Length;
+      if This.Acutal_Initial_Size < S.Get_Length then
+         This.Acutal_Initial_Size := S.Get_Length;
       end if;
    end Send;
 

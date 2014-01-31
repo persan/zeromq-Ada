@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---  Copyright 2007 Per Sandberg <per.sandberg@bredband.net>                  --
+--            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -51,12 +51,12 @@ package ZMQ.Utilities.Memory_Streams is
      all Memory_Stream_Interface'Class;
    --
    procedure Read
-     (This : in out Memory_Stream_Interface;
+     (This   : in out Memory_Stream_Interface;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset) is abstract;
 
    procedure Write
-     (This : in out Memory_Stream_Interface;
+     (This   : in out Memory_Stream_Interface;
       Item   : in Ada.Streams.Stream_Element_Array) is abstract;
 
    function Get_Address
@@ -149,19 +149,19 @@ package ZMQ.Utilities.Memory_Streams is
 
    overriding
    procedure Dump
-     (This      : in Memory_Stream;
+     (This        : in Memory_Stream;
       Full_Buffer : in Boolean := False;
       Outf        : in Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output);
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
    overriding procedure Read
-     (This : in out Memory_Stream;
+     (This   : in out Memory_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset);
 
    overriding procedure Write
-     (This : in out Memory_Stream;
+     (This   : in out Memory_Stream;
       Item   : in Ada.Streams.Stream_Element_Array);
 
 
@@ -173,7 +173,7 @@ package ZMQ.Utilities.Memory_Streams is
       Strategy     : Expand_Strategy) is new Memory_Stream with private;
 
    overriding procedure Write
-     (This : in out Dynamic_Memory_Stream;
+     (This   : in out Dynamic_Memory_Stream;
       Item   : in Ada.Streams.Stream_Element_Array);
 
 
@@ -202,12 +202,12 @@ private
    end record;
 
    procedure Read
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Memory_Stream);
    for Memory_Stream'Read use Read;
 
    procedure Write
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : in Memory_Stream);
    for Memory_Stream'Write use Write;
 
@@ -227,16 +227,16 @@ private
    procedure Finalize   (This : in out Dynamic_Memory_Stream);
 
    procedure Read
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Dynamic_Memory_Stream);
    for Dynamic_Memory_Stream'Read use Read;
 
    procedure Write
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : in Dynamic_Memory_Stream);
    for Dynamic_Memory_Stream'Write use Write;
    procedure Expand
-     (This : in out Dynamic_Memory_Stream;
+     (This    : in out Dynamic_Memory_Stream;
       to_Size : Ada.Streams.Stream_Element_Offset);
 
 end ZMQ.Utilities.Memory_Streams;

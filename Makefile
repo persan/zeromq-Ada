@@ -1,4 +1,5 @@
 
+
 ifndef PREFIX
   PREFIX=$(dir $(shell dirname `which gnatls`))
 endif
@@ -7,6 +8,7 @@ DESTDIR ?=
 GNATFLAGS ?=
 ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
 GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
+
 compile:
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=relocatable
@@ -30,6 +32,7 @@ install: compile uninstall
 	mkdir -p ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
 	cp examples/zmq-examples*.ad* ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
 	cp examples/zmq-examples.gpr.inst ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada/zmq-examples.gpr
+
 all: compile install
 
 samples:
@@ -48,18 +51,19 @@ clean:
 	rm -rf .obj
 	${MAKE} -C tests clean
 
-setup:
-	${MAKE} -C eBindings install
-
 test:
 	${MAKE} -C tests
-
 dist:
 	rm -rf .dist
 	gprbuild -p -P helpers/zmq-helpers.gpr -XLIBRARY_TYPE=static
+	echo "|$(shell helpers/getinfo --binding-version)|"
 	git clone . .dist/zeromq-ada-$(shell helpers/getinfo --binding-version)
 	rm -rf .dist/zeromq-ada-$(shell helpers/getinfo --binding-version)/.git
 	cd .dist; tar -czf ../zeromq-ada-$(shell helpers/getinfo --binding-version).tgz *
+	rm -rf .dist
 
-Makefile.config:Makefile
+Makefile.config:Makefile  #IGNORE
 	echo "PREFIX=$(dir $(shell dirname `which gnatls`))" >${@}
+	
+	
+							

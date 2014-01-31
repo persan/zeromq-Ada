@@ -53,7 +53,7 @@ package body ZMQ.Contexts is
       This.c := Low_Level.zmq_ctx_new;
       if This.c = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-         GNAT.Source_Info.Enclosing_Entity;
+           GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Initialize;
 
@@ -70,7 +70,7 @@ package body ZMQ.Contexts is
          rc := Low_Level.zmq_ctx_destroy (This.c);
          if rc  /= 0 then
             raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-            GNAT.Source_Info.Enclosing_Entity;
+              GNAT.Source_Info.Enclosing_Entity;
          end if;
          This.c := Null_Address;
       end if;
@@ -107,7 +107,7 @@ package body ZMQ.Contexts is
 
    not overriding
    procedure Set_maximum_number_of_sockets
-       (This : in out Context; Count : Positive := 1024) is
+     (This : in out Context; Count : Positive := 1024) is
    begin
       if Low_Level.zmq_ctx_set
         (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS, int (Count)) /= 0 then

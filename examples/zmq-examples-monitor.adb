@@ -127,9 +127,9 @@ procedure ZMQ.Examples.Monitor is
 
    Ctx_1     : aliased ZMQ.Contexts.Context;
    Ctx_2     : aliased ZMQ.Contexts.Context;
-   Monitor : Monitor_Type (Ctx_1'Access);
-   Server  : Server_Type (Ctx_2'Access);
-   Client  : Client_Type (Ctx_1'Access);
+   Monitor   : Monitor_Type (Ctx_1'Access);
+   Server    : Server_Type (Ctx_2'Access);
+   Client    : Client_Type (Ctx_1'Access);
 
 begin
    GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);

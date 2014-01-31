@@ -34,8 +34,8 @@ generic
    type Element_Type (<>) is private;
    Initial_Size : Ada.Streams.Stream_Element_Offset := 1024;
 package ZMQ.Sockets.Indefinite_Typed_Generic is
-   --  This package provides a wraper for first serializeing any object
-   --  then send the serialized data over the socket.
+--  This package provides a wraper for first serializeing any object
+--  then send the serialized data over the socket.
 
    type Socket is new ZMQ.Sockets.Socket with private;
 
@@ -50,6 +50,6 @@ package ZMQ.Sockets.Indefinite_Typed_Generic is
       Msg        : out Element_Type);
 private
    type Socket is new ZMQ.Sockets.Socket with  record
-      null;
+      Acutal_Initial_Size : Ada.Streams.Stream_Element_Offset := Initial_Size;
    end record;
 end ZMQ.Sockets.Indefinite_Typed_Generic;

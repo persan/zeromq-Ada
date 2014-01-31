@@ -1,7 +1,7 @@
-with "../zmq.gpr";
+with "zmq.gpr";
 with "aunit.gpr";
-with "../helpers/zmq-helpers.gpr";
-with "../examples/zmq-examples.gpr";
+with "helpers/zmq-helpers.gpr";
+with "examples/zmq-examples.gpr";
 
 project ZMQ.Tests is
 
@@ -9,9 +9,11 @@ project ZMQ.Tests is
      ("zmq-tests-testharnesess-test_all.adb",
       "zmq-examples-json_data-test.adb");
 
-   for Source_Dirs use (".","testcases");
-   for Object_Dir use ".obj";
-   for Exec_Dir use "bin";
+   ROOT := "tests/";
+
+   for Source_Dirs use (ROOT & ".", ROOT & "testcases");
+   for Object_Dir use ROOT & ".obj";
+   for Exec_Dir use ROOT & "bin";
 
    package Builder is
       for Executable ("zmq-tests-testharnesess-test_all.adb") use "test_all";
@@ -19,7 +21,7 @@ project ZMQ.Tests is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use Zmq.Compiler'Default_Switches ("ada") & ("-gnaty-s","-gnata");
+      for Default_Switches ("ada") use Zmq.Compiler'Default_Switches ("ada") & ("-gnaty-s", "-gnata");
    end Compiler;
 
    package Binder is
