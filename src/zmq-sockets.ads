@@ -737,7 +737,7 @@ package ZMQ.Sockets is
    procedure  Getsockopt (This       : in Socket;
                           Option     : Interfaces.C.int;
                           Value      : System.Address;
-                          Value_Size : out Natural);
+                          Value_Size : in out Natural);
 
 
    function Stream

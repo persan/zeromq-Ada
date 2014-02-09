@@ -752,7 +752,7 @@ package body ZMQ.Sockets is
    procedure  Getsockopt (This       : in Socket;
                           Option     : Interfaces.C.int;
                           Value      : System.Address;
-                          Value_Size : out Natural) is
+                          Value_Size : in out Natural) is
       ret          : int;
       Value_Size_i : aliased size_t;
    begin
@@ -771,7 +771,7 @@ package body ZMQ.Sockets is
    not overriding
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return unsigned_long is
-      Dummy_Value_Size : Natural;
+      Dummy_Value_Size : Natural := unsigned_long'Size / System.Storage_Unit;
    begin
       return ret : unsigned_long do
          This.Getsockopt (Option, ret'Address, Dummy_Value_Size);
@@ -786,7 +786,7 @@ package body ZMQ.Sockets is
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return String is
       Buffer     : aliased String (1 .. MAX_OPTION_SIZE);
-      Value_Size : Natural;
+      Value_Size : Natural := Buffer'Length;
 
    begin
       This.Getsockopt (Option, Buffer'Address, Value_Size);
@@ -825,7 +825,7 @@ package body ZMQ.Sockets is
      (This    : in  Socket;
       Option  : Interfaces.C.int) return  Ada.Streams.Stream_Element_Array is
       Buffer     : aliased Stream_Element_Array (1 .. MAX_OPTION_SIZE);
-      Value_Size : Ada.Streams.Stream_Element_Offset;
+      Value_Size : Ada.Streams.Stream_Element_Offset := Buffer'Length;
 
    begin
       This.Getsockopt (Option, Buffer'Address, Natural (Value_Size));
@@ -862,7 +862,7 @@ package body ZMQ.Sockets is
 
 
    function Get_IO_thread_affinity (This : Socket) return Thread_Bitmap is
-      Value_Size : Natural;
+      Value_Size : Natural := Thread_Bitmap'Size / System.Storage_Unit;
    begin
       return ret : Thread_Bitmap do
          This.Getsockopt
