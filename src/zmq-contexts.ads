@@ -36,15 +36,10 @@ package ZMQ.Contexts is
    IO_THREADS_DFLT  : constant := 1;
    MAX_SOCKETS_DFLT : constant := 1024;
 
-   type Context is new Ada.Finalization.Limited_Controlled with private;
+   type Context is tagged limited private;
    type Any_Context is access all Context'Class;
 
 
-   overriding
-   procedure Initialize (This : in out Context);
-
-   overriding
-   procedure Finalize (This : in out Context);
 
    not overriding
    procedure Set_number_of_IO_threads
@@ -82,4 +77,10 @@ private
    type Context is new Ada.Finalization.Limited_Controlled with record
       c : System.Address := System.Null_Address;
    end record;
+   overriding
+   procedure Initialize (This : in out Context);
+
+   overriding
+   procedure Finalize (This : in out Context);
+
 end ZMQ.Contexts;

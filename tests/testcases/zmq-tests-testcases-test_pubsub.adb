@@ -65,8 +65,6 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
-      T.Ctx.Finalize;
-      null;
    end Finalize;
    --------------------
    -- Register_Tests --
