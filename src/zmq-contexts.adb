@@ -48,7 +48,7 @@ package body ZMQ.Contexts is
    begin
       Validate_Library_Version;
       if This.c /= Null_Address then
-         raise ZMQ_Error with "Alredy Initialized";
+         raise ZMQ_Error with "Already Initialized";
       end if;
       This.c := Low_Level.zmq_ctx_new;
       if This.c = Null_Address then
