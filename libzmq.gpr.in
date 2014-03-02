@@ -6,7 +6,7 @@
 --                                                                          --
 --                               P r o j e c t                              --
 --                                                                          --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net            --
+--            Copyright (C) 2010-2016, per.s.sandberg@bahnhof.se            --
 --                                                                          --
 -- 0MQ Ada-binding is free software;  you can  redistribute it  and/or      --
 -- modify it under terms of the  GNU General Public License as published    --
@@ -34,29 +34,27 @@ library project libZMQ is
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
-   Version := "4.0.1";
    For Languages use ("C");
    for Library_Name use "zmq";
+   VERSION := "%(withzmqversion)s";
+   LIBZMQ_ROOT := "%(withzmq)s";
 
-   LIBZMQ_ROOT := "/usr/gnat/";
-
-   for Library_Version use "lib" & project'Library_Name & ".so." & Version;
    for Library_Kind use ZMQ_Kind;
-   for Library_Dir use LIBZMQ_ROOT & "lib";
+   for Library_Dir use "%(withzmqlib)s";
    for externally_built use "True";
-   for Source_Dirs use (LIBZMQ_ROOT & "include");
+   for Source_Dirs use ("%(withzmqinclude)s");
 
    for Source_Files use ("zmq.h",
                          "zmq_utils.h");
 
 
    package Linker is
-      for  Linker_Options use ("-luuid", "-lrt","-lpthread");
+      for  Linker_Options use ("-lrt", "-lpthread");
       case ZMQ_Kind is
          when "relocatable" =>
             null;
          when "static" =>
-            for  Linker_Options use Linker'Linker_Options & ("-lstdc++");
+            for Linker_Options use Linker'Linker_Options & ("-lstdc++");
       end case;
    end Linker;
 
