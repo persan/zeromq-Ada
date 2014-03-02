@@ -19,3 +19,4 @@ fontconfig
 temp.out
 .#*#
 _temp.sed
+libzmq.gpr
