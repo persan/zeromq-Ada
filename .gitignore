@@ -18,3 +18,4 @@ gnatinspect.db
 fontconfig
 temp.out
 .#*#
+_temp.sed
