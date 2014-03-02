@@ -1,10 +1,44 @@
-project Zmq is
-   for Languages use ("Ada");
+------------------------------------------------------------------------------
+--                                                                          --
+--                             0MQ Ada-binding                              --
+--                                                                          --
+--                                   Z M Q                                  --
+--                                                                          --
+--                               P r o j e c t                              --
+--                                                                          --
+--            Copyright (C) 2010-2016, per.s.sandberg@bahnhof.se            --
+--                                                                          --
+-- 0MQ Ada-binding is free software;  you can  redistribute it  and/or      --
+-- modify it under terms of the  GNU General Public License as published    --
+-- by the Free Soft-ware  Foundation;                                       --
+-- either version 2,  or (at your option) any later version.                --
+-- 0MQ Ada-binding is distributed in the hope that it will be useful, but   --
+-- WITH OUT ANY WARRANTY;                                                   --
+-- without even the  implied warranty of MERCHANTABILITY or                 --
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License    --
+-- for  more details.  You should have  received  a copy of the GNU General --
+-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
+--                                                                          --
+-- As a special exception,  if other files  instantiate  generics from this --
+-- unit, or you link  this unit with other files  to produce an executable, --
+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
+-- covered  by the  GNU  General  Public  License.  This exception does not --
+-- however invalidate  any other reasons why  the executable file  might be --
+-- covered by the  GNU Public License.                                      --
+--                                                                          --
+------------------------------------------------------------------------------
+with "libzmq.gpr";
+project ZMQ is
+   For Languages use ("Ada", "Makefile", "Python");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
+   Version := "4.0.1";
 
    for Library_Name use "zmqAda";
+   for Library_Version use "lib" & project'Library_Name & ".so." & Version;
    for Library_Dir use "../zmq/" & ZMQ_Kind;
    for Source_Dirs use ("../../include/zmq");
    for Externally_Built use "True";
@@ -13,7 +47,15 @@ project Zmq is
          for Library_Kind use "static";
       when "relocatable" =>
          for Library_Kind use "dynamic";
+         for Library_Auto_Init use "True";
+         for Library_Interface use ("ZMQ",
+                                    "ZMQ.contexts",
+                                    "ZMQ.messages",
+                                    "ZMQ.sockets",
+                                    "ZMQ.proxys",
+                                    "ZMQ.low_level",
+                                    "ZMQ.Utilities",
+                                    "ZMQ.Utilities.Memory_Streams");
    end case;
-
-end Zmq;
+end ZMQ;
 
