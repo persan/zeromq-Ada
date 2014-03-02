@@ -1,12 +1,10 @@
 
 
-ifndef PREFIX
-  PREFIX=$(dir $(shell dirname `which gnatls`))
-endif
-LIBDIR ?= ${PREFIX}/lib
-DESTDIR ?= 
-GNATFLAGS ?=
-ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
+-include Makefile.config
+
+Makefile.config:configure
+	./configure
+
 GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
 
 compile:
@@ -62,8 +60,9 @@ dist:
 	cd .dist; tar -czf ../zeromq-ada-$(shell helpers/getinfo --binding-version).tgz *
 	rm -rf .dist
 
-Makefile.config:Makefile  #IGNORE
-	echo "PREFIX=$(dir $(shell dirname `which gnatls`))" >${@}
+	
 	
 	
 							
+	
+																									
