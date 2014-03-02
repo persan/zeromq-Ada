@@ -4,7 +4,7 @@ lib
 *.pyc
 new\ file
 .temp
-gen
+gen/*.npp
 ctest.c
 zmq_h.ads
 
