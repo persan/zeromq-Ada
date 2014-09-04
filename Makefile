@@ -1,6 +1,6 @@
-
-
 -include Makefile.config
+
+all: compile install
 
 Makefile.config: configure
 	./configure
@@ -30,8 +30,6 @@ install: compile uninstall
 	mkdir -p ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
 	cp examples/zmq-examples*.ad* ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada
 	cp examples/zmq-examples.gpr.inst ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada/zmq-examples.gpr
-
-all: compile install
 
 samples:
 	${GNATMAKE} -P examples/zmq-examples.gpr
