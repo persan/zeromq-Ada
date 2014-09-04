@@ -6,7 +6,8 @@ Prerequisits:
    a modern GCC (4.3 or better) with Ada enabled
    
 Install:
-   $make
-   $sudo make install
+   $ ./configure
+   $ make
+   $ sudo make install
 
 
