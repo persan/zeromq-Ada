@@ -2,7 +2,7 @@
 
 -include Makefile.config
 
-Makefile.config:configure
+Makefile.config: configure
 	./configure
 
 GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
