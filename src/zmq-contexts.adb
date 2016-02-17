@@ -47,11 +47,11 @@ package body ZMQ.Contexts is
    is
    begin
       Validate_Library_Version;
-      if This.c /= Null_Address then
+      if This.C /= Null_Address then
          raise ZMQ_Error with "Already Initialized";
       end if;
-      This.c := Low_Level.zmq_ctx_new;
-      if This.c = Null_Address then
+      This.C := Low_Level.Zmq_Ctx_New;
+      if This.C = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
       end if;
@@ -64,81 +64,90 @@ package body ZMQ.Contexts is
    overriding procedure Finalize
      (This : in out Context)
    is
-      rc : int;
+      Rc : int;
    begin
       if This.Is_Connected then
-         rc := Low_Level.zmq_ctx_destroy (This.c);
-         if rc  /= 0 then
+         Rc := Low_Level.Zmq_Ctx_Destroy (This.C);
+         if Rc  /= 0 then
             raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
               GNAT.Source_Info.Enclosing_Entity;
          end if;
-         This.c := Null_Address;
+         This.C := Null_Address;
       end if;
    end Finalize;
 
    function Is_Connected (This : Context) return Boolean is
    begin
-      return This.c /= Null_Address;
+      return This.C /= Null_Address;
    end Is_Connected;
 
    function GetImpl (This : Context) return System.Address is
    begin
-      return This.c;
+      return This.C;
    end GetImpl;
 
 
    not overriding
-   procedure Set_number_of_IO_threads
-     (This : in out Context; Threads : Natural := 1) is
+   procedure Set_Number_Of_IO_Threads
+     (This    : in out Context;
+      Threads : Natural := 1) is
+      Status : int;
    begin
-      if Low_Level.zmq_ctx_set
-        (This.c, Low_Level.Defs.ZMQ_IO_THREADS, int (Threads)) /= 0 then
-         raise Program_Error with Error_Message (errno);
+      Status :=  Low_Level.Zmq_Ctx_Set
+        (This.C, Low_Level.Defs.ZMQ_IO_THREADS, int (Threads));
+      if Status /= 0 then
+         raise Program_Error with Error_Message (Integer (Status));
       end if;
-   end Set_number_of_IO_threads;
+   end Set_Number_Of_IO_Threads;
 
 
    not overriding
-   function get_number_of_IO_threads (This : in out Context) return Natural is
+   function Get_Number_Of_IO_Threads (This : in out Context) return Natural is
    begin
       return Natural
-        (Low_Level.zmq_ctx_get (This.c, Low_Level.Defs.ZMQ_IO_THREADS));
-   end get_number_of_IO_threads;
+        (Low_Level.Zmq_Ctx_Get (This.C, Low_Level.Defs.ZMQ_IO_THREADS));
+   end Get_Number_Of_IO_Threads;
 
    not overriding
-   procedure Set_maximum_number_of_sockets
+   procedure Set_Maximum_Number_Of_Sockets
      (This : in out Context; Count : Positive := 1024) is
+      status : int;
    begin
-      if Low_Level.zmq_ctx_set
-        (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS, int (Count)) /= 0 then
-         raise Program_Error with Error_Message (errno);
+      status := Low_Level.Zmq_Ctx_Set
+        (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS, int (Count));
+      if status /= 0
+      then
+         raise Program_Error with Error_Message (Integer (status));
       end if;
-   end Set_maximum_number_of_sockets;
+   end Set_Maximum_Number_Of_Sockets;
 
 
    not overriding
-   function Get_maximum_number_of_sockets
+   function Get_Maximum_Number_Of_Sockets
      (This : in out Context) return Natural is
    begin
       return Natural
-        (Low_Level.zmq_ctx_get (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS));
-   end Get_maximum_number_of_sockets;
+        (Low_Level.Zmq_Ctx_Get (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS));
+   end Get_Maximum_Number_Of_Sockets;
 
    not overriding
    procedure Set_IPv6
      (This : in out Context; Enable : Boolean := False) is
+      Status : int;
    begin
-      if Low_Level.zmq_ctx_set
-        (This.c, Low_Level.Defs.ZMQ_IPV6, Boolean'Pos (Enable)) /= 0 then
-         raise Program_Error with Error_Message (errno);
+      Status := Low_Level.Zmq_Ctx_Set
+        (This.C, Low_Level.Defs.ZMQ_IPV6, Boolean'Pos (Enable));
+      if Status /= 0
+      then
+         raise Program_Error with Error_Message (Integer (Status));
       end if;
    end Set_IPv6;
 
    not overriding
    function Get_IPv6 (This : in out Context) return Boolean is
    begin
-      return Low_Level.zmq_ctx_get
-        (This.c, Low_Level.Defs.ZMQ_MAX_SOCKETS) = 1;
+      return Low_Level.Zmq_Ctx_Get
+        (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS) = 1;
    end Get_IPv6;
 
 

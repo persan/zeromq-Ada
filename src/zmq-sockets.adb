@@ -50,13 +50,13 @@ package body ZMQ.Sockets is
       if With_Context.GetImpl = Null_Address then
          raise ZMQ_Error with "Contecxt Not Initialized";
       end if;
-      if This.c /= Null_Address then
+      if This.C /= Null_Address then
          raise ZMQ_Error with "Socket Initialized";
       end if;
 
-      This.c := Low_Level.zmq_socket (With_Context.GetImpl,
+      This.C := Low_Level.Zmq_Socket (With_Context.GetImpl,
                                       Socket_Type'Pos (Kind));
-      if This.c = Null_Address then
+      if This.C = Null_Address then
          raise ZMQ_Error with "Unable to initialize";
       end if;
    end Initialize;
@@ -70,12 +70,12 @@ package body ZMQ.Sockets is
      (This    : in out Socket;
       Address : String)
    is
-      addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
-      ret  : int;
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_bind (This.c, addr);
-      Free (addr);
-      if ret /= 0 then
+      Ret := Low_Level.Zmq_Bind (This.C, Addr);
+      Free (Addr);
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
@@ -92,12 +92,12 @@ package body ZMQ.Sockets is
      (This    : in out Socket;
       Address : String)
    is
-      addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
-      ret  : int;
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_unbind (This.c, addr);
-      Free (addr);
-      if ret /= 0 then
+      Ret := Low_Level.Zmq_Unbind (This.C, Addr);
+      Free (Addr);
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
@@ -113,14 +113,14 @@ package body ZMQ.Sockets is
                           Option     : Interfaces.C.int;
                           Value      : System.Address;
                           Value_Size : Natural) is
-      ret     : int;
+      Ret     : int;
    begin
-      ret := Low_Level.zmq_setsockopt
-        (This.c,
+      Ret := Low_Level.Zmq_Setsockopt
+        (This.C,
          Option,
          Value,
          size_t (Value_Size));
-      if ret /= 0 then
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
       end if;
@@ -219,12 +219,12 @@ package body ZMQ.Sockets is
      (This    : in out Socket;
       Address : String)
    is
-      addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
-      ret  : int;
+      Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_connect (This.c, addr);
-      Free (addr);
-      if ret /= 0 then
+      Ret := Low_Level.Zmq_Connect (This.C, Addr);
+      Free (Addr);
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity & "(" & Address & ")";
       end if;
@@ -247,10 +247,10 @@ package body ZMQ.Sockets is
       Msg     : Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags)
    is
-      ret  : int;
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_msg_send (Msg.GetImpl, This.c, int (Flags));
-      if ret = -1 then
+      Ret := Low_Level.Zmq_Msg_Send (Msg.GetImpl, This.C, int (Flags));
+      if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
       end if;
@@ -300,11 +300,11 @@ package body ZMQ.Sockets is
                    Msg_Address  : System.Address;
                    Msg_Length   : Natural;
                    Flags        : Socket_Flags := No_Flags) is
-      ret  : int;
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_send
-        (This.c, Msg_Address, Interfaces.C.size_t (Msg_Length), int (Flags));
-      if ret = -1 then
+      Ret := Low_Level.Zmq_Send
+        (This.C, Msg_Address, Interfaces.C.size_t (Msg_Length), int (Flags));
+      if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
       end if;
@@ -336,26 +336,26 @@ package body ZMQ.Sockets is
       Msg     : in out Messages.Message'Class;
       Flags   : Socket_Flags := No_Flags)
    is
-      ret  : int;
+      Ret  : int;
    begin
-      ret := Low_Level.zmq_msg_recv (Msg.GetImpl,
-                                     This.c,
+      Ret := Low_Level.Zmq_Msg_Recv (Msg.GetImpl,
+                                     This.C,
                                      int (Flags));
 
-      if ret = -1 then
+      if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in "
            & GNAT.Source_Info.Enclosing_Entity;
       end if;
    end Recv;
 
-   procedure recv (This    : in Socket;
+   procedure Recv (This    : in Socket;
                    Flags   : Socket_Flags := No_Flags) is
-      dummy_Msg : Messages.Message;
+      Dummy_Msg : Messages.Message;
    begin
-      dummy_Msg.Initialize;
-      This.Recv (dummy_Msg, Flags);
-      dummy_Msg.Finalize;
-   end recv;
+      Dummy_Msg.Initialize;
+      This.Recv (Dummy_Msg, Flags);
+      Dummy_Msg.Finalize;
+   end Recv;
 
    not overriding
 
@@ -365,8 +365,8 @@ package body ZMQ.Sockets is
    begin
       Msg.Initialize;
       This.Recv (Msg, Flags);
-      return ret : String (1 .. Msg.GetSize) do
-         ret := Msg.GetData;
+      return Ret : String (1 .. Msg.GetSize) do
+         Ret := Msg.GetData;
       end return;
    end Recv;
 
@@ -382,15 +382,15 @@ package body ZMQ.Sockets is
       Max_Length : Natural := 1024;
       Flags      : Socket_Flags := No_Flags)
       return  String is
-      msg : Messages.Message;
+      Msg : Messages.Message;
    begin
-      This.Recv (msg, Flags);
-      if msg.GetSize > Max_Length then
+      This.Recv (Msg, Flags);
+      if Msg.GetSize > Max_Length then
          raise Constraint_Error with "message size out of bounds" &
-           msg.GetSize'Img & ">" & Max_Length'Img;
+           Msg.GetSize'Img & ">" & Max_Length'Img;
       end if;
-      return ret : String (1 .. msg.GetSize) do
-         ret := msg.GetData;
+      return Ret : String (1 .. Msg.GetSize) do
+         Ret := Msg.GetData;
       end return;
    end Recv;
 
@@ -399,8 +399,8 @@ package body ZMQ.Sockets is
                   Flags   : Socket_Flags := No_Flags)
                   return Ada.Strings.Unbounded.Unbounded_String is
    begin
-      return ret : Ada.Strings.Unbounded.Unbounded_String do
-         This.Recv (ret, Flags);
+      return Ret : Ada.Strings.Unbounded.Unbounded_String do
+         This.Recv (Ret, Flags);
       end return;
    end Recv;
 
@@ -409,29 +409,29 @@ package body ZMQ.Sockets is
    --------------
 
    overriding procedure Finalize
-     (this : in out Socket)
+     (This : in out Socket)
    is
-      ret : int;
+      Ret : int;
    begin
-      if this.c /= Null_Address then
-         ret := Low_Level.zmq_close (this.c);
-         if ret /= 0 then
+      if This.C /= Null_Address then
+         Ret := Low_Level.Zmq_Close (This.C);
+         if Ret /= 0 then
             raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno);
          end if;
-         this.c := Null_Address;
+         This.C := Null_Address;
       end if;
    end Finalize;
 
-   procedure Proxy (frontend  : not null access Socket;
-                    backend   : not null access Socket'Class;
-                    capture   : access Socket'Class) is
-      ret : int;
+   procedure Proxy (Frontend  : not null access Socket;
+                    Backend   : not null access Socket'Class;
+                    Capture   : access Socket'Class) is
+      Ret : int;
    begin
-      ret := Low_Level.zmq_proxy
-        (frontend.c,
-         backend.c,
-         (if capture /= null then capture.c else System.Null_Address));
-      if ret /= 0 then
+      Ret := Low_Level.Zmq_Proxy
+        (Frontend.C,
+         Backend.C,
+         (if Capture /= null then Capture.C else System.Null_Address));
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno);
       end if;
    end Proxy;
@@ -440,247 +440,247 @@ package body ZMQ.Sockets is
 
 
    not overriding
-   procedure  Set_high_water_mark_for_outbound_messages
+   procedure  Set_High_Water_Mark_For_Outbound_Messages
      (This     : in out Socket;
-      messages : Natural := 1_000)
+      Messages : Natural := 1_000)
    is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDHWM, messages);
-   end Set_high_water_mark_for_outbound_messages;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDHWM, Messages);
+   end Set_High_Water_Mark_For_Outbound_Messages;
 
 
    not overriding
-   procedure  Set_high_water_mark_for_inbound_messages
+   procedure  Set_High_Water_Mark_For_Inbound_Messages
      (This     : in out Socket;
-      messages : Natural := 1_000)
+      Messages : Natural := 1_000)
    is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVHWM, messages);
-   end Set_high_water_mark_for_inbound_messages;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVHWM, Messages);
+   end Set_High_Water_Mark_For_Inbound_Messages;
 
    not overriding
-   procedure  Set_disk_offload_size (This       : in out Socket;
+   procedure  Set_Disk_Offload_Size (This       : in out Socket;
                                      Value      : Natural) is
    begin
       null; -- This.setsockopt (ZMQ.Low_Level.Defs.SWAP, Value);
-   end Set_disk_offload_size;
+   end Set_Disk_Offload_Size;
 
    not overriding
-   procedure  Set_IO_thread_affinity (This    : in out Socket;
+   procedure  Set_IO_Thread_Affinity (This    : in out Socket;
                                       Threads : Thread_Bitmap) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_AFFINITY, Threads'Address, 4);
-   end Set_IO_thread_affinity;
+   end Set_IO_Thread_Affinity;
 
    not overriding
-   procedure  Set_socket_identity
+   procedure  Set_Socket_Identity
      (This       : in out Socket;
       Value      : Ada.Streams.Stream_Element_Array) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_IDENTITY, Value);
-   end Set_socket_identity;
+   end Set_Socket_Identity;
 
-   procedure  Set_socket_identity
+   procedure  Set_Socket_Identity
      (This       : in out Socket;
       Value      : String) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_IDENTITY, Value);
-   end Set_socket_identity;
+   end Set_Socket_Identity;
 
 
    not overriding
-   procedure  Establish_message_filter (This       : in out Socket;
+   procedure  Establish_Message_Filter (This       : in out Socket;
                                         Value      : String) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SUBSCRIBE, Value);
-   end Establish_message_filter;
+   end Establish_Message_Filter;
 
    not overriding
 
-   procedure  Establish_message_filter
+   procedure  Establish_Message_Filter
      (This       : in out Socket;
       Value      :  Ada.Streams.Stream_Element_Array) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SUBSCRIBE, Value);
-   end Establish_message_filter;
+   end Establish_Message_Filter;
 
-   procedure  Establish_message_filter
+   procedure  Establish_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SUBSCRIBE, To_String (Value));
-   end Establish_message_filter;
+   end Establish_Message_Filter;
 
    not overriding
 
-   procedure  Remove_message_filter (This       : in out Socket;
+   procedure  Remove_Message_Filter (This       : in out Socket;
                                      Value      : String) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_UNSUBSCRIBE, Value);
-   end Remove_message_filter;
+   end Remove_Message_Filter;
 
-   procedure  Remove_message_filter
+   procedure  Remove_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_UNSUBSCRIBE, To_String (Value));
-   end Remove_message_filter;
+   end Remove_Message_Filter;
 
-   procedure  Remove_message_filter
+   procedure  Remove_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Streams.Stream_Element_Array) is
    begin
       This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_UNSUBSCRIBE, Value);
-   end Remove_message_filter;
+   end Remove_Message_Filter;
 
    not overriding
-   procedure  Set_multicast_data_rate
+   procedure  Set_Multicast_Data_Rate
      (This                     : in out Socket;
-      kilobits_per_second      : Natural := 100) is
+      Kilobits_Per_Second      : Natural := 100) is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RATE, kilobits_per_second);
-   end Set_multicast_data_rate;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RATE, Kilobits_Per_Second);
+   end Set_Multicast_Data_Rate;
 
    not overriding
-   procedure  set_multicast_recovery_interval (This : in out Socket;
+   procedure  Set_Multicast_Recovery_Interval (This : in out Socket;
                                                Time : Duration := 10.0) is
    begin
       This.Setsockopt
         (ZMQ.Low_Level.Defs.ZMQ_RECOVERY_IVL, Integer (Time * 1000));
-   end set_multicast_recovery_interval;
+   end Set_Multicast_Recovery_Interval;
    not overriding
 
-   procedure  Set_multicast_loopback (This        : in out Socket;
+   procedure  Set_Multicast_Loopback (This        : in out Socket;
                                       Enable      : Boolean) is
    begin
       null; -- This.setsockopt (ZMQ.Low_Level.Defs.ZMQ_HWM, Enable);
-   end Set_multicast_loopback;
+   end Set_Multicast_Loopback;
    not overriding
-   procedure  Set_kernel_transmit_buffer_size (This  : in out Socket;
-                                               bytes : Natural) is
+   procedure  Set_Kernel_Transmit_Buffer_Size (This  : in out Socket;
+                                               Bytes : Natural) is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDBUF, bytes);
-   end Set_kernel_transmit_buffer_size;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDBUF, Bytes);
+   end Set_Kernel_Transmit_Buffer_Size;
    not overriding
 
-   procedure  Set_kernel_receive_buffer_size (This  : in out Socket;
-                                              bytes : Natural) is
+   procedure  Set_Kernel_Receive_Buffer_Size (This  : in out Socket;
+                                              Bytes : Natural) is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVBUF, bytes);
-   end Set_kernel_receive_buffer_size;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVBUF, Bytes);
+   end Set_Kernel_Receive_Buffer_Size;
 
 
    not overriding
-   function Get_linger_period_for_socket_shutdown
+   function Get_Linger_Period_For_Socket_Shutdown
      (This : Socket) return Duration is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_LINGER);
-   end Get_linger_period_for_socket_shutdown;
+   end Get_Linger_Period_For_Socket_Shutdown;
 
    not overriding
-   procedure  Set_linger_period_for_socket_shutdown
+   procedure  Set_Linger_Period_For_Socket_Shutdown
      (This   : in out Socket;
-      period : Duration := Duration'Last) is
+      Period : Duration := Duration'Last) is
    begin
-      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_LINGER, period);
-   end Set_linger_period_for_socket_shutdown;
+      This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_LINGER, Period);
+   end Set_Linger_Period_For_Socket_Shutdown;
 
 
    not overriding
-   function Get_reconnection_interval
+   function Get_Reconnection_Interval
      (This : Socket) return Duration is
    begin
       return Duration (Natural'(This.Getsockopt
                        (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL))) / 1000.0;
-   end Get_reconnection_interval;
+   end Get_Reconnection_Interval;
 
    not overriding
-   procedure  Set_reconnection_interval
+   procedure  Set_Reconnection_Interval
      (This   : in out Socket;
-      period : Duration := 0.100) is
+      Period : Duration := 0.100) is
    begin
-      if period < 0.0  then
+      if Period < 0.0  then
          This.Setsockopt
            (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL, Integer'(-1));
       else
          This.Setsockopt
-           (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (period * 1000.0));
+           (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (Period * 1000.0));
       end if;
 
-   end Set_reconnection_interval;
+   end Set_Reconnection_Interval;
 
 
    not overriding
-   function Get_Maximum_reconnection_interval
+   function Get_Maximum_Reconnection_Interval
      (This : Socket) return Duration is
    begin
       return Duration (Natural'(This.Getsockopt
                        (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL))) / 1000.0;
-   end Get_Maximum_reconnection_interval;
+   end Get_Maximum_Reconnection_Interval;
 
    not overriding
-   procedure  Set_Maximum_reconnection_interval
+   procedure  Set_Maximum_Reconnection_Interval
      (This   : in out Socket;
-      period : Duration := 0.0) is
+      Period : Duration := 0.0) is
    begin
-      if period < 0.0  then
+      if Period < 0.0  then
          This.Setsockopt
            (Low_Level.Defs.ZMQ_RECONNECT_IVL, Integer'(-1));
       else
          This.Setsockopt
-           (Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (period * 1000.0));
+           (Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (Period * 1000.0));
       end if;
 
-   end Set_Maximum_reconnection_interval;
+   end Set_Maximum_Reconnection_Interval;
 
 
 
    not overriding
-   function Get_maximum_length_of_the_queue_of_outstanding_connections
+   function Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
      (This : Socket) return Natural is
    begin
       return This.Getsockopt (Low_Level.Defs.ZMQ_BACKLOG);
-   end Get_maximum_length_of_the_queue_of_outstanding_connections;
+   end Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections;
 
    not overriding
-   procedure Set_maximum_length_of_the_queue_of_outstanding_connections
+   procedure Set_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
      (This        : in out Socket;
-      connections : Natural  := 100) is
+      Connections : Natural  := 100) is
    begin
-      This.Setsockopt (Low_Level.Defs.ZMQ_BACKLOG, connections);
-   end Set_maximum_length_of_the_queue_of_outstanding_connections;
+      This.Setsockopt (Low_Level.Defs.ZMQ_BACKLOG, Connections);
+   end Set_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections;
 
 
    not overriding
-   function Get_Maximum_acceptable_inbound_message_size
+   function Get_Maximum_Acceptable_Inbound_Message_Size
      (This : Socket) return Long_Long_Integer  is
    begin
       return This.Getsockopt (Low_Level.Defs.ZMQ_MAXMSGSIZE);
-   end Get_Maximum_acceptable_inbound_message_size;
+   end Get_Maximum_Acceptable_Inbound_Message_Size;
 
    not overriding
-   procedure Set_Maximum_acceptable_inbound_message_size
+   procedure Set_Maximum_Acceptable_Inbound_Message_Size
      (This   : in out Socket;
       Bytes  : Long_Long_Integer  := 0) is
    begin
       This.Setsockopt (Low_Level.Defs.ZMQ_MAXMSGSIZE, Bytes);
-   end Set_Maximum_acceptable_inbound_message_size;
+   end Set_Maximum_Acceptable_Inbound_Message_Size;
 
 
    not overriding
-   function Get_Maximum_network_hops_for_multicast_packets
+   function Get_Maximum_Network_Hops_For_Multicast_Packets
      (This : Socket) return Positive is
    begin
       return This.Getsockopt (Low_Level.Defs.ZMQ_MULTICAST_HOPS);
-   end Get_Maximum_network_hops_for_multicast_packets;
+   end Get_Maximum_Network_Hops_For_Multicast_Packets;
 
    not overriding
-   procedure Set_Maximum_network_hops_for_multicast_packets
+   procedure Set_Maximum_Network_Hops_For_Multicast_Packets
      (This         : in out Socket;
-      network_hops : Positive  := 1) is
+      Network_Hops : Positive  := 1) is
    begin
-      This.Setsockopt (Low_Level.Defs.ZMQ_MULTICAST_HOPS, network_hops);
-   end Set_Maximum_network_hops_for_multicast_packets;
+      This.Setsockopt (Low_Level.Defs.ZMQ_MULTICAST_HOPS, Network_Hops);
+   end Set_Maximum_Network_Hops_For_Multicast_Packets;
 
 
    not overriding
@@ -743,7 +743,7 @@ package body ZMQ.Sockets is
 
    function Get_Impl (This : in Socket) return System.Address is
    begin
-      return This.c;
+      return This.C;
    end Get_Impl;
 
    -------------
@@ -753,16 +753,16 @@ package body ZMQ.Sockets is
                           Option     : Interfaces.C.int;
                           Value      : System.Address;
                           Value_Size : in out Natural) is
-      ret          : int;
-      Value_Size_i : aliased size_t;
+      Ret          : int;
+      Value_Size_I : aliased size_t;
    begin
-      ret := Low_Level.zmq_getsockopt
-        (This.c,
+      Ret := Low_Level.Zmq_Getsockopt
+        (This.C,
          Option,
          Value,
-         Value_Size_i'Access);
-      Value_Size := Natural (Value_Size_i);
-      if ret /= 0 then
+         Value_Size_I'Access);
+      Value_Size := Natural (Value_Size_I);
+      if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity & "(" & Option'Img & ")";
       end if;
@@ -773,8 +773,8 @@ package body ZMQ.Sockets is
                          Option  : Interfaces.C.int) return unsigned_long is
       Dummy_Value_Size : Natural := unsigned_long'Size / System.Storage_Unit;
    begin
-      return ret : unsigned_long do
-         This.Getsockopt (Option, ret'Address, Dummy_Value_Size);
+      return Ret : unsigned_long do
+         This.Getsockopt (Option, Ret'Address, Dummy_Value_Size);
          if Dummy_Value_Size /= 8 then
             raise Program_Error with "Invalid getsockopt for this type";
          end if;
@@ -797,8 +797,8 @@ package body ZMQ.Sockets is
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return Boolean is
    begin
-      return ret : Boolean do
-         ret := unsigned_long'(This.Getsockopt (Option)) /= 0;
+      return Ret : Boolean do
+         Ret := unsigned_long'(This.Getsockopt (Option)) /= 0;
       end return;
    end Getsockopt;
 
@@ -806,8 +806,8 @@ package body ZMQ.Sockets is
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return Integer is
    begin
-      return ret : Integer do
-         ret := Integer (unsigned_long'(This.Getsockopt (Option)));
+      return Ret : Integer do
+         Ret := Integer (unsigned_long'(This.Getsockopt (Option)));
       end return;
    end Getsockopt;
 
@@ -815,8 +815,8 @@ package body ZMQ.Sockets is
      (This    : in Socket;
       Option  : Interfaces.C.int) return Long_Long_Integer is
    begin
-      return ret : Long_Long_Integer do
-         ret := Long_Long_Integer (unsigned_long'(This.Getsockopt (Option)));
+      return Ret : Long_Long_Integer do
+         Ret := Long_Long_Integer (unsigned_long'(This.Getsockopt (Option)));
       end return;
    end Getsockopt;
 
@@ -841,79 +841,79 @@ package body ZMQ.Sockets is
       return Duration (Integer'(This.Getsockopt (Option)) * 1000.0);
    end Getsockopt;
 
-   function More_message_parts_to_follow (This : Socket) return Boolean is
+   function More_Message_Parts_To_Follow (This : Socket) return Boolean is
    begin
-      return ret : Boolean do
-         ret := This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVMORE);
+      return Ret : Boolean do
+         Ret := This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVMORE);
       end return;
-   end More_message_parts_to_follow;
+   end More_Message_Parts_To_Follow;
 
-   function Get_high_water_mark_for_outbound_messages
+   function Get_High_Water_Mark_For_Outbound_Messages
      (This : Socket) return Natural is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDHWM);
-   end Get_high_water_mark_for_outbound_messages;
+   end Get_High_Water_Mark_For_Outbound_Messages;
 
-   function Get_high_water_mark_for_inbound_messages
+   function Get_High_Water_Mark_For_Inbound_Messages
      (This : Socket) return Natural is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVHWM);
-   end Get_high_water_mark_for_inbound_messages;
+   end Get_High_Water_Mark_For_Inbound_Messages;
 
 
-   function Get_IO_thread_affinity (This : Socket) return Thread_Bitmap is
+   function Get_IO_Thread_Affinity (This : Socket) return Thread_Bitmap is
       Value_Size : Natural := Thread_Bitmap'Size / System.Storage_Unit;
    begin
-      return ret : Thread_Bitmap do
+      return Ret : Thread_Bitmap do
          This.Getsockopt
-           (ZMQ.Low_Level.Defs.ZMQ_AFFINITY, ret'Address, Value_Size);
+           (ZMQ.Low_Level.Defs.ZMQ_AFFINITY, Ret'Address, Value_Size);
          if Value_Size /= 8 then
             raise Program_Error with "Invalid bitmap size " & Value_Size'Img;
          end if;
       end return;
-   end Get_IO_thread_affinity;
+   end Get_IO_Thread_Affinity;
 
-   function Get_socket_identity
+   function Get_Socket_Identity
      (This : Socket) return Ada.Streams.Stream_Element_Array  is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_IDENTITY);
-   end Get_socket_identity;
+   end Get_Socket_Identity;
 
-   function Get_multicast_data_rate (This : Socket) return Natural  is
+   function Get_Multicast_Data_Rate (This : Socket) return Natural  is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RATE);
-   end Get_multicast_data_rate;
+   end Get_Multicast_Data_Rate;
 
-   function Get_multicast_recovery_interval (This : Socket) return Duration is
+   function Get_Multicast_Recovery_Interval (This : Socket) return Duration is
    begin
       return Duration
         (unsigned_long'(
          This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RECOVERY_IVL)));
-   end Get_multicast_recovery_interval;
+   end Get_Multicast_Recovery_Interval;
 
-   function Get_multicast_loopback (This : Socket) return Boolean is
+   function Get_Multicast_Loopback (This : Socket) return Boolean is
       pragma Unreferenced (This);
    begin
       return False; -- This.getsockopt (ZMQ.Low_Level.Defs.ZMQ_MCAST_LOOP);
-   end Get_multicast_loopback;
+   end Get_Multicast_Loopback;
 
-   function Get_kernel_transmit_buffer_size (This : Socket) return Natural is
+   function Get_Kernel_Transmit_Buffer_Size (This : Socket) return Natural is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDBUF);
-   end Get_kernel_transmit_buffer_size;
+   end Get_Kernel_Transmit_Buffer_Size;
 
-   function Get_kernel_receive_buffer_size (This : Socket) return Natural is
+   function Get_Kernel_Receive_Buffer_Size (This : Socket) return Natural is
    begin
       return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVBUF);
-   end Get_kernel_receive_buffer_size;
+   end Get_Kernel_Receive_Buffer_Size;
 
-   not overriding function Retrieve_socket_type
+   not overriding function Retrieve_Socket_Type
      (This : in Socket)
       return Socket_Type is
    begin
       return Socket_Type'Val
         (Natural'(This.Getsockopt (Low_Level.Defs.ZMQ_TYPE)));
-   end Retrieve_socket_type;
+   end Retrieve_Socket_Type;
 
 
    procedure Read
@@ -932,21 +932,21 @@ package body ZMQ.Sockets is
    end Write;
 
    procedure Read_Socket
-     (stream : not null access Ada.Streams.Root_Stream_Type'class;
-      s      : out Socket) is
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      S      : out Socket) is
    begin
       raise Program_Error with "Sockets are not streameble";
    end Read_Socket;
    procedure Write_Socket
-     (stream : not null access Ada.Streams.Root_Stream_Type'class;
-      s      : Socket) is
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      S      : Socket) is
    begin
       raise Program_Error with "Sockets are not streameble";
    end Write_Socket;
 
    function Stream
      (This : Socket)
-      return not null access Ada.Streams.Root_Stream_Type'class is
+      return not null access Ada.Streams.Root_Stream_Type'Class is
    begin
       return This.S'Unrestricted_Access;
    end Stream;

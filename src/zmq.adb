@@ -30,7 +30,7 @@
 -------------------------------------------------------------------------------
 
 
-with Interfaces.C.Strings;
+with Interfaces.C;
 with ZMQ.Low_Level;
 with Ada.Assertions;
 package body ZMQ is
@@ -40,10 +40,9 @@ package body ZMQ is
    -------------------
 
    function Error_Message (No : Integer) return String is
-      s : constant String := No'Img;
+      S : constant String := No'Img;
    begin
-      return "[" &  s (s'First + 1 .. s'Last) & "] " &
-        Interfaces.C.Strings.Value (Low_Level.zmq_strerror (int (No)));
+      return "[" &  S (S'First + 1 .. S'Last) & "] ";
    end Error_Message;
 
    function Library_Version return Version_Type is
@@ -51,22 +50,22 @@ package body ZMQ is
       Minor : aliased int;
       Patch : aliased int;
    begin
-      return ret : Version_Type do
-         Low_Level.zmq_version (Major'Access,
+      return Ret : Version_Type do
+         Low_Level.Zmq_Version (Major'Access,
                                 Minor'Access,
                                 Patch'Access);
-         ret := (Natural (Major), Natural (Minor), Natural (Patch));
+         Ret := (Natural (Major), Natural (Minor), Natural (Patch));
       end return;
    end Library_Version;
 
    function Image (Item : Version_Type) return String is
-      s1 : constant String := Item.Major'Img;
-      s2 : constant String := Item.Minor'Img;
-      s3 : constant String := Item.Patch'Img;
+      S1 : constant String := Item.Major'Img;
+      S2 : constant String := Item.Minor'Img;
+      S3 : constant String := Item.Patch'Img;
    begin
-      return s1 (s1'First + 1 .. s1'Last) & "." &
-        s2 (s2'First + 1 .. s2'Last) & "." &
-        s3 (s3'First + 1 .. s3'Last);
+      return S1 (S1'First + 1 .. S1'Last) & "." &
+        S2 (S2'First + 1 .. S2'Last) & "." &
+        S3 (S3'First + 1 .. S3'Last);
    end Image;
 
    procedure Validate_Library_Version is
@@ -78,10 +77,5 @@ package body ZMQ is
          "Incompatible libzmq found: " & Image (Lib_Version) &
            ", expected: " & Image (Binding_Version));
    end Validate_Library_Version;
-
-   function errno return Integer is
-   begin
-      return Integer (Low_Level.zmq_errno);
-   end errno;
 
 end ZMQ;

@@ -26,24 +26,24 @@ with ZMQ.Sockets;
 with ZMQ.Low_Level;
 package ZMQ.Pollsets is
    pragma Elaborate_Body;
-   type pollitem is tagged record
-      socket  : access ZMQ.Sockets.Socket;
+   type Pollitem is tagged record
+      Socket  : access ZMQ.Sockets.Socket;
       --  fd      : aliased int;
       --  events  : aliased short;
       --  revents : aliased short;
    end record;
 
    type  Pollset (Max_Size : Natural := 32) is tagged limited private;
-   procedure append (this : in out Pollset; item : pollitem'Class);
-   procedure remove (this : in out Pollset; item : pollitem'Class);
+   procedure Append (This : in out Pollset; Item : Pollitem'Class);
+   procedure Remove (This : in out Pollset; Item : Pollitem'Class);
 
-   procedure poll (this    : in out Pollset;
+   procedure Poll (This    : in out Pollset;
                    Timeout : Duration);
 private
-   type ll_polset is array (Natural range <>)
-     of aliased ZMQ.Low_Level.zmq_pollitem_t;
+   type Ll_Polset is array (Natural range <>)
+     of aliased ZMQ.Low_Level.Zmq_Pollitem_T;
    type  Pollset (Max_Size : Natural := 32) is tagged limited record
-      local_data  : aliased ll_polset (1 .. Max_Size);
+      Local_Data  : aliased Ll_Polset (1 .. Max_Size);
       Cursor      : Natural := 1;
    end record;
 end ZMQ.Pollsets;

@@ -49,7 +49,6 @@ package ZMQ is
    function Image (Item : Version_Type) return String;
 
 private
-   function errno return Integer;
    function Error_Message (No : Integer) return String;
    procedure Validate_Library_Version;
    --  Raiese ZMQ_Error if the underlaying library is'nt a valid version

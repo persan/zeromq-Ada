@@ -89,7 +89,7 @@ package ZMQ.Sockets is
    procedure Unbind (This    : in out Socket;
                      Address : Ada.Strings.Unbounded.Unbounded_String);
 
-   not overriding function Retrieve_socket_type
+   not overriding function Retrieve_Socket_Type
      (This : in Socket)
       return Socket_Type;
    --  ========================================================================
@@ -97,13 +97,13 @@ package ZMQ.Sockets is
    --  ========================================================================
 
    not overriding
-   function Get_high_water_mark_for_inbound_messages
+   function Get_High_Water_Mark_For_Inbound_Messages
      (This : Socket) return Natural;
 
    not overriding
-   procedure  Set_high_water_mark_for_outbound_messages
+   procedure  Set_High_Water_Mark_For_Outbound_Messages
      (This     : in out Socket;
-      messages : Natural := 1_000);
+      Messages : Natural := 1_000);
    --  Sets the high water mark for outbound messages on the specified socket.
    --  The high water mark is a hard limit on the maximum number of outstanding
    --  messages ØMQ shall queue in memory for any single peer that the
@@ -123,13 +123,13 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_high_water_mark_for_outbound_messages
+   function Get_High_Water_Mark_For_Outbound_Messages
      (This : Socket) return Natural;
 
    not overriding
-   procedure  Set_high_water_mark_for_inbound_messages
+   procedure  Set_High_Water_Mark_For_Inbound_Messages
      (This     : in out Socket;
-      messages : Natural := 1_000);
+      Messages : Natural := 1_000);
    --  Sets the high water mark for inbound messages on the specified socket.
    --  The high water mark is a hard limit on the maximum number of
    --  outstanding messages ØMQ shall queue in memory for any single peer
@@ -145,7 +145,7 @@ package ZMQ.Sockets is
 
 
    not overriding
-   procedure  Set_disk_offload_size
+   procedure  Set_Disk_Offload_Size
      (This       : in out Socket;
       Value      : Natural);
    --  Sets the disk offload (swap) size < for the specified socket.
@@ -159,10 +159,10 @@ package ZMQ.Sockets is
    type Thread_Bitmap is array (0 .. 63) of Boolean;
 
    pragma Pack (Thread_Bitmap);
-   function Get_IO_thread_affinity
+   function Get_IO_Thread_Affinity
      (This : Socket) return Thread_Bitmap;
    not overriding
-   procedure  Set_IO_thread_affinity
+   procedure  Set_IO_Thread_Affinity
      (This     : in out Socket;
       Threads  : Thread_Bitmap);
    --  Sets the I/O thread affinity for newly created connections on the
@@ -182,17 +182,17 @@ package ZMQ.Sockets is
    ----------------------------------------------------------------------------
 
    not overriding
-   procedure  Set_socket_identity
+   procedure  Set_Socket_Identity
      (This       : in out Socket;
       Value      : String) with
-     pre => Value'Length < 256 and then
+     Pre => Value'Length < 256 and then
      Value'Length > 0 and then
      Value (Value'First) /= ASCII.NUL;
    not overriding
-   procedure  Set_socket_identity
+   procedure  Set_Socket_Identity
      (This       : in out Socket;
       Value      : Ada.Streams.Stream_Element_Array) with
-     pre => Value'Length < 256 and then
+     Pre => Value'Length < 256 and then
      Value'Length > 0 and then
      Value (Value'First) /= 0;
    --  Sets the identity of the specified socket.
@@ -209,18 +209,18 @@ package ZMQ.Sockets is
    ----------------------------------------------------------------------------
 
    not overriding
-   procedure  Establish_message_filter (This       : in out Socket;
+   procedure  Establish_Message_Filter (This       : in out Socket;
                                         Value      : String) with
-     pre => This.Retrieve_socket_type = SUB;
+     Pre => This.Retrieve_Socket_Type = SUB;
    not overriding
-   procedure  Establish_message_filter
+   procedure  Establish_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String) with
-     pre => This.Retrieve_socket_type = SUB;
-   procedure  Establish_message_filter
+     Pre => This.Retrieve_Socket_Type = SUB;
+   procedure  Establish_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Streams.Stream_Element_Array)  with
-     pre => This.Retrieve_socket_type = SUB;
+     Pre => This.Retrieve_Socket_Type = SUB;
    --  Establishes a new message filter on a SUB socket.
    --  Newly created SUB sockets filters out all incoming messages,
    --  therefore you should call this option to establish an initial
@@ -235,21 +235,21 @@ package ZMQ.Sockets is
    ----------------------------------------------------------------------------
 
    not overriding
-   procedure  Remove_message_filter (This       : in out Socket;
+   procedure  Remove_Message_Filter (This       : in out Socket;
                                      Value      : String)  with
-     pre => This.Retrieve_socket_type = SUB;
+     Pre => This.Retrieve_Socket_Type = SUB;
 
    not overriding
-   procedure  Remove_message_filter
+   procedure  Remove_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Strings.Unbounded.Unbounded_String)  with
-     pre => This.Retrieve_socket_type = SUB;
+     Pre => This.Retrieve_Socket_Type = SUB;
 
    not overriding
-   procedure  Remove_message_filter
+   procedure  Remove_Message_Filter
      (This       : in out Socket;
       Value      : Ada.Streams.Stream_Element_Array)  with
-     pre => This.Retrieve_socket_type = SUB;
+     Pre => This.Retrieve_Socket_Type = SUB;
    --  Remove an existing message filter on a SUB socket.
    --  The filter specified must match an existing filter previously
    --  established with "Establish_message_filter".
@@ -259,23 +259,23 @@ package ZMQ.Sockets is
    ----------------------------------------------------------------------------
 
 
-   function Get_multicast_data_rate
+   function Get_Multicast_Data_Rate
      (This : Socket) return Natural;
    not overriding
-   procedure  Set_multicast_data_rate
+   procedure  Set_Multicast_Data_Rate
      (This                     : in out Socket;
-      kilobits_per_second      : Natural := 100);
+      Kilobits_Per_Second      : Natural := 100);
    --  Sets the maximum send or receive data rate for multicast transports
    --  such as PGM using the specified socket.
 
 
    not overriding
-   procedure  set_multicast_recovery_interval
+   procedure  Set_Multicast_Recovery_Interval
      (This : in out Socket;
       Time : Duration := 10.0) with
      Inline => True;
    not overriding
-   function Get_multicast_recovery_interval
+   function Get_Multicast_Recovery_Interval
      (This : Socket) return Duration;
    --  Sets the recovery interval in seconds for multicast transports using
    --  the specified socket.
@@ -290,7 +290,7 @@ package ZMQ.Sockets is
 
 
    not overriding
-   procedure  Set_multicast_loopback
+   procedure  Set_Multicast_Loopback
      (This   : in out Socket;
       Enable : Boolean);
    --  Controls whether data sent via multicast transports using
@@ -304,12 +304,12 @@ package ZMQ.Sockets is
    --  in production environments.
 
    not overriding
-   function Get_kernel_transmit_buffer_size
+   function Get_Kernel_Transmit_Buffer_Size
      (This : Socket) return Natural;
    not overriding
-   procedure  Set_kernel_transmit_buffer_size
+   procedure  Set_Kernel_Transmit_Buffer_Size
      (This  : in out Socket;
-      bytes : Natural);
+      Bytes : Natural);
    --  Sets the underlying kernel transmit buffer size for the socket
    --  to the specified size in bytes.
    --  A value of zero means leave the OS default unchanged.
@@ -318,12 +318,12 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_kernel_receive_buffer_size
+   function Get_Kernel_Receive_Buffer_Size
      (This : Socket) return Natural;
    not overriding
-   procedure  Set_kernel_receive_buffer_size
+   procedure  Set_Kernel_Receive_Buffer_Size
      (This  : in out Socket;
-      bytes : Natural);
+      Bytes : Natural);
    --  Sets the underlying kernel receive buffer size for the socket to
    --  the specified size in bytes.
    --  A value of zero means leave the OS default unchanged.
@@ -332,12 +332,12 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_linger_period_for_socket_shutdown
+   function Get_Linger_Period_For_Socket_Shutdown
      (This : Socket) return Duration;
    not overriding
-   procedure  Set_linger_period_for_socket_shutdown
+   procedure  Set_Linger_Period_For_Socket_Shutdown
      (This   : in out Socket;
-      period : Duration := Duration'Last);
+      Period : Duration := Duration'Last);
    --  Sets the linger period for the specified socket.
    --  The linger period determines how long pending messages which have yet
    --  to be sent to a peer shall linger in memory after a socket is closed,
@@ -360,12 +360,12 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_reconnection_interval
+   function Get_Reconnection_Interval
      (This : Socket) return Duration;
    not overriding
-   procedure  Set_reconnection_interval
+   procedure  Set_Reconnection_Interval
      (This   : in out Socket;
-      period : Duration := 0.100);
+      Period : Duration := 0.100);
    --  Sets the initial reconnection interval for the specified socket.
    --  The reconnection interval is the period ØMQ shall wait between attempts
    --  to reconnect disconnected peers when using connection-oriented
@@ -376,13 +376,13 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_Maximum_reconnection_interval
+   function Get_Maximum_Reconnection_Interval
      (This : Socket) return Duration;
    not overriding
-   procedure Set_Maximum_reconnection_interval
+   procedure Set_Maximum_Reconnection_Interval
      (This   : in out Socket;
-      period : Duration := 0.0) with
-     pre => period = 0.0 or else This.Get_reconnection_interval < period;
+      Period : Duration := 0.0) with
+     Pre => Period = 0.0 or else This.Get_Reconnection_Interval < Period;
    --  Sets the maximum reconnection interval for the specified socket.
    --  This is the maximum period ØMQ shall wait between attempts to reconnect.
    --  On each reconnect attempt, the previous interval shall be doubled
@@ -392,12 +392,12 @@ package ZMQ.Sockets is
    --  interval calculations are only based on reconnection_interval.
 
    not overriding
-   function Get_maximum_length_of_the_queue_of_outstanding_connections
+   function Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
      (This : Socket) return Natural;
    not overriding
-   procedure Set_maximum_length_of_the_queue_of_outstanding_connections
+   procedure Set_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
      (This        : in out Socket;
-      connections : Natural  := 100);
+      Connections : Natural  := 100);
    --  Set the maximum length of the queue of outstanding peer connections
    --  this only applies to connection-oriented transports.
    --  For details refer to your operating system documentation for the
@@ -405,25 +405,25 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_Maximum_acceptable_inbound_message_size
+   function Get_Maximum_Acceptable_Inbound_Message_Size
      (This : Socket) return Long_Long_Integer;
    not overriding
-   procedure Set_Maximum_acceptable_inbound_message_size
+   procedure Set_Maximum_Acceptable_Inbound_Message_Size
      (This   : in out Socket;
       Bytes  : Long_Long_Integer  := 0)  with
-     pre => Bytes >= -1;
+     Pre => Bytes >= -1;
    --  Limits the size of the inbound message.
    --  If a peer sends a message larger than Bytes it is disconnected.
    --  Value of -1 means no limit.
 
 
    not overriding
-   function Get_Maximum_network_hops_for_multicast_packets
+   function Get_Maximum_Network_Hops_For_Multicast_Packets
      (This : Socket) return Positive;
    not overriding
-   procedure Set_Maximum_network_hops_for_multicast_packets
+   procedure Set_Maximum_Network_Hops_For_Multicast_Packets
      (This         : in out Socket;
-      network_hops : Positive  := 1);
+      Network_Hops : Positive  := 1);
    --  Sets the time-to-live field in every multicast packet sent from
    --  this socket.
    --  The default is 1 which means that the multicast packets don't leave
@@ -436,7 +436,7 @@ package ZMQ.Sockets is
    procedure Set_Recieve_Timeout
      (This    : in out Socket;
       Timeout : Duration := Duration'Last)  with
-     pre => Timeout > 0.0;
+     Pre => Timeout > 0.0;
    --  Sets the timeout for receive operation on the socket.
    --  If the value is 0, receive will return immediately,
    --  with a EAGAIN error if there is no message to receive.
@@ -452,7 +452,7 @@ package ZMQ.Sockets is
    procedure Set_Send_Timeout
      (This    : in out Socket;
       Timeout : Duration := Duration'Last)  with
-     pre => Timeout >= 0.0;
+     Pre => Timeout >= 0.0;
    --  Sets the timeout for send operation on the socket.
    --  If the value is 0, send  will return immediately, with a EAGAIN error
    --  if the message cannot be sent.
@@ -474,7 +474,7 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function More_message_parts_to_follow
+   function More_Message_Parts_To_Follow
      (This : Socket) return Boolean;
    --  Returns True if the multi-part message currently being read from the
    --  specified socket has more message parts to follow.
@@ -485,7 +485,7 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_socket_identity
+   function Get_Socket_Identity
      (This : Socket) return Ada.Streams.Stream_Element_Array;
    --  Returns the identity of the specified socket.
    --  Socket identity determines if existing ZMQ infastructure
@@ -504,7 +504,7 @@ package ZMQ.Sockets is
 
 
    not overriding
-   function Get_multicast_loopback
+   function Get_Multicast_Loopback
      (This : Socket) return Boolean;
    --  Returns True if multicast transports shall be recievd bye the
    --  loopback interface.
@@ -623,22 +623,22 @@ package ZMQ.Sockets is
       return Ada.Strings.Unbounded.Unbounded_String;
 
    not overriding
-   procedure recv
+   procedure Recv
      (This    : in Socket;
       Flags   : Socket_Flags := No_Flags);
 
 
 
    not overriding
-   procedure Proxy (frontend  : not null access Socket;
-                    backend   : not null access Socket'Class;
-                    capture   : access Socket'Class);
+   procedure Proxy (Frontend  : not null access Socket;
+                    Backend   : not null access Socket'Class;
+                    Capture   : access Socket'Class);
 
 
    overriding
-   procedure Finalize (this : in out Socket);
+   procedure Finalize (This : in out Socket);
    not overriding
-   procedure Close (this : in out Socket) renames Finalize;
+   procedure Close (This : in out Socket) renames Finalize;
 
    --
 
@@ -742,12 +742,12 @@ package ZMQ.Sockets is
 
    function Stream
      (This : Socket)
-      return not null access Ada.Streams.Root_Stream_Type'class with
-     pre => This.Retrieve_socket_type = STREAM;
+      return not null access Ada.Streams.Root_Stream_Type'Class with
+     Pre => This.Retrieve_Socket_Type = STREAM;
 
 private
 
-   type Socket_Stream (self : not null access Socket'class) is new
+   type Socket_Stream (Self : not null access Socket'Class) is new
      Ada.Streams.Root_Stream_Type with null record;
 
    procedure Read
@@ -760,14 +760,14 @@ private
       Item   : Ada.Streams.Stream_Element_Array);
 
    procedure Read_Socket
-     (stream : not null access Ada.Streams.Root_Stream_Type'class;
-      s      : out Socket);
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      S      : out Socket);
    procedure Write_Socket
-     (stream : not null access Ada.Streams.Root_Stream_Type'class;
-      s      : Socket);
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      S      : Socket);
 
    type Socket is new Ada.Finalization.Limited_Controlled with record
-      c    : System.Address := System.Null_Address;
+      C    : System.Address := System.Null_Address;
       S    : aliased Socket_Stream (Socket'Access);
    end record;
 

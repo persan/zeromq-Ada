@@ -178,13 +178,13 @@ package ZMQ.Utilities.Memory_Streams is
 
 
 private
-   subtype large_buffer is
+   subtype Large_Buffer is
      Streams.Stream_Element_Array (1 .. Streams.Stream_Element_Offset'Last);
-   type Large_Buffer_Access is access large_buffer;
+   type Large_Buffer_Access is access Large_Buffer;
    for Large_Buffer_Access'Storage_Size use 0;
 
-   type Large_Buffer_Union (ref  : Boolean := False) is record
-      case ref is
+   type Large_Buffer_Union (Ref  : Boolean := False) is record
+      case Ref is
       when True =>
          As_Address : System.Address;
       when False =>
@@ -211,17 +211,18 @@ private
       Item   : in Memory_Stream);
    for Memory_Stream'Write use Write;
 
-   type controler (controled : not null access Dynamic_Memory_Stream)
+   type Controler (Controled : not null access Dynamic_Memory_Stream)
    is new Ada.Finalization.Limited_Controlled with null record;
 
-   procedure Initialize (This : in out controler);
-   procedure Finalize   (This : in out controler);
+   procedure Initialize (This : in out Controler);
+   procedure Finalize   (This : in out Controler);
 
    type Dynamic_Memory_Stream
      (Initial_Size : Streams.Stream_Element_Offset;
-      Strategy     : Expand_Strategy) is new Memory_Stream with record
-      C : controler (Dynamic_Memory_Stream'Access);
-   end record;
+      Strategy     : Expand_Strategy) is new Memory_Stream with
+      record
+         C : Controler (Dynamic_Memory_Stream'Access);
+      end record;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream);
    procedure Finalize   (This : in out Dynamic_Memory_Stream);
@@ -237,6 +238,6 @@ private
    for Dynamic_Memory_Stream'Write use Write;
    procedure Expand
      (This    : in out Dynamic_Memory_Stream;
-      to_Size : Ada.Streams.Stream_Element_Offset);
+      To_Size : Ada.Streams.Stream_Element_Offset);
 
 end ZMQ.Utilities.Memory_Streams;

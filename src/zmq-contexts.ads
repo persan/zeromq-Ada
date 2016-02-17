@@ -42,10 +42,10 @@ package ZMQ.Contexts is
 
 
    not overriding
-   procedure Set_number_of_IO_threads
+   procedure Set_Number_Of_IO_Threads
      (This : in out Context; Threads : Natural := 1);
    not overriding
-   function get_number_of_IO_threads
+   function Get_Number_Of_IO_Threads
      (This : in out Context) return Natural;
    --  Specifies the size of the ØMQ thread pool to handle I/O operations.
    --  If your application is using only the inproc transport for messaging
@@ -53,10 +53,10 @@ package ZMQ.Contexts is
    --  This option only applies before creating any sockets on the context.
 
    not overriding
-   procedure Set_maximum_number_of_sockets
+   procedure Set_Maximum_Number_Of_Sockets
      (This : in out Context; Count : Positive := 1024);
    not overriding
-   function Get_maximum_number_of_sockets
+   function Get_Maximum_Number_Of_Sockets
      (This : in out Context) return Natural;
    --  Sets the maximum number of sockets allowed on the context.
 
@@ -75,7 +75,7 @@ package ZMQ.Contexts is
 
 private
    type Context is new Ada.Finalization.Limited_Controlled with record
-      c : System.Address := System.Null_Address;
+      C : System.Address := System.Null_Address;
    end record;
    overriding
    procedure Initialize (This : in out Context);

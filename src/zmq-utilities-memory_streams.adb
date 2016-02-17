@@ -206,23 +206,23 @@ package body ZMQ.Utilities.Memory_Streams is
 
    procedure Expand
      (This    : in out Dynamic_Memory_Stream;
-      to_Size : Ada.Streams.Stream_Element_Offset) is
-      new_Size : System.Memory.size_t := 0;
+      To_Size : Ada.Streams.Stream_Element_Offset) is
+      New_Size : System.Memory.size_t := 0;
       use System.Memory;
    begin
-      while new_Size < size_t (to_Size) loop
+      while New_Size < size_t (To_Size) loop
          case This.Strategy is
          when As_Needed =>
-            new_Size := size_t (to_Size);
+            New_Size := size_t (To_Size);
          when Multiply_By_Two =>
-            new_Size := size_t (2 * This.Buffer_Length);
+            New_Size := size_t (2 * This.Buffer_Length);
          when Add_Initial_Size =>
-            new_Size := size_t (This.Buffer_Length + This.Initial_Size);
+            New_Size := size_t (This.Buffer_Length + This.Initial_Size);
          end case;
       end loop;
       This.Buffer.As_Address :=  System.Memory.Realloc
-        (This.Buffer.As_Address, new_Size);
-      This.Buffer_Length := Streams.Stream_Element_Count (new_Size);
+        (This.Buffer.As_Address, New_Size);
+      This.Buffer_Length := Streams.Stream_Element_Count (New_Size);
    end Expand;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream) is
@@ -240,15 +240,15 @@ package body ZMQ.Utilities.Memory_Streams is
    end Finalize;
 
 
-   procedure Initialize (This : in out controler) is
+   procedure Initialize (This : in out Controler) is
       use System.Memory;
    begin
-      This.controled.Initialize;
+      This.Controled.Initialize;
    end Initialize;
 
-   procedure Finalize   (This : in out controler) is
+   procedure Finalize   (This : in out Controler) is
    begin
-      This.controled.Finalize;
+      This.Controled.Finalize;
    end Finalize;
 
 end ZMQ.Utilities.Memory_Streams;

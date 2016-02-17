@@ -45,7 +45,7 @@ package body ZMQ.Proxys is
       Dummy : int;
       pragma Unreferenced (Dummy);
    begin
-      Dummy := ZMQ.Low_Level.zmq_proxy
+      Dummy := ZMQ.Low_Level.Zmq_Proxy
         (Frontend.Get_Impl, Backend.Get_Impl, Capture.Get_Impl);
    end Proxy;
 

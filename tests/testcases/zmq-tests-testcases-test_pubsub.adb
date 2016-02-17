@@ -36,7 +36,7 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
       T.Pub.Connect (Test_Port);
       T.Sub.Bind    (Test_Port);
-      T.Sub.Establish_message_filter ("");
+      T.Sub.Establish_Message_Filter ("");
       delay 0.1;
    end initialize;
 
