@@ -1,11 +1,11 @@
 -include Makefile.config
 
-all: compile install
+all: compile
 
 Makefile.config: configure
 	./configure
 
-GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R 
+GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R
 
 compile:
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
@@ -57,10 +57,3 @@ dist:
 	rm -rf .dist/zeromq-ada-$(shell helpers/getinfo --binding-version)/.git
 	cd .dist; tar -czf ../zeromq-ada-$(shell helpers/getinfo --binding-version).tgz *
 	rm -rf .dist
-
-	
-	
-	
-							
-	
-																									
