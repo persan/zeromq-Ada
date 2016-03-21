@@ -29,23 +29,23 @@
 -- covered by the  GNU Public License.                                      --
 --                                                                          --
 ------------------------------------------------------------------------------
-with "libsodium.gpr";
-library project libZMQ is
+
+library project libSodium is
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
    For Languages use ("C");
-   for Library_Name use "zmq";
+   for Library_Name use "sodium";
    VERSION := "%(withzmqversion)s";
-   LIBZMQ_ROOT := "%(withzmq)s";
+   --LIBZMQ_ROOT := "%(withzmq)s";
 
    for Library_Kind use ZMQ_Kind;
    for Library_Dir use "%(withzmqlib)s";
    for externally_built use "True";
    for Source_Dirs use ("%(withzmqinclude)s");
 
-   for Source_Files use ("zmq.h",
-                         "zmq_utils.h");
+   --for Source_Files use ("zmq.h",
+   --                      "zmq_utils.h");
 
 
    package Linker is
@@ -58,4 +58,4 @@ library project libZMQ is
       end case;
    end Linker;
 
-end libZMQ;
+end libSodium;

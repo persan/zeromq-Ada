@@ -6,22 +6,27 @@ import argparse
 import subprocess
 
 
-project="zmq-Ada"
+project = "zmq-Ada"
 
 
 def getProjectDir():
-    projects=False
-    os.environ["ADA_PROJECT_PATH"]=""
-    os.environ["GPR_PROJECT_PATH"]=""
-    response=subprocess.Popen(["gnatls", "-v"], stdout=subprocess.PIPE).communicate()[0].split("\n")
+    projects = False
+    os.environ["ADA_PROJECT_PATH"] = ""
+    os.environ["GPR_PROJECT_PATH"] = ""
+    response = subprocess.Popen(
+         ["gnatls", "-v"],
+         stdout=subprocess.PIPE).communicate()[0].split("\n")
     for line in response:
         if "Project Search Path" in line:
-            projects=True
+            projects = True
         if projects:
             if exists(line.strip()):
                 return line.strip()
+
+
 def which(program):
     import os
+
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
@@ -36,106 +41,162 @@ def which(program):
             if is_exe(exe_file):
                 return exe_file
 
+
 def whichzmqversion():
-    with file("_locate_zmq.c","w") as outf:
+    with file("_locate_zmq.c", "w") as outf:
         outf.write("#include <zmq.h>\n")
         outf.write("#include <stdio.h>\n")
-        outf.write('int main(){printf("%d.%d.%d",ZMQ_VERSION_MAJOR,ZMQ_VERSION_MINOR,ZMQ_VERSION_PATCH);}')
-    response=subprocess.Popen(["gcc","_locate_zmq.c","-lzmq","--static"], stdout=subprocess.PIPE).communicate()[0].split("\n")
-    response=subprocess.Popen(["./a.out"], stdout=subprocess.PIPE).communicate()[0]
+        outf.write('int main() { printf("%d.%d.%d",ZMQ_VERSION_MAJOR,ZMQ_VERSION_MINOR,ZMQ_VERSION_PATCH);}')
+    response = subprocess.Popen(["gcc", "_locate_zmq.c", "-lzmq"],
+                                stdout=subprocess.PIPE).communicate()[0].split("\n")
+    response = subprocess.Popen([join(dirname(__file__),"a.out")],
+                                stdout=subprocess.PIPE).communicate()[0]
     os.remove("_locate_zmq.c")
     os.remove("a.out")
     return response
 
+
 def whichzmq():
-    with file("_locate_zmq.c","w") as outf:
+    with file("_locate_zmq.c", "w") as outf:
         outf.write("#include <zmq.h>")
-    response=subprocess.Popen(["cpp", "-pipe", "_locate_zmq.c" ], stdout=subprocess.PIPE).communicate()[0].split("\n")
+    response = subprocess.Popen(["cpp", "-pipe", "_locate_zmq.c"],
+                                stdout=subprocess.PIPE).communicate()[0].split("\n")
     os.remove("_locate_zmq.c")
     for line in response:
         if "/zmq.h" in line:
-            line=line.split('"')[1]
+            line = line.split('"')[1]
             return dirname(dirname(line))
     return "/usr"
-    
-def parsargs(args):            
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    fail=False
-    parser.add_argument('--prefix', metavar='N', type=str, default=dirname(dirname(which("gnatls"))),  help='Install root')
-    parser.add_argument('--eprefix', metavar='N', type=str, default=dirname(dirname(which("gnatls"))),     help='system admin root')
-    parser.add_argument("--bindir", metavar='N', type=str,   help='user executables [EPREFIX/bin]')
-    parser.add_argument("--sbindir", metavar='N', type=str,   help='system admin executables [EPREFIX/sbin]')
-    parser.add_argument("--projectdir", metavar='N', type=str, default=getProjectDir(), help='Location of gprfiles [%s]' % getProjectDir())
-    parser.add_argument("--libexecdir", metavar='N', type=str,   help='program executables [EPREFIX/libexec]')
-    parser.add_argument("--sysconfdir", metavar='N', type=str,   help='read-only single-machine data [PREFIX/etc]')
-    parser.add_argument("--sharedstatedir", metavar='N', type=str,   help='modifiable architecture-independent data [PREFIX/com]')
-    parser.add_argument("--localstatedir", metavar='N', type=str,   help='modifiable single-machine data [PREFIX/var]')
-    parser.add_argument("--libdir", metavar='N', type=str,   help='object code libraries [EPREFIX/lib]')
-    parser.add_argument("--includedir", metavar='N', type=str,   help='header files [PREFIX/include]')
-    parser.add_argument("--datarootdir", metavar='N', type=str,   help='read-only arch.-independent data root [PREFIX/share]')
-    parser.add_argument("--datadir", metavar='N', type=str,   help='read-only architecture-independent data [DATAROOTDIR]')
-    parser.add_argument("--infodir", metavar='N', type=str,   help='info documentation [DATAROOTDIR/info]')
-    parser.add_argument("--localedir", metavar='N', type=str,   help='locale-dependent data [DATAROOTDIR/locale]')
-    parser.add_argument("--mandir", metavar='N', type=str,   help='man documentation [DATAROOTDIR/man]')
-    parser.add_argument("--docdir", metavar='N', type=str,   help='documentation root [DATAROOTDIR/doc/a-zeromq]')
-    parser.add_argument("--htmldir", metavar='N', type=str,   help='html documentation [DOCDIR]')
-    parser.add_argument("--dvidir", metavar='N', type=str,   help='dvi documentation [DOCDIR]')
-    parser.add_argument("--pdfdir", metavar='N', type=str,   help='pdf documentation [DOCDIR]')
-    parser.add_argument("--psdir", metavar='N', type=str,   help='ps documentation [DOCDIR]')
-    parser.add_argument("--withzmq", metavar='N', type=str, default=whichzmq(),  help='location of zmq')
-    parser.add_argument("--withzmqlib", metavar='N', type=str,   help='location of libzmq.a')
-    parser.add_argument("--withzmqinclude", metavar='N', type=str,  help='location of zmq.h')
-    parser.add_argument("--withzmqversion", metavar='N', type=str, default=whichzmqversion(), help='Version of libzmq')
-    
-    args=parser.parse_args(args)
-    if not args.bindir: args.bindir=join(args.prefix,"bin")
-    if not args.sbindir: args.sbindir=join(args.eprefix,"sbin")
-    if not args.libexecdir: args.libexecdir=join(args.eprefix,"libexex")
-    if not args.sysconfdir: args.sysconfdir=join(args.prefix,"etc")
-    if not args.libdir: args.libdir=join(args.prefix,"lib")
-    if not args.sharedstatedir: args.sharedstatedir=join(args.prefix,"com")
-    if not args.localstatedir: args.localstatedir=join(args.prefix,"var")
-    if not args.includedir: args.includedir=join(args.prefix,"include")
-    if not args.datarootdir: args.datarootdir=join(args.prefix,"share")
-    if not args.datadir: args.datadir=args.datarootdir
-    if not args.infodir: args.infodir=join(args.datarootdir,"info")
-    if not args.localedir: args.localedir=join(args.datarootdir,"locale")
-    if not args.mandir: args.mandir=join(args.datarootdir,"man")
-    if not args.docdir: args.docdir=join(args.datarootdir,"doc",project)
-    if not args.htmldir: args.htmldir=join(args.docdir,"html")
-    if not args.dvidir: args.dvidir=join(args.docdir,"dvi")
-    if not args.pdfdir: args.pdfdir=join(args.docdir,"pdf")
-    if not args.psdir: args.psdir=join(args.docdir,"ps")
-    if not args.withzmqlib: args.withzmqlib=join(args.withzmq,"lib")
-    if not args.withzmqinclude: args.withzmqinclude=join(args.withzmq,"include")
 
-    if not exists (join(args.withzmqinclude,"zmq.h")):
+
+def parsargs(args):
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    fail = False
+    parser.add_argument('--prefix',
+                        metavar='N',
+                        type=str,
+                        default=dirname(dirname(which("gnatls"))),
+                        help='Install root')
+    parser.add_argument('--eprefix', metavar='N', type=str,
+                        default=dirname(dirname(which("gnatls"))),
+                        help='system admin root')
+    parser.add_argument("--bindir", metavar='N', type=str,
+                        help='user executables [EPREFIX/bin]')
+    parser.add_argument("--sbindir", metavar='N', type=str,
+                        help='system admin executables [EPREFIX/sbin]')
+    parser.add_argument("--projectdir", metavar='N', type=str,
+                        default=getProjectDir(),
+                        help='Location of gprfiles [%s]' % getProjectDir())
+    parser.add_argument("--libexecdir", metavar='N', type=str,
+                        help='program executables [EPREFIX/libexec]')
+    parser.add_argument("--sysconfdir", metavar='N', type=str,
+                        help='read-only single-machine data [PREFIX/etc]')
+    parser.add_argument("--sharedstatedir", metavar='N', type=str,
+                        help='modifiable architecture-independent data [PREFIX/com]')
+    parser.add_argument("--localstatedir", metavar='N', type=str,
+                        help='modifiable single-machine data [PREFIX/var]')
+    parser.add_argument("--libdir", metavar='N', type=str,
+                        help='object code libraries [EPREFIX/lib]')
+    parser.add_argument("--includedir", metavar='N', type=str,
+                        help='header files [PREFIX/include]')
+    parser.add_argument("--datarootdir", metavar='N', type=str,
+                        help='read-only arch.-independent data root [PREFIX/share]')
+    parser.add_argument("--datadir", metavar='N', type=str,
+                        help='read-only architecture-independent data [DATAROOTDIR]')
+    parser.add_argument("--infodir", metavar='N', type=str,
+                        help='info documentation [DATAROOTDIR/info]')
+    parser.add_argument("--localedir", metavar='N', type=str,
+                        help='locale-dependent data [DATAROOTDIR/locale]')
+    parser.add_argument("--mandir", metavar='N', type=str,
+                        help='man documentation [DATAROOTDIR/man]')
+    parser.add_argument("--docdir", metavar='N', type=str,
+                        help='documentation root [DATAROOTDIR/doc/a-zeromq]')
+    parser.add_argument("--htmldir", metavar='N', type=str,
+                        help='html documentation [DOCDIR]')
+    parser.add_argument("--dvidir", metavar='N', type=str,
+                        help='dvi documentation [DOCDIR]')
+    parser.add_argument("--pdfdir", metavar='N', type=str,
+                        help='pdf documentation [DOCDIR]')
+    parser.add_argument("--psdir", metavar='N', type=str,
+                        help='ps documentation [DOCDIR]')
+    parser.add_argument("--withzmq", metavar='N', type=str,
+                        default=whichzmq(),  help='location of zmq')
+    parser.add_argument("--withzmqlib", metavar='N', type=str,
+                        help='location of libzmq.a')
+    parser.add_argument("--withzmqinclude", metavar='N', type=str,
+                        help='location of zmq.h')
+    parser.add_argument("--withzmqversion", metavar='N', type=str,
+                        default=whichzmqversion(), help='Version of libzmq')
+
+    args = parser.parse_args(args)
+    if not args.bindir:
+        args.bindir = join(args.prefix, "bin")
+    if not args.sbindir:
+        args.sbindir = join(args.eprefix, "sbin")
+    if not args.libexecdir:
+        args.libexecdir = join(args.eprefix, "libexex")
+    if not args.sysconfdir:
+        args.sysconfdir = join(args.prefix, "etc")
+    if not args.libdir:
+        args.libdir = join(args.prefix, "lib")
+    if not args.sharedstatedir:
+        args.sharedstatedir = join(args.prefix, "com")
+    if not args.localstatedir:
+        args.localstatedir = join(args.prefix, "var")
+    if not args.includedir:
+        args.includedir = join(args.prefix, "include")
+    if not args.datarootdir:
+        args.datarootdir = join(args.prefix, "share")
+    if not args.datadir:
+        args.datadir = args.datarootdir
+    if not args.infodir:
+        args.infodir = join(args.datarootdir, "info")
+    if not args.localedir:
+        args.localedir = join(args.datarootdir, "locale")
+    if not args.mandir:
+        args.mandir = join(args.datarootdir, "man")
+    if not args.docdir:
+        args.docdir = join(args.datarootdir, "doc", project)
+    if not args.htmldir:
+        args.htmldir = join(args.docdir, "html")
+    if not args.dvidir:
+        args.dvidir = join(args.docdir, "dvi")
+    if not args.pdfdir:
+        args.pdfdir = join(args.docdir, "pdf")
+    if not args.psdir:
+        args.psdir = join(args.docdir, "ps")
+    if not args.withzmqlib:
+        args.withzmqlib = join(args.withzmq, "lib")
+    if not args.withzmqinclude:
+        args.withzmqinclude = join(args.withzmq, "include")
+
+    if not exists(join(args.withzmqinclude, "zmq.h")):
         sys.stderr.write("No zmq.h found\n")
-        fail=True
-    if not exists (join(args.withzmqlib,"libzmq.a")):
+        fail = True
+    if not exists(join(args.withzmqlib, "libzmq.a")):
         sys.stderr.write("No libzmq found\n")
-        fail=True
+        fail = True
     if fail:
         return None
     return args
 
+
 def expand(args):
-    for root,dirs,files in os.walk("."):
-       for f in files:
-           if splitext(f)[1] == ".in":
-               src=join(root,f)
-               tgt=join(root,splitext(f)[0])
-               with file(src) as inf:
-                   with file(tgt,"w") as outf:
-                       outf.write(inf.read() % args.__dict__)
-                       
+    print args.__dict__
+    for root, dirs, files in os.walk("."):
+        if "libzeromq" not in root:
+            for f in files:
+                if splitext(f)[1] == ".in":
+                    src = join(root, f)
+                    tgt = join(root, splitext(f)[0])
+                    with file(src) as inf:
+                        print src, tgt
+                        with file(tgt, "w") as outf:
+                            outf.write(inf.read() % args.__dict__)
+
+
 def main(args):
     expand(parsargs(args))
-         
+
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-
-
-
-
