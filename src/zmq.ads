@@ -43,7 +43,7 @@ package ZMQ is
       Patch : aliased Natural;
    end record;
 
-   Binding_Version : constant Version_Type := (4, 0, 1);
+   Binding_Version : constant Version_Type := (4, 1, 4);
    function Library_Version return Version_Type;
 
    function Image (Item : Version_Type) return String;

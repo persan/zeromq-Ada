@@ -35,7 +35,7 @@ project ZMQ is
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
-   Version := "4.0.1";
+   Version := "4.1.4";
 
    for Library_Name use "zmqAda";
    for Library_Version use "lib" & project'Library_Name & ".so." & Version;
@@ -91,6 +91,6 @@ project ZMQ is
       for Specification_Exceptions ("Makefile") use ("Makefile");
       for Spec_suffix ("sed") use ".sed";
       for Body_suffix ("Python") use ".py";
+      for Implementation_Exceptions ("Python") use ("configure");
    end naming;
 end ZMQ;
-
