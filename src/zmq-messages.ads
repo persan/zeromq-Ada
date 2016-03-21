@@ -47,16 +47,8 @@ package ZMQ.Messages is
    type Message is new Ada.Finalization.Limited_Controlled with private;
 
 
-   procedure Initialize (Self : in out Message);
-   --  Initialize empty 0MQ message
-   --  Initialize the message object referenced by msg to represent
-   --  an empty message.
-   --  This function is most useful when called before receiving a message.
 
    procedure Initialize (Self : in out Message; Size : Natural);
-   procedure Initialize
-     (Self : in out Message; Size : Ada.Streams.Stream_Element_Offset);
-   pragma Inline (Initialize);
    --  Initialize 0MQ message of a specified size
    --  Allocate resources required to store a message size bytes long
    --  and initialize the message object referenced by msg to represent
@@ -67,11 +59,9 @@ package ZMQ.Messages is
                          Data : String);
    procedure Initialize (Self : in out Message;
                          Data : Ada.Streams.Stream_Element_Array);
-   pragma Inline (Initialize);
    procedure Initialize (Self : in out Message;
                          Data : System.Address;
                          Size : Natural);
-   pragma Inline (Initialize);
    --  Initialize 0MQ message of a specified size
    --  Allocate resources required to store the data
    --  and initialize the message object referenced by msg to represent

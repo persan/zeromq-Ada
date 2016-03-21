@@ -33,7 +33,7 @@ procedure ZMQ.examples.Display is
 
 begin
 
-   Context.Set_number_of_IO_threads (1);
+   Context.Set_Number_Of_IO_Threads (1);
    Socket.Initialize (Context, Sockets.SUB);
    Socket.Establish_Message_Filter ("");
    Socket.Bind ("tcp://lo:5555");

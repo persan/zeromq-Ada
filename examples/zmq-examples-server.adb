@@ -27,40 +27,38 @@ with ZMQ.Contexts;
 with ZMQ.Messages;
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure ZMQ.examples.Server is
-   ctx   : ZMQ.Contexts.Context;
-   s     : ZMQ.Sockets.Socket;
-   resultset_string : constant String := "OK";
+procedure ZMQ.Examples.Server is
+   Ctx              : ZMQ.Contexts.Context;
+   S                : ZMQ.Sockets.Socket;
+   Resultset_String : constant String := "OK";
 begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
-   ctx.Set_number_of_IO_threads (1);
+   Ctx.Set_Number_Of_IO_Threads (1);
 
    --   Create a ZMQ_REP socket to receive requests and send replies
-   s.Initialize (ctx, Sockets.REP);
+   S.Initialize (Ctx, Sockets.REP);
 
    --   Bind to the TCP transport and port 5555 on the 'lo' interface
-   s.Bind ("tcp://lo:5555");
+   S.Bind ("tcp://lo:5555");
 
    loop
       declare
-         query : ZMQ.Messages.Message;
+         Query : ZMQ.Messages.Message;
       begin
-         query.Initialize;
+         Query.Initialize(0);
          --  Receive a message, blocks until one is available
-         s.Recv (query);
+         S.Recv (Query);
          --  Process the query
-         Put_Line (query.GetData);
+         Put_Line (Query.GetData);
          declare
             --  Allocate a response message and fill in an example response
-            resultset : ZMQ.Messages.Message;
+            Resultset : ZMQ.Messages.Message;
          begin
-            resultset.Initialize (query.GetData & "->" & resultset_string);
+            Resultset.Initialize (Query.GetData & "->" & Resultset_String);
             --   Send back our canned response
-            s.Send (resultset);
-            resultset.Finalize;
+            S.Send (Resultset);
          end;
-         query.Finalize;
       end;
 
    end loop;

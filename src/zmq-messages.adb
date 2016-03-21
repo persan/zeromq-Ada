@@ -38,20 +38,6 @@ with System.Address_To_Access_Conversions;
 package body ZMQ.Messages is
    use Interfaces.C;
 
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize (Self : in out Message) is
-      Ret : int;
-   begin
-      Ret := Low_Level.Zmq_Msg_Init (Self.Msg'Access);
-      if Ret /= 0 then
-         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
-           GNAT.Source_Info.Enclosing_Entity;
-      end if;
-   end Initialize;
-
 
    --  ========================================================================
    --  Initialize with size
@@ -60,19 +46,15 @@ package body ZMQ.Messages is
    procedure Initialize (Self : in out Message; Size : Natural) is
       Ret : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Init_Size (Self.Msg'Access, size_t (Size));
+      if Size > 0 then
+         Ret := Low_Level.Zmq_Msg_Init_Size (Self.Msg'Access, size_t (Size));
+      else
+         Ret := Low_Level.Zmq_Msg_Init (Self.Msg'Access);
+      end if;
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
       end if;
-   end Initialize;
-
-   procedure Initialize
-     (Self : in out Message;
-      Size : Ada.Streams.Stream_Element_Offset)
-   is
-   begin
-      Self.Initialize (Natural (Size));
    end Initialize;
 
    --  ========================================================================

@@ -352,9 +352,8 @@ package body ZMQ.Sockets is
                    Flags   : Socket_Flags := No_Flags) is
       Dummy_Msg : Messages.Message;
    begin
-      Dummy_Msg.Initialize;
+      Dummy_Msg.Initialize (0);
       This.Recv (Dummy_Msg, Flags);
-      Dummy_Msg.Finalize;
    end Recv;
 
    not overriding
@@ -363,7 +362,7 @@ package body ZMQ.Sockets is
                   Flags   : Socket_Flags := No_Flags) return String is
       Msg     : Messages.Message;
    begin
-      Msg.Initialize;
+      Msg.Initialize (0);
       This.Recv (Msg, Flags);
       return Ret : String (1 .. Msg.GetSize) do
          Ret := Msg.GetData;
@@ -379,7 +378,7 @@ package body ZMQ.Sockets is
 
    function Recv
      (This       : in Socket;
-      Max_Length : Natural := 1024;
+      Max_Length : Natural;
       Flags      : Socket_Flags := No_Flags)
       return  String is
       Msg : Messages.Message;

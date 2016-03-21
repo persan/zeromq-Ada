@@ -600,7 +600,7 @@ package ZMQ.Sockets is
    not overriding
    function Recv
      (This       : in Socket;
-      Max_Length : Natural := 1024;
+      Max_Length : Natural;
       Flags      : Socket_Flags := No_Flags)
       return  String;
 

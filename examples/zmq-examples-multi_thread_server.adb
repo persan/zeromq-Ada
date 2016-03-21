@@ -26,51 +26,49 @@ with ZMQ.Sockets;
 with ZMQ.Contexts;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ZMQ.Proxys;
-procedure ZMQ.examples.Multi_Thread_Server is
+procedure ZMQ.Examples.Multi_Thread_Server is
 
-   task type server_task (ctx : not null access ZMQ.Contexts.Context;
-                          id  : Integer) is
-   end server_task;
+   task type Server_Task (Ctx : not null access ZMQ.Contexts.Context;
+                          Id  : Integer) is
+   end Server_Task;
 
-   task body server_task is
-      msg : Ada.Strings.Unbounded.Unbounded_String;
-      s   : ZMQ.Sockets.Socket;
+   task body Server_Task is
+      Msg : Ada.Strings.Unbounded.Unbounded_String;
+      S   : ZMQ.Sockets.Socket;
    begin
-      s.Initialize (ctx.all, Sockets.REP);
-      s.Connect ("inproc://workers");
+      S.Initialize (Ctx.all, Sockets.REP);
+      S.Connect ("inproc://workers");
       loop
-         msg := s.Recv;
-         Append (msg, "<Served by thread:" & id'Img & ">");
-         s.Send (msg);
+         Msg := S.Recv;
+         Append (Msg, "<Served by thread:" & Id'Img & ">");
+         S.Send (Msg);
       end loop;
-   end server_task;
+   end Server_Task;
 
-   ctx              : aliased ZMQ.Contexts.Context;
+   Ctx              : aliased ZMQ.Contexts.Context;
 
    Number_Of_Servers : constant := 10;
-   servers           : array (1 .. Number_Of_Servers) of access server_task;
+   Servers           : array (1 .. Number_Of_Servers) of access Server_Task;
 
-   workers          : ZMQ.Sockets.Socket;
-   clients          : ZMQ.Sockets.Socket;
-
-   dev              : ZMQ.devices.device;
+   Workers          : aliased ZMQ.Sockets.Socket;
+   Clients          : aliased ZMQ.Sockets.Socket;
 
 begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
-   ctx.Set_number_of_IO_threads (servers'Length + 1);
+   Ctx.Set_Number_Of_IO_Threads (Servers'Length + 1);
 
    --   Create a ZMQ_REP socket to receive requests and send replies
-   workers.Initialize (ctx, Sockets.XREQ);
-   workers.Bind ("inproc://workers");
+   Workers.Initialize (Ctx, Sockets.XREQ);
+   Workers.Bind ("inproc://workers");
 
    --   Bind to the TCP transport and port 5555 on the 'lo' interface
-   clients.Initialize (ctx, Sockets.XREP);
-   workers.Bind ("tcp://lo:5555");
+   Clients.Initialize (Ctx, Sockets.XREP);
+   Workers.Bind ("tcp://lo:5555");
 
-   for i in servers'Range loop
-      servers (i) := new server_task (ctx'Access, i);
+   for I in Servers'Range loop
+      Servers (I) := new Server_Task (Ctx'Access, I);
    end loop;
-   ZMQ.Proxys.Proxy (workers, workers);
+   ZMQ.Proxys.Proxy (Frontend => Workers'Access, Backend => Clients'Access);
 
 end ZMQ.Examples.Multi_Thread_Server;
