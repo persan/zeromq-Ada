@@ -31,8 +31,9 @@
 
 with ZMQ.Low_Level;
 with Interfaces.C; use Interfaces.C;
+with System; use System;
 package body ZMQ.Proxys is
-
+   --
    -----------
    -- Proxy --
    -----------
@@ -46,7 +47,8 @@ package body ZMQ.Proxys is
       pragma Unreferenced (Dummy);
    begin
       Dummy := ZMQ.Low_Level.Zmq_Proxy
-        (Frontend.Get_Impl, Backend.Get_Impl, Capture.Get_Impl);
+        (Frontend.Get_Impl, Backend.Get_Impl,
+         (if Capture /= null then Capture.Get_Impl else System.Null_Address));
    end Proxy;
 
 end ZMQ.Proxys;

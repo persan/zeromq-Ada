@@ -57,18 +57,19 @@ begin
    --  Initialise 0MQ context, requesting a single application thread
    --  and a single I/O thread
    Ctx.Set_Number_Of_IO_Threads (Servers'Length + 1);
-
    --   Create a ZMQ_REP socket to receive requests and send replies
-   Workers.Initialize (Ctx, Sockets.XREQ);
-   Workers.Bind ("inproc://workers");
+   Workers.Initialize (Ctx, Sockets.ROUTER);
+   Workers.Bind ("tcp://lo:5555");
 
    --   Bind to the TCP transport and port 5555 on the 'lo' interface
-   Clients.Initialize (Ctx, Sockets.XREP);
-   Workers.Bind ("tcp://lo:5555");
+   Clients.Initialize (Ctx, Sockets.DEALER);
+   Clients.Bind ("inproc://workers");
 
    for I in Servers'Range loop
       Servers (I) := new Server_Task (Ctx'Access, I);
    end loop;
-   ZMQ.Proxys.Proxy (Frontend => Workers'Access, Backend => Clients'Access);
+
+   ZMQ.Proxys.Proxy (Frontend => Clients'Access,
+                     Backend => Workers'Access);
 
 end ZMQ.Examples.Multi_Thread_Server;

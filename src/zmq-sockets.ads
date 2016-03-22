@@ -44,14 +44,17 @@ package ZMQ.Sockets is
       SUB,
       REQ,
       REP,
-      XREQ,
-      XREP,
+      DEALER,
+      ROUTER,
       PULL,
       PUSH,
       XPUB,
       XSUB,
       STREAM);
-
+   XREQ : constant Socket_Type := DEALER;
+   pragma Obsolescent (XREQ, "use DEALER");
+   XREP : constant Socket_Type := ROUTER;
+   pragma Obsolescent (XREP, "use ROUTER");
    type Socket is
      new Ada.Finalization.Limited_Controlled  with private;
    type Any_Socket is access all Socket'Class;
