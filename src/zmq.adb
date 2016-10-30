@@ -32,7 +32,7 @@
 
 with Interfaces.C;
 with ZMQ.Low_Level;
-with Ada.Assertions;
+with GNAT.IO;
 package body ZMQ is
    use Interfaces.C;
    -------------------
@@ -71,11 +71,10 @@ package body ZMQ is
    procedure Validate_Library_Version is
       Lib_Version : constant Version_Type :=  Library_Version;
    begin
-      Ada.Assertions.Assert
-        ((Binding_Version.Major = Lib_Version.Major) and
-             (Binding_Version.Minor = Lib_Version.Minor),
-         "Incompatible libzmq found: " & Image (Lib_Version) &
-           ", expected: " & Image (Binding_Version));
+      if Binding_Version.Major /= Lib_Version.Major then
+         GNAT.IO.Put_Line ("Warning libzmq: " & Image (Lib_Version) &
+           " found, binding version is: " & Image (Binding_Version));
+      end if;
    end Validate_Library_Version;
 
 end ZMQ;
