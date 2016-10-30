@@ -9,11 +9,10 @@ project ZMQ.Tests is
      ("zmq-tests-testharnesess-test_all.adb",
       "zmq-examples-json_data-test.adb");
 
-   ROOT := "tests/";
 
-   for Source_Dirs use (ROOT & ".", ROOT & "testcases");
-   for Object_Dir use ROOT & ".obj";
-   for Exec_Dir use ROOT & "bin";
+   for Source_Dirs use (".", "testcases");
+   for Object_Dir use ".obj";
+   for Exec_Dir use  "bin";
 
    package Builder is
       for Executable ("zmq-tests-testharnesess-test_all.adb") use "test_all";
