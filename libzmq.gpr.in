@@ -30,32 +30,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 with "libsodium.gpr";
-library project libZMQ is
-
-   type ZMQ_Kind_Type is ("static", "relocatable");
-   ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
-   For Languages use ("C");
-   for Library_Name use "zmq";
-   VERSION := "%(withzmqversion)s";
-   LIBZMQ_ROOT := "%(withzmq)s";
-
-   for Library_Kind use ZMQ_Kind;
-   for Library_Dir use "%(withzmqlib)s";
-   for externally_built use "True";
-   for Source_Dirs use ("%(withzmqinclude)s");
-
-   for Source_Files use ("zmq.h",
-                         "zmq_utils.h");
-
+abstract project libZMQ is
 
    package Linker is
-      for  Linker_Options use ("-lrt", "-lpthread");
-      case ZMQ_Kind is
-         when "relocatable" =>
-            null;
-         when "static" =>
-            for Linker_Options use Linker'Linker_Options & ("-lstdc++");
-      end case;
+       for Linker_Options use  ("-lzmq");
    end Linker;
 
 end libZMQ;
