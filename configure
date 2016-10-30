@@ -57,6 +57,7 @@ def whichzmqversion():
 
 
 def whichzmq():
+    ret = "/usr"
     with file("_locate_zmq.c", "w") as outf:
         outf.write("#include <zmq.h>")
     response = subprocess.Popen(["cpp", "-pipe", "_locate_zmq.c"],
@@ -65,8 +66,8 @@ def whichzmq():
     for line in response:
         if "/zmq.h" in line:
             line = line.split('"')[1]
-            return dirname(dirname(line))
-    return "/usr"
+            ret = dirname(dirname(line))
+    return ret
 
 
 def parsargs(args):
@@ -173,16 +174,15 @@ def parsargs(args):
     if not exists(join(args.withzmqinclude, "zmq.h")):
         sys.stderr.write("No zmq.h found\n")
         fail = True
-    if not exists(join(args.withzmqlib, "libzmq.a")):
-        sys.stderr.write("No libzmq found\n")
-        fail = True
+    #if not exists(join(args.withzmqlib, "libzmq.a")):
+    #    sys.stderr.write("No libzmq found\n")
+    #    fail = True
     if fail:
         return None
     return args
 
 
 def expand(args):
-    print args.__dict__
     for root, dirs, files in os.walk("."):
         if "libzeromq" not in root:
             for f in files:

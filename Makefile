@@ -5,7 +5,7 @@ all: compile
 Makefile.config: configure
 	./configure
 
-GNATMAKE = gnatmake ${GNATFLAGS} -p -f -R
+GNATMAKE = gprbuild ${GNATFLAGS} -p -f -R
 
 compile:
 	${GNATMAKE} -P zmq.gpr -XLIBRARY_TYPE=static
