@@ -1,5 +1,5 @@
 -include Makefile.config
-
+export GPR_PROJECT_PATH:=${CURDIR}
 all: compile
 
 Makefile.config: configure
@@ -44,9 +44,7 @@ generate:
 	gnat pretty -P zmq.gpr -rf   -M128  src/gen/*.ads
 
 clean:
-	rm -rf .obj
-	${MAKE} -C tests clean
-
+	git clean -fXd
 test:
 	${MAKE} -C tests
 dist:
@@ -57,3 +55,6 @@ dist:
 	rm -rf .dist/zeromq-ada-$(shell helpers/getinfo --binding-version)/.git
 	cd .dist; tar -czf ../zeromq-ada-$(shell helpers/getinfo --binding-version).tgz *
 	rm -rf .dist
+
+gps:
+	gps -P tests/zmq-tests.gpr
