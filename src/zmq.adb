@@ -51,7 +51,7 @@ package body ZMQ is
       Patch : aliased int;
    begin
       return Ret : Version_Type do
-         Low_Level.Zmq_Version (Major'Access,
+         Low_Level.zmq_version (Major'Access,
                                 Minor'Access,
                                 Patch'Access);
          Ret := (Natural (Major), Natural (Minor), Natural (Patch));

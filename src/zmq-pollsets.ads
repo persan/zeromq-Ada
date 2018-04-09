@@ -41,7 +41,7 @@ package ZMQ.Pollsets is
                    Timeout : Duration);
 private
    type Ll_Polset is array (Natural range <>)
-     of aliased ZMQ.Low_Level.Zmq_Pollitem_T;
+     of aliased ZMQ.Low_Level.zmq_pollitem_t;
    type  Pollset (Max_Size : Natural := 32) is tagged limited record
       Local_Data  : aliased Ll_Polset (1 .. Max_Size);
       Cursor      : Natural := 1;

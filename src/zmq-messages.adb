@@ -47,9 +47,9 @@ package body ZMQ.Messages is
       Ret : int;
    begin
       if Size > 0 then
-         Ret := Low_Level.Zmq_Msg_Init_Size (Self.Msg'Access, size_t (Size));
+         Ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, size_t (Size));
       else
-         Ret := Low_Level.Zmq_Msg_Init (Self.Msg'Access);
+         Ret := Low_Level.zmq_msg_init (Self.Msg'Access);
       end if;
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
@@ -94,7 +94,7 @@ package body ZMQ.Messages is
    is
       Ret : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Init_Data (Self.Msg'Access,
+      Ret := Low_Level.zmq_msg_init_data (Self.Msg'Access,
                                           Message,
                                           size_t (Size),
                                           Free,
@@ -170,7 +170,7 @@ package body ZMQ.Messages is
    ---------------
    function GetData (Self : Message) return System.Address is
    begin
-      return Low_Level.Zmq_Msg_Data (Self.Msg'Unrestricted_Access);
+      return Low_Level.zmq_msg_data (Self.Msg'Unrestricted_Access);
    end GetData;
 
 
@@ -225,7 +225,7 @@ package body ZMQ.Messages is
    ---------------
    function GetSize (Self : Message) return Natural is
    begin
-      return Natural (Low_Level.Zmq_Msg_Size (Self.Msg'Unrestricted_Access));
+      return Natural (Low_Level.zmq_msg_size (Self.Msg'Unrestricted_Access));
    end GetSize;
 
 
@@ -236,7 +236,7 @@ package body ZMQ.Messages is
    procedure Finalize (Self : in out Message) is
       Ret : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Close (Self.Msg'Access);
+      Ret := Low_Level.zmq_msg_close (Self.Msg'Access);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;

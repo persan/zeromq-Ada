@@ -234,14 +234,12 @@ package body ZMQ.Utilities.Memory_Streams is
    end Initialize;
 
    procedure Finalize   (This : in out Dynamic_Memory_Stream) is
-      use System.Memory;
    begin
       System.Memory.Free (This.Buffer.As_Address);
    end Finalize;
 
 
    procedure Initialize (This : in out Controler) is
-      use System.Memory;
    begin
       This.Controled.Initialize;
    end Initialize;

@@ -7,7 +7,6 @@ with GNAT.Spitbol; use GNAT.Spitbol;
 package body ZMQ.Tests.Testcases.Test_REQRESP is
    use AUnit;
    use Ada.Strings.Unbounded;
-   use GNAT.Source_Info;
 
    REQUEST_STRING  : constant Unbounded_String := V ("Query");
    RESPONSE_STRING : constant Unbounded_String := V ("Reply");

@@ -6,7 +6,6 @@ with AUnit.Assertions; use AUnit.Assertions;
 package body ZMQ.Tests.Testcases.Test_Pubsub is
    use AUnit;
    use Ada.Strings.Unbounded;
-   use GNAT.Source_Info;
    MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
 
 

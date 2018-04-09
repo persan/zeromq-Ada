@@ -54,7 +54,7 @@ package body ZMQ.Sockets is
          raise ZMQ_Error with "Socket Initialized";
       end if;
 
-      This.C := Low_Level.Zmq_Socket (With_Context.GetImpl,
+      This.C := Low_Level.zmq_socket (With_Context.GetImpl,
                                       Socket_Type'Pos (Kind));
       if This.C = Null_Address then
          raise ZMQ_Error with "Unable to initialize";
@@ -73,7 +73,7 @@ package body ZMQ.Sockets is
       Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Bind (This.C, Addr);
+      Ret := Low_Level.zmq_bind (This.C, Addr);
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
@@ -95,7 +95,7 @@ package body ZMQ.Sockets is
       Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Unbind (This.C, Addr);
+      Ret := Low_Level.zmq_unbind (This.C, Addr);
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
@@ -115,7 +115,7 @@ package body ZMQ.Sockets is
                           Value_Size : Natural) is
       Ret     : int;
    begin
-      Ret := Low_Level.Zmq_Setsockopt
+      Ret := Low_Level.zmq_setsockopt
         (This.C,
          Option,
          Value,
@@ -222,7 +222,7 @@ package body ZMQ.Sockets is
       Addr : chars_ptr := Interfaces.C.Strings.New_String (Address);
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Connect (This.C, Addr);
+      Ret := Low_Level.zmq_connect (This.C, Addr);
       Free (Addr);
       if Ret /= 0 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
@@ -249,7 +249,7 @@ package body ZMQ.Sockets is
    is
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Send (Msg.GetImpl, This.C, int (Flags));
+      Ret := Low_Level.zmq_msg_send (Msg.GetImpl, This.C, int (Flags));
       if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
@@ -302,7 +302,7 @@ package body ZMQ.Sockets is
                    Flags        : Socket_Flags := No_Flags) is
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Send
+      Ret := Low_Level.zmq_send
         (This.C, Msg_Address, Interfaces.C.size_t (Msg_Length), int (Flags));
       if Ret = -1 then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
@@ -338,7 +338,7 @@ package body ZMQ.Sockets is
    is
       Ret  : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Recv (Msg.GetImpl,
+      Ret := Low_Level.zmq_msg_recv (Msg.GetImpl,
                                      This.C,
                                      int (Flags));
 
@@ -413,7 +413,7 @@ package body ZMQ.Sockets is
       Ret : int;
    begin
       if This.C /= Null_Address then
-         Ret := Low_Level.Zmq_Close (This.C);
+         Ret := Low_Level.zmq_close (This.C);
          if Ret /= 0 then
             raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno);
          end if;
@@ -426,7 +426,7 @@ package body ZMQ.Sockets is
                     Capture   : access Socket'Class) is
       Ret : int;
    begin
-      Ret := Low_Level.Zmq_Proxy
+      Ret := Low_Level.zmq_proxy
         (Frontend.C,
          Backend.C,
          (if Capture /= null then Capture.C else System.Null_Address));
@@ -687,7 +687,7 @@ package body ZMQ.Sockets is
      (This : Socket) return Duration is
    begin
       return Duration (Integer'(This.Getsockopt
-                       (Low_Level.Defs.ZMQ_RCVTIMEO)) * 1000.0);
+                       (Low_Level.Defs.ZMQ_RCVTIMEO))) * 1000.0;
    end Get_Recieve_Timeout;
    not overriding
    procedure Set_Recieve_Timeout
@@ -708,7 +708,7 @@ package body ZMQ.Sockets is
      (This : Socket) return Duration is
    begin
       return Duration (Integer'(This.Getsockopt
-                       (Low_Level.Defs.ZMQ_SNDTIMEO)) * 1000.0);
+                       (Low_Level.Defs.ZMQ_SNDTIMEO))) * 1000.0;
    end Get_Send_Timeout;
    not overriding
    procedure Set_Send_Timeout
@@ -755,7 +755,7 @@ package body ZMQ.Sockets is
       Ret          : int;
       Value_Size_I : aliased size_t;
    begin
-      Ret := Low_Level.Zmq_Getsockopt
+      Ret := Low_Level.zmq_getsockopt
         (This.C,
          Option,
          Value,
@@ -837,7 +837,7 @@ package body ZMQ.Sockets is
      (This    : in Socket;
       Option  : Interfaces.C.int) return Duration is
    begin
-      return Duration (Integer'(This.Getsockopt (Option)) * 1000.0);
+      return Duration (Integer'(This.Getsockopt (Option))) * 1000.0;
    end Getsockopt;
 
    function More_Message_Parts_To_Follow (This : Socket) return Boolean is

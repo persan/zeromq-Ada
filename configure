@@ -174,7 +174,7 @@ def parsargs(args):
     if not exists(join(args.withzmqinclude, "zmq.h")):
         sys.stderr.write("No zmq.h found\n")
         fail = True
-    #if not exists(join(args.withzmqlib, "libzmq.a")):
+    # if not exists(join(args.withzmqlib, "libzmq.a")):
     #    sys.stderr.write("No libzmq found\n")
     #    fail = True
     if fail:

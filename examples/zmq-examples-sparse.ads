@@ -1,14 +1,13 @@
 
 
-with Ada.Strings.Unbounded;
+
 with Ada.Containers.Indefinite_Vectors;
 package ZMQ.Examples.Sparse is
    type Sparse_Data;
    type Sparse_Data_Access is access all Sparse_Data'Class;
 
-   type Sparse_Data (Name : not null access String) is tagged record
+   type Sparse_Data (Name : not null access String) is abstract tagged record
       Changed : Boolean := False;
-      Name    : GNAT.Strings.String_Access;
       Parent  : Sparse_Data_Access;
    end record;
 
@@ -23,6 +22,7 @@ package ZMQ.Examples.Sparse is
    type Sparse_Boolean is new Sparse_Data with record
       Value : access Boolean;
    end record;
+
    procedure Set (Self : Sparse_Integer; Value : Boolean);
    type Sparse_Float is new Sparse_Data with record
       Value : access Float;

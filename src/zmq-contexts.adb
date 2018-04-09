@@ -50,7 +50,7 @@ package body ZMQ.Contexts is
       if This.C /= Null_Address then
          raise ZMQ_Error with "Already Initialized";
       end if;
-      This.C := Low_Level.Zmq_Ctx_New;
+      This.C := Low_Level.zmq_ctx_new;
       if This.C = Null_Address then
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
            GNAT.Source_Info.Enclosing_Entity;
@@ -67,7 +67,7 @@ package body ZMQ.Contexts is
       Rc : int;
    begin
       if This.Is_Connected then
-         Rc := Low_Level.Zmq_Ctx_Destroy (This.C);
+         Rc := Low_Level.zmq_ctx_destroy (This.C);
          if Rc  /= 0 then
             raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno) & " in " &
               GNAT.Source_Info.Enclosing_Entity;
@@ -93,7 +93,7 @@ package body ZMQ.Contexts is
       Threads : Natural := 1) is
       Status : int;
    begin
-      Status :=  Low_Level.Zmq_Ctx_Set
+      Status :=  Low_Level.zmq_ctx_set
         (This.C, Low_Level.Defs.ZMQ_IO_THREADS, int (Threads));
       if Status /= 0 then
          raise Program_Error with Error_Message (Integer (Status));
@@ -105,7 +105,7 @@ package body ZMQ.Contexts is
    function Get_Number_Of_IO_Threads (This : in out Context) return Natural is
    begin
       return Natural
-        (Low_Level.Zmq_Ctx_Get (This.C, Low_Level.Defs.ZMQ_IO_THREADS));
+        (Low_Level.zmq_ctx_get (This.C, Low_Level.Defs.ZMQ_IO_THREADS));
    end Get_Number_Of_IO_Threads;
 
    not overriding
@@ -113,7 +113,7 @@ package body ZMQ.Contexts is
      (This : in out Context; Count : Positive := 1024) is
       status : int;
    begin
-      status := Low_Level.Zmq_Ctx_Set
+      status := Low_Level.zmq_ctx_set
         (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS, int (Count));
       if status /= 0
       then
@@ -127,7 +127,7 @@ package body ZMQ.Contexts is
      (This : in out Context) return Natural is
    begin
       return Natural
-        (Low_Level.Zmq_Ctx_Get (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS));
+        (Low_Level.zmq_ctx_get (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS));
    end Get_Maximum_Number_Of_Sockets;
 
    not overriding
@@ -135,7 +135,7 @@ package body ZMQ.Contexts is
      (This : in out Context; Enable : Boolean := False) is
       Status : int;
    begin
-      Status := Low_Level.Zmq_Ctx_Set
+      Status := Low_Level.zmq_ctx_set
         (This.C, Low_Level.Defs.ZMQ_IPV6, Boolean'Pos (Enable));
       if Status /= 0
       then
@@ -146,7 +146,7 @@ package body ZMQ.Contexts is
    not overriding
    function Get_IPv6 (This : in out Context) return Boolean is
    begin
-      return Low_Level.Zmq_Ctx_Get
+      return Low_Level.zmq_ctx_get
         (This.C, Low_Level.Defs.ZMQ_MAX_SOCKETS) = 1;
    end Get_IPv6;
 

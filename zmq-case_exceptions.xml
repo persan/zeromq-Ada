@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<exceptions>
+    <case_exceptions>
+        <word>zmq_errno</word>
+        <word>zmq_strerror</word>
+        <word>zmq_ctx_new</word>
+        <word>zmq_ctx_term</word>
+        <word>zmq_ctx_shutdown</word>
+        <word>zmq_ctx_get</word>
+        <word>zmq_init</word>
+        <word>zmq_term</word>
+        <word>zmq_ctx_destroy</word>
+        <word>zmq_msg_t_u_u_array</word>
+        <word>zmq_msg_t</word>
+        <word>zmq_msg_init</word>
+        <word>zmq_msg_init_size</word>
+        <word>zmq_msg_close</word>
+        <word>zmq_msg_move</word>
+        <word>zmq_msg_copy</word>
+        <word>zmq_msg_data</word>
+        <word>zmq_msg_size</word>
+        <word>zmq_msg_more</word>
+        <word>zmq_msg_get</word>
+        <word>zmq_msg_gets</word>
+        <word>zmq_socket</word>
+        <word>zmq_close</word>
+        <word>zmq_bind</word>
+        <word>zmq_connect</word>
+        <word>zmq_unbind</word>
+        <word>zmq_disconnect</word>
+        <word>zmq_pollitem_t</word>
+        <word>zmq_has</word>
+        <word>zmq_z85_decode</word>
+        <word>zmq_curve_keypair</word>
+        <word>zmq_stopwatch_start</word>
+        <word>zmq_stopwatch_stop</word>
+        <word>zmq_sleep</word>
+        <word>zmq_threadstart</word>
+        <word>zmq_threadclose</word>
+    </case_exceptions>
+</exceptions>

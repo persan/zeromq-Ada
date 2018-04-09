@@ -38,11 +38,11 @@ generate:
 	rm -rf src/gen/*
 	mkdir -p .temp src/gen
 	echo "#include <zmq.h>">.temp/x.c
-	(cd .temp;g++  -c -fdump-ada-spec x.c)
+	(cd .temp;g++  -c -fdump-ada-spec -C x.c)
 	python rename.py .temp/zmq_h.ads
-	gnatchop -w -gnat12 .temp/zmq_h.ads src/gen
-	gnat pretty -P zmq.gpr -rf   -M128  src/gen/*.ads
-
+	cp .temp/zmq_h.ads src/gen/zmq-low_level.ads
+	gnatpp -rf  -M128  --comments-special src/gen/*.ads
+	sed "s-Zmq.Low_Level-ZMQ.Low_Level-" -i src/gen/zmq-low_level.ads
 clean:
 	git clean -fXd
 test:

@@ -103,7 +103,7 @@ package ZMQ.Messages is
 
    procedure Finalize   (Self : in out Message);
 
-   type Zmq_Msg_T_Access is access all ZMQ.Low_Level.Zmq_Msg_T;
+   type Zmq_Msg_T_Access is access all ZMQ.Low_Level.zmq_msg_t;
    function GetImpl (Self : Message) return not null Zmq_Msg_T_Access;
 
 
@@ -131,7 +131,7 @@ package ZMQ.Messages is
 
 private
    type Message is new Ada.Finalization.Limited_Controlled with record
-      Msg            : aliased ZMQ.Low_Level.Zmq_Msg_T;
+      Msg            : aliased ZMQ.Low_Level.zmq_msg_t;
    end record;
 
 end ZMQ.Messages;
