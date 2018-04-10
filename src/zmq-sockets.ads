@@ -51,10 +51,13 @@ package ZMQ.Sockets is
       XPUB,
       XSUB,
       STREAM);
-   XREQ : constant Socket_Type := DEALER;
-   pragma Obsolescent (XREQ, "use DEALER");
-   XREP : constant Socket_Type := ROUTER;
-   pragma Obsolescent (XREP, "use ROUTER");
+
+   XREQ : constant Socket_Type := DEALER with
+     Obsolescent => "use DEALER";
+
+   XREP : constant Socket_Type := ROUTER with
+     Obsolescent => "use DEALER";
+
    type Socket is
      new Ada.Finalization.Limited_Controlled  with private;
    type Any_Socket is access all Socket'Class;
