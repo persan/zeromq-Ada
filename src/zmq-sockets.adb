@@ -719,7 +719,7 @@ package body ZMQ.Sockets is
          This.Setsockopt (Low_Level.Defs.ZMQ_SNDTIMEO, Integer (-1));
       else
          This.Setsockopt
-           (Low_Level.Defs.ZMQ_RCVTIMEO, Integer (Timeout * 1000.0));
+           (Low_Level.Defs.ZMQ_SNDTIMEO, Integer (Timeout * 1000.0));
       end if;
    end Set_Send_Timeout;
 
