@@ -60,7 +60,7 @@ def whichzmq():
     ret = "/usr"
     with file("_locate_zmq.c", "w") as outf:
         outf.write("#include <zmq.h>")
-    response = subprocess.Popen(["cpp", "-pipe", "_locate_zmq.c"],
+    response = subprocess.Popen(["gcc", "-E", "-pipe", "_locate_zmq.c"],
                                 stdout=subprocess.PIPE).communicate()[0].split("\n")
     os.remove("_locate_zmq.c")
     for line in response:
