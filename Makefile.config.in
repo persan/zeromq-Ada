@@ -2,4 +2,4 @@ PREFIX=%(prefix)s
 LIBDIR ?= %(libdir)s
 DESTDIR ?=
 GNATFLAGS ?=
-ADA_PROJECT_DIR ?= ${PREFIX}/lib/gnat
+export PATH:=${PREFIX}/bin:%(PATH)s

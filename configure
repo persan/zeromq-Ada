@@ -179,6 +179,7 @@ def parsargs(args):
     #    fail = True
     if fail:
         return None
+    args.__dict__["PATH"] = os.getenv("PATH")
     return args
 
 
