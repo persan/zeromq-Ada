@@ -2,8 +2,10 @@
 
 import GPS
 from os.path import *
+import string
 
-HEADER="""##############################################################################
+HEADER = \
+"""##############################################################################
 ##                                                                          ##
 ##                             0MQ Ada-binding                              ##
 ##                                                                          ##
@@ -37,55 +39,56 @@ HEADER="""######################################################################
 """
 
 
-
-import string
 def to80Comment(s):
-   if len(s) > 76:
-      s = s.replace(" ","");
-   if len(s) > 76:
-       s=s[:-76]
-   n= 76 - len(s)
-   n=n/2
-   ret = "##" + (" " * n) + s
-   ret = ret + (" " * (76 - len(ret))) + "##"
-   return ret
+    if len(s) > 76:
+        s = s.replace(" ", "")
+    if len(s) > 76:
+        s = s[:-76]
+    n = 76 - len(s)
+    n = n/2
+    ret = "##" + (" " * n) + s
+    ret = ret + (" " * (76 - len(ret))) + "##"
+    return ret
+
 
 def getHeader(f):
-   name,ext=splitext(basename(f.name()))
-   name=name.upper().replace("-",".")
-   name =to80Comment( string.join(name," "))
-   if ext==".ads":
-      ext  =to80Comment("S p e c" )
-      return (HEADER % {"name" : name , "ext" : ext}).replace("#","-")
-   elif ext==".adb":
-      ext  =to80Comment("B o d y" )
-      return (HEADER % {"name" : name , "ext" : ext}).replace("#","-")
-   elif ext==".gpr":
-      ext  =to80Comment( "P r o j e c t" )
-      return (HEADER % {"name" : name , "ext" : ext}).replace("#","-")
-   else:
-      ext  =to80Comment("")
-      return HEADER % {"name" : name , "ext" : ext}
+    name, ext = splitext(basename(f.name()))
+    name = name.upper().replace("-", ".")
+    name = to80Comment(string.join(name, " "))
+    if ext == ".ads":
+        ext = to80Comment("S p e c")
+        return(HEADER % {"name": name, "ext": ext}).replace("#", "-")
+    elif ext == ".adb":
+        ext = to80Comment("B o d y")
+        return (HEADER % {"name": name, "ext": ext}).replace("#", "-")
+    elif ext == ".gpr":
+        ext = to80Comment("P r o j e c t")
+        return (HEADER % {"name": name, "ext": ext}).replace("#", "-")
+    else:
+        ext = to80Comment("")
+        return HEADER % {"name": name, "ext": ext}
 
-def fixFile(f,of):
-   name,ext=splitext(basename(f.name()))
-   ed = GPS.EditorBuffer.get(f)
-   begin=ed.beginning_of_buffer()
-   if (ext not in [".gpr",".adb",".ads",".c",".cpp",".h",".hh",".idl"]):
-      begin=begin.forward_line(1)
-   last=ed.beginning_of_buffer().search(r"\n\n", regexp=True)
 
-   of.write("%s\n" % "///////////////////////////////////////////////////////////////////////////////")
-   of.write("%s\n" % f.name())
-   of.write("%s\n" % "<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-   of.write("%s\n" % ed.get_chars(begin,last[0]))
-   of.write("%s\n" % "<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-   of.write("%s\n" % getHeader(f))
-   of.write("%s\n" % "///////////////////////////////////////////////////////////////////////////////")
+def fixFile(f, of):
+    name, ext = splitext(basename(f.name()))
+    ed = GPS.EditorBuffer.get(f)
+    begin = ed.beginning_of_buffer()
+    if (ext not in [".gpr", ".adb", ".ads",
+                    ".c", ".cpp", ".h", ".hh", ".idl"]):
+        begin = begin.forward_line(1)
+    last = ed.beginning_of_buffer().search(r"\n\n", regexp=True)
 
-with file("temp.out","w") as of:
-  for i in GPS.Project("zmq.tests").sources():
-     fixFile(i,of)
+    of.write("%s\n" % 80 * "/")
+    of.write("%s\n" % f.name())
+    of.write("%s\n" % 30 * "<")
+    of.write("%s\n" % ed.get_chars(begin, last[0]))
+    of.write("%s\n" % 30 * "<")
+    of.write("%s\n" % getHeader(f))
+    of.write("%s\n" % 80 * "/")
+
+with file("temp.out", "w") as of:
+    for i in GPS.Project("zmq.tests").sources():
+        fixFile(i, of)
 
 
 

@@ -34,13 +34,10 @@ header = """--------------------------------------------------------------------
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
---  begin read only
 --
 --  The contents of this file is derived from zmq.h using the
 --   -fdump-ada-spec switch for gcc.
 """
-
-tail = "--  end read only"
 
 renames = [["stddef_h.size_t", "size_t"],
            ["with stddef_h;", ""],
@@ -80,7 +77,7 @@ obslolete_functions = ["zmq_ctx_shutdown",
 
 def main(path):
     dumped = False
-    with file(path) as f:
+    with open(path) as f:
         buffer = f.read()
 
     for i in renames:
@@ -106,34 +103,34 @@ def main(path):
             buffer[i] = "%s : constant := %s;" % (m.group(1), m.group(2))
 
         for obslolete in obslolete_functions:
-            pattern = r'^.*pragma Import *\(C, *(%s), *"%s"\);' % (obslolete, obslolete)
+            pattern = r'^.*pragma Import *\(C, *(%s), *"%s"\);' %\
+            (obslolete, obslolete)
             if not dumped:
-                print pattern
+                print (pattern)
             matcher = re.compile(pattern)
             if matcher.match(buffer[i]):
                 buffer[i] = "   pragma Obsolescent;\n%s" % buffer[i]
         dumped = True
 
     buffer = "\n".join(buffer)
-    with file(path, "w") as f:
+    with open(path, "w") as f:
         f.write(header)
         f.write(buffer)
         f.write(tail)
-
-
-    matcher = re.compile(r"\w+ (zmq_\w+) .*")
-    with open("zmq-case_exceptions.xml","w") as outf:
-        outf.write("""<?xml version="1.0" ?>
+    if not exists("zmq-case_exceptions.xml"):
+        matcher = re.compile(r"\w+ (zmq_\w+) .*")
+        with open("zmq-case_exceptions.xml", "w") as outf:
+            outf.write("""<?xml version="1.0" ?>
 <exceptions>
     <case_exceptions>
 """)    
-        with open(path) as inf:
-            for line in inf:
-                line = line.strip()
-                m = matcher.match(line)
-                if m:
-                    outf.write("        <word>%s</word>\n" % m.group(1))
-            outf.write("""    </case_exceptions>
+            with open(path) as inf:
+                for line in inf:
+                    line = line.strip()
+                    m = matcher.match(line)
+                    if m:
+                        outf.write("        <word>%s</word>\n" % m.group(1))
+                outf.write("""    </case_exceptions>
 </exceptions>""")
         
 
