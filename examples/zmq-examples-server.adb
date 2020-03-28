@@ -46,7 +46,7 @@ begin
       declare
          Query : ZMQ.Messages.Message;
       begin
-         Query.Initialize(0);
+         Query.Initialize (0);
          --  Receive a message, blocks until one is available
          S.Recv (Query);
          --  Process the query

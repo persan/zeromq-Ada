@@ -31,11 +31,11 @@ with ZMQ.Sockets;
 with ZMQ.Contexts;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
+with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 procedure ZMQ.Examples.HWServer is
    Context  : ZMQ.Contexts.Context;
    Socket   : ZMQ.Sockets.Socket;
-   inbuffer : Ada.Strings.Unbounded.Unbounded_String;
+   Inbuffer : Ada.Strings.Unbounded.Unbounded_String;
 begin
    --  Prepare our context and socket
    Socket.Initialize (Context, ZMQ.Sockets.REP);
@@ -43,8 +43,8 @@ begin
 
    loop
       --  Wait for next request from client
-      inbuffer := Socket.Recv;
-      Put_Line ("Received request:" & To_String (inbuffer));
+      Inbuffer := Socket.Recv;
+      Put_Line ("Received request:" & Inbuffer);
 
       --  Do some 'work'
       delay 1.0;

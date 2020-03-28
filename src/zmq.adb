@@ -31,6 +31,7 @@
 
 
 with Interfaces.C;
+with Interfaces.C.Strings;
 with ZMQ.Low_Level;
 with GNAT.IO;
 package body ZMQ is
@@ -41,8 +42,10 @@ package body ZMQ is
 
    function Error_Message (No : Integer) return String is
       S : constant String := No'Img;
+      use all type Interfaces.C.Strings.chars_ptr;
    begin
-      return "[" &  S (S'First + 1 .. S'Last) & "] ";
+      return "[" &  S (S'First + 1 .. S'Last) & "] " &
+        Value (ZMQ.Low_Level.zmq_strerror (int (No)));
    end Error_Message;
 
    function Library_Version return Version_Type is
@@ -72,8 +75,9 @@ package body ZMQ is
       Lib_Version : constant Version_Type :=  Library_Version;
    begin
       if Binding_Version.Major /= Lib_Version.Major then
-         GNAT.IO.Put_Line ("Warning libzmq: " & Image (Lib_Version) &
-           " found, binding version is: " & Image (Binding_Version));
+         GNAT.IO.Put_Line
+           ("Warning libzmq: " & Image (Lib_Version) &
+              " found, binding version is: " & Image (Binding_Version));
       end if;
    end Validate_Library_Version;
 

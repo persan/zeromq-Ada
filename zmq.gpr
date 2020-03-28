@@ -31,7 +31,7 @@
 ------------------------------------------------------------------------------
 with "libzmq.gpr";
 project ZMQ is
-   For Languages use ("Ada", "Makefile", "Python");
+   for Languages use ("Ada", "Makefile", "Python");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
@@ -82,15 +82,14 @@ project ZMQ is
    end Check;
 
    package Ide is
-      for gnatlist use project'project_dir & "proj.gnatls";
       for Vcs_Kind use "git";
    end Ide;
 
-   package naming is
-      for Spec_suffix ("Makefile") use ".mk";
+   package Naming is
+      for Spec_Suffix ("Makefile") use ".mk";
       for Specification_Exceptions ("Makefile") use ("Makefile");
-      for Spec_suffix ("sed") use ".sed";
-      for Body_suffix ("Python") use ".py";
+      for Spec_Suffix ("sed") use ".sed";
+      for Body_Suffix ("Python") use ".py";
       for Implementation_Exceptions ("Python") use ("configure");
-   end naming;
+   end Naming;
 end ZMQ;

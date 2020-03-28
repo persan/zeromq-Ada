@@ -9,14 +9,11 @@ def do_load():
         if exists(path):
             with open(path) as inf:
                 buffer = inf.read()
-                print buffer
                 GPS.parse_xml(buffer)
-                print "OK"
 
 try:
     if GPS.zmq_config_is_loaded:
-        print "OK"
+        pass
 except:
     GPS.zmq_config_is_loaded = True
-    print "\nLOAD\n"
     do_load()

@@ -42,9 +42,7 @@ package ZMQ.Examples.JSON_Data is
 
 
    procedure Read (Src : JSON_Value; Into : in out Data_Type);
-   procedure Read is new
-     Gen_Map_JSON_Object (Data_Type);
-   procedure Read is new
-     Gen_Map_JSON_Object (Coordinate);
+   procedure Read is new Gen_Map_JSON_Object (Data_Type);
+   procedure Read is new Gen_Map_JSON_Object (Coordinate);
 
 end ZMQ.Examples.JSON_Data;

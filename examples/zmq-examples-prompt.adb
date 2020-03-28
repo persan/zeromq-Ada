@@ -26,25 +26,25 @@ with ZMQ.Sockets;
 with ZMQ.Contexts;
 with Ada.Text_IO;
 with GNAT.Sockets;
-procedure ZMQ.examples.prompt is
+procedure ZMQ.Examples.Prompt is
 
-   ctx : aliased Contexts.Context;
-   s   : Sockets.Socket;
+   Ctx : aliased Contexts.Context;
+   S   : Sockets.Socket;
 
 begin
-   ctx.Set_number_of_IO_threads (1);
-   s.Initialize (ctx, Sockets.PUB);
-   s.Connect ("tcp://localhost:5555");
+   Ctx.Set_Number_Of_IO_Threads (1);
+   S.Initialize (Ctx, Sockets.PUB);
+   S.Connect ("tcp://localhost:5555");
 
    Read_Loop : loop
       Ada.Text_IO.Put (">");
       declare
-         textbuf : constant String :=  Ada.Text_IO.Get_Line;
+         Textbuf : constant String :=  Ada.Text_IO.Get_Line;
       begin
-         exit Read_Loop when textbuf'Length = 0;
-         s.Send ("hej" & ASCII.NUL & GNAT.Sockets.Host_Name & ":" & textbuf);
+         exit Read_Loop when Textbuf'Length = 0;
+         S.Send ("Hello " & ASCII.NUL & GNAT.Sockets.Host_Name & ":" & Textbuf);
          delay 0.02;
       end;
    end loop Read_Loop;
-   s.Send (END_MESSAGE);
-end ZMQ.Examples.prompt;
+   S.Send (END_MESSAGE);
+end ZMQ.Examples.Prompt;
