@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
---                   Copyright (c) 2010 Per Sandberg                         --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --

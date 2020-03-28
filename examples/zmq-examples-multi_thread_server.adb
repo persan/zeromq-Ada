@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
---                   Copyright (c) 2011 Per Sandberg                         --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -21,6 +21,7 @@
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
+
 
 with ZMQ.Sockets;
 with ZMQ.Contexts;

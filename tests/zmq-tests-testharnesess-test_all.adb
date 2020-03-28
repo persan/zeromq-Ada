@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
---                   Copyright (c) 2011 Per Sandberg                         --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -40,22 +40,22 @@ procedure ZMQ.Tests.Testharnesess.Test_All is
      (ZMQ.Tests.TestSuits.Test_All.Suite);
    --  Reporter : AUnit.Reporter.Text.Text_Reporter;
    Reporter : AUnit.Reporter.XML.XML_Reporter;
-   task killer is
-      entry ok;
-   end killer;
+   task Killer is
+      entry Ok;
+   end Killer;
 
-   task body killer is
+   task body Killer is
    begin
       select
-         accept ok;
+         accept Ok;
       or
          delay 5.0;
          GNAT.IO.Put_Line ("Times up");
          GNAT.OS_Lib.OS_Exit (-1);
       end select;
-   end killer;
+   end Killer;
 
 begin
    Run (Reporter);
-   killer.ok;
+   Killer.Ok;
 end ZMQ.Tests.TestHarnesess.Test_All;

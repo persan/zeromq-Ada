@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
---                   Copyright (c) 2011 Per Sandberg                         --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -25,7 +25,7 @@
 with ZMQ.Sockets;
 with ZMQ.Contexts;
 with Ada.Text_IO;
-procedure ZMQ.examples.Display is
+procedure ZMQ.Examples.Display is
    use Ada.Text_IO;
    Context  : aliased Contexts.Context;
    Socket   : Sockets.Socket;

@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  B o d y                                  --
 --                                                                           --
---            Copyright (C) 2013-2020, per.s.sandberg@bahnhof.se             --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -47,7 +47,7 @@ package body ZMQ.Messages is
       Ret : int;
    begin
       if Size > 0 then
-         Ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, size_t (Size));
+         Ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, Size_T (Size));
       else
          Ret := Low_Level.zmq_msg_init (Self.Msg'Access);
       end if;
@@ -94,9 +94,9 @@ package body ZMQ.Messages is
    is
       Ret : int;
    begin
-      Ret := Low_Level.zmq_msg_init_data (Self.Msg'Access,
+      Ret := Low_Level.Zmq_Msg_Init_Data (Self.Msg'Access,
                                           Message,
-                                          size_t (Size),
+                                          Size_T (Size),
                                           Free,
                                           Hint);
       if Ret /= 0 then

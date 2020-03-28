@@ -6,7 +6,7 @@
 --                                                                           --
 --                                  S p e c                                  --
 --                                                                           --
---            Copyright (C) 2010-2011, per.sandberg@bredband.net             --
+--            Copyright (C) 2020-2030, per.s.sandberg@bahnhof.se             --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -28,7 +28,6 @@
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
---  begin read only
 --
 --  The contents of this file is derived from zmq.h using the
 --   -fdump-ada-spec switch for gcc.
@@ -1006,4 +1005,3 @@ package ZMQ.Low_Level is
       --  thread-safe sockets **************************************************************************** DRAFT Socket
       --  monitoring events
 end ZMQ.Low_Level;
---  end read only
