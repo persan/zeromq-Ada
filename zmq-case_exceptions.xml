@@ -3,6 +3,7 @@
     <case_exceptions>
         <word>zmq_errno</word>
         <word>zmq_strerror</word>
+        <word>zmq_version</word>
         <word>zmq_ctx_new</word>
         <word>zmq_ctx_term</word>
         <word>zmq_ctx_shutdown</word>
@@ -10,7 +11,7 @@
         <word>zmq_init</word>
         <word>zmq_term</word>
         <word>zmq_ctx_destroy</word>
-        <word>zmq_msg_t_u_u_array</word>
+        <word>zmq_msg_t_array1158</word>
         <word>zmq_msg_t</word>
         <word>zmq_msg_init</word>
         <word>zmq_msg_init_size</word>
@@ -32,7 +33,21 @@
         <word>zmq_has</word>
         <word>zmq_z85_decode</word>
         <word>zmq_curve_keypair</word>
+        <word>zmq_curve_public</word>
+        <word>zmq_atomic_counter_new</word>
+        <word>zmq_atomic_counter_set</word>
+        <word>zmq_atomic_counter_inc</word>
+        <word>zmq_atomic_counter_dec</word>
+        <word>zmq_atomic_counter_value</word>
+        <word>zmq_atomic_counter_destroy</word>
+        <word>zmq_timers_new</word>
+        <word>zmq_timers_destroy</word>
+        <word>zmq_timers_cancel</word>
+        <word>zmq_timers_reset</word>
+        <word>zmq_timers_timeout</word>
+        <word>zmq_timers_execute</word>
         <word>zmq_stopwatch_start</word>
+        <word>zmq_stopwatch_intermediate</word>
         <word>zmq_stopwatch_stop</word>
         <word>zmq_sleep</word>
         <word>zmq_threadstart</word>

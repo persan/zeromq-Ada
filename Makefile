@@ -43,6 +43,7 @@ generate:
 	cp .temp/zmq_h.ads src/gen/zmq-low_level.ads
 	gnatpp -rf  -M128  --comments-special src/gen/*.ads
 	sed "s-Zmq.Low_Level-ZMQ.Low_Level-" -i src/gen/zmq-low_level.ads
+	chmod -w src/gen/*.ads
 clean:
 	git clean -fXd
 test:
@@ -58,3 +59,4 @@ dist:
 
 gps:
 	gps -P tests/zmq-tests.gpr
+
