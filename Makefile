@@ -83,3 +83,16 @@ dist:
 gps:
 	gps -P tests/zmq-tests.gpr
 
+helpers/getinfo:$(wildcard src/*.ads)
+	cd helpers;gprbuild -p
+	
+tag:helpers/getinfo
+	@if [ -n "`git status --porcelain`" ] ; then \
+		echo "Folder is not clean";\
+		git status;\
+		exit -1;\
+	fi
+	@(VERSION=`helpers/getinfo --binding-version`-`date +%Y%m%d`;\
+	git tag $${VERSION})
+	
+	

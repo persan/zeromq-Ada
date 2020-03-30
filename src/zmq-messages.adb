@@ -47,7 +47,7 @@ package body ZMQ.Messages is
       Ret : int;
    begin
       if Size > 0 then
-         Ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, Size_T (Size));
+         Ret := Low_Level.zmq_msg_init_size (Self.Msg'Access, size_t (Size));
       else
          Ret := Low_Level.zmq_msg_init (Self.Msg'Access);
       end if;
@@ -94,9 +94,9 @@ package body ZMQ.Messages is
    is
       Ret : int;
    begin
-      Ret := Low_Level.Zmq_Msg_Init_Data (Self.Msg'Access,
+      Ret := Low_Level.zmq_msg_init_data (Self.Msg'Access,
                                           Message,
-                                          Size_T (Size),
+                                          size_t (Size),
                                           Free,
                                           Hint);
       if Ret /= 0 then

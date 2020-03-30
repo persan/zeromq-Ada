@@ -52,5 +52,7 @@
         <word>zmq_sleep</word>
         <word>zmq_threadstart</word>
         <word>zmq_threadclose</word>
+        <word>size_t</word>
+        <word>zmq_msg_init_data</word>
     </case_exceptions>
 </exceptions>
