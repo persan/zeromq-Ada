@@ -18,7 +18,7 @@ jobs:
     - name: Set up GNAT toolchain
       run: >
         sudo apt-get update && 
-        sudo apt-get install gnat gprbuild libzmq3-dev libaunit17.2017-dev libgnatcoll16-dev
+        sudo apt-get install gnat gprbuild libzmq3-dev libaunit*-dev libgnatcoll*-dev
 
     - name: Build
       run: make
