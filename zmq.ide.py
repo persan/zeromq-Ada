@@ -34,9 +34,8 @@ def do_load():
                 buffer = inf.read()
                 GPS.parse_xml(buffer)
 
-try:
-    if GPS.zmq_config_is_loaded:
-        pass
-except:
-    GPS.zmq_config_is_loaded = True
+
+if "zmq_config_is_loaded" not in dir(GPS):
     do_load()
+    GPS.zmq_config_is_loaded = True
+

@@ -32,6 +32,7 @@ procedure ZMQ.Examples.Multi_Thread_Server is
    task type Server_Task (Ctx : not null access ZMQ.Contexts.Context;
                           Id  : Integer) is
    end Server_Task;
+   type Server_Task_Access is access all Server_Task;
 
    task body Server_Task is
       Msg : Ada.Strings.Unbounded.Unbounded_String;
@@ -49,7 +50,7 @@ procedure ZMQ.Examples.Multi_Thread_Server is
    Ctx              : aliased ZMQ.Contexts.Context;
 
    Number_Of_Servers : constant := 10;
-   Servers           : array (1 .. Number_Of_Servers) of access Server_Task;
+   Servers           : array (1 .. Number_Of_Servers) of Server_Task_Access;
 
    Workers          : aliased ZMQ.Sockets.Socket;
    Clients          : aliased ZMQ.Sockets.Socket;

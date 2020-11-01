@@ -21,4 +21,6 @@ jobs:
         sudo apt-get install gnat gprbuild libzmq3-dev
 
     - name: Build
-      run: gprbuild -j0 -p
+      run: make
+    - name: Test
+      run: make test

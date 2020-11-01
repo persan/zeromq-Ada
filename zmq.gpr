@@ -31,7 +31,7 @@
 ------------------------------------------------------------------------------
 with "libzmq.gpr";
 project ZMQ is
-   for Languages use ("Ada", "Makefile", "Python");
+   for Languages use ("Ada", "Makefile", "Python", "Toml");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
@@ -65,8 +65,9 @@ project ZMQ is
    end Builder;
 
    package Compiler is
-      for Driver ("MAkefile") use "";
+      for Driver ("Makefile") use "";
       for Driver ("Python") use "";
+      for Driver ("Toml") use "";
 
       for Default_Switches ("ada") use
         ("-g", "-O2", "-gnatf", "-gnat12", "-gnatwa", "-gnaty");
@@ -90,6 +91,7 @@ project ZMQ is
       for Specification_Exceptions ("Makefile") use ("Makefile");
       for Spec_Suffix ("sed") use ".sed";
       for Body_Suffix ("Python") use ".py";
+      for Body_Suffix ("Toml") use ".toml";
       for Implementation_Exceptions ("Python") use ("configure");
    end Naming;
 end ZMQ;
