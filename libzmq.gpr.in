@@ -29,7 +29,6 @@
 -- covered by the  GNU Public License.                                      --
 --                                                                          --
 ------------------------------------------------------------------------------
-with "libsodium.gpr";
 abstract project libZMQ is
 
    package Linker is
