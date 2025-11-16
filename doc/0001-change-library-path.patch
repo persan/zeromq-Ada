@@ -1,0 +1,65 @@
+From e5197387d3c0a62f078d7200db6087c7f02cca57 Mon Sep 17 00:00:00 2001
+From: Lutz Berger <lutz.berger@airbus.com>
+Date: Thu, 13 Nov 2025 08:58:29 +0100
+Subject: [PATCH] change library path
+
+---
+ Makefile                       | 1 +
+ examples/zmq-examples.gpr.inst | 2 +-
+ zmq.gpr.inst                   | 7 ++++---
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7c75354..b4914dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -46,6 +46,7 @@ install: compile uninstall
+ 
+ 	cp -f src/zmq.ad* ${DESTDIR}/${PREFIX}/include/zmq
+ 	cp -f src/zmq-*.ad* ${DESTDIR}/${PREFIX}/include/zmq
++	cp -f src/gen/zmq-*.ad* ${DESTDIR}/${PREFIX}/include/zmq
+ 	chmod -w ${DESTDIR}/${PREFIX}/include/zmq/*.ad?
+ #	(cd ${DESTDIR}/${PREFIX}/lib; for i in `find -name lib*.so*`; do ln -s $$i ; done)s
+ 	cp zmq.gpr.inst ${DESTDIR}/${ADA_PROJECT_DIR}/zmq.gpr
+diff --git a/examples/zmq-examples.gpr.inst b/examples/zmq-examples.gpr.inst
+index 1c1c366..b702ab6 100644
+--- a/examples/zmq-examples.gpr.inst
++++ b/examples/zmq-examples.gpr.inst
+@@ -10,7 +10,7 @@ project ZMQ.Examples is
+    for Exec_Dir use ".";
+ 
+    package Compiler is
+-      for Default_Switches ("ada") use ("-g", "-O2", "-gnatf", "-gnat05");
++      for Default_Switches ("ada") use ("-g", "-O2", "-gnatf", "-gnat2012");
+    end Compiler;
+ 
+    package Binder is
+diff --git a/zmq.gpr.inst b/zmq.gpr.inst
+index 748cab2..581ba51 100644
+--- a/zmq.gpr.inst
++++ b/zmq.gpr.inst
+@@ -31,17 +31,18 @@
+ ------------------------------------------------------------------------------
+ with "libzmq.gpr";
+ project ZMQ is
+-   For Languages use ("Ada", "Makefile", "Python");
++   For Languages use ("Ada");
+ 
+    type ZMQ_Kind_Type is ("static", "relocatable");
+-   ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
++   ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "relocatable");
+    Version := "4.0.1";
+ 
+    for Library_Name use "zmqAda";
+    for Library_Version use "lib" & project'Library_Name & ".so." & Version;
+-   for Library_Dir use "../zmq/" & ZMQ_Kind;
++   for Library_Dir use "../../lib/zmq/" & ZMQ_Kind;
+    for Source_Dirs use ("../../include/zmq");
+    for Externally_Built use "True";
++
+    case ZMQ_Kind is
+       when "static" =>
+          for Library_Kind use "static";
+-- 
+2.51.0
+
