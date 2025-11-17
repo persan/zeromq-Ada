@@ -22,3 +22,4 @@ _temp.sed
 libzmq.gpr
 libsodium.gpr
 _
+.clang*
