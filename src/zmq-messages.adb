@@ -187,8 +187,10 @@ package body ZMQ.Messages is
    ---------------
    --  getData  --
    ---------------
-   function  GetData  (Self : Message)
-                       return Ada.Streams.Stream_Element_Array is
+   function  GetData
+     (Self : Message)
+      return Ada.Streams.Stream_Element_Array is
+
       type Data_Type is new Ada.Streams.Stream_Element_Array
         (1 .. Ada.Streams.Stream_Element_Offset (Self.GetSize));
       package Conv is new System.Address_To_Access_Conversions (Data_Type);
@@ -208,6 +210,36 @@ package body ZMQ.Messages is
       return Ada.Strings.Unbounded.To_Unbounded_String
         (String (Conv.To_Pointer (Self.GetData).all));
    end GetData;
+
+   --------------------
+   --  Process_Data  --
+   --------------------
+
+   procedure Process_Data
+     (Self    : Message;
+      Handler : not null access procedure (Data : String)) is
+      type Data_Type is new String (1 .. Self.GetSize);
+      package Conv is new System.Address_To_Access_Conversions (Data_Type);
+   begin
+      Handler (String (Conv.To_Pointer (Self.GetData).all));
+   end Process_Data;
+
+   --------------------
+   --  Process_Data  --
+   --------------------
+   procedure Process_Data
+     (Self    : Message;
+      Handler : not null access procedure
+        (Data : Ada.Streams.Stream_Element_Array)) is
+      type Data_Type is new Ada.Streams.Stream_Element_Array
+        (1 .. Ada.Streams.Stream_Element_Offset (Self.GetSize));
+      package Conv is new System.Address_To_Access_Conversions (Data_Type);
+   begin
+      Handler (Ada.Streams.Stream_Element_Array
+               (Conv.To_Pointer (Self.GetData).all));
+   end Process_Data;
+
+
 
    -----------------------
    --  getData_Generic  --

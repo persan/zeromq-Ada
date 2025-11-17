@@ -80,8 +80,8 @@ dist:
 	cd .dist; tar -czf ../zeromq-ada-$(shell helpers/getinfo --binding-version).tgz *
 	rm -rf .dist
 
-gps:
-	gps -P tests/zmq-tests.gpr
+gps gnatstudio:
+	gnatstudio -P tests/zmq-tests.gpr&
 
 helpers/getinfo:$(wildcard src/*.ads)
 	cd helpers;gprbuild -p

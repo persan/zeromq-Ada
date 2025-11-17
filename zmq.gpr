@@ -70,7 +70,7 @@ project ZMQ is
       for Driver ("Toml") use "";
 
       for Default_Switches ("ada") use
-        ("-g", "-O2", "-gnatf", "-gnat12", "-gnatwa", "-gnaty");
+        ("-g", "-O2", "-gnatf", "-gnat2022", "-gnatwa", "-gnaty");
 
       for Switches ("zmq-low_level.ads") use
         Compiler'Default_Switches ("ada") & ("-gnaty-M");

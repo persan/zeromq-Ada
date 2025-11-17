@@ -1,7 +1,7 @@
 with "../zmq.gpr";
 project ZMQ.helpers is
 
-   for Main use ("getinfo.adb");
+   for Main use ("zmq-getinfo.adb");
    for Object_Dir use ".obj";
    for Exec_Dir use ".";
 
@@ -11,7 +11,7 @@ project ZMQ.helpers is
 
    package Compiler is
       for Default_Switches ("ada") use ZMQ.Compiler'Default_Switches ("ada");
-      for Switches("getinfo.adb") use
+      for Switches("zmq-getinfo.adb") use
         Compiler'Default_Switches ("ada") & ("-gnateDversion=""" & ZMQ.Version & """");
    end Compiler;
    package IDE renames zmq.IDE;

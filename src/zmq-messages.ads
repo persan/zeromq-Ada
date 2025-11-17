@@ -104,17 +104,30 @@ package ZMQ.Messages is
    procedure Finalize   (Self : in out Message);
 
    type Zmq_Msg_T_Access is access all ZMQ.Low_Level.zmq_msg_t;
-   function GetImpl (Self : Message) return not null Zmq_Msg_T_Access;
+   function GetImpl
+     (Self : Message) return not null Zmq_Msg_T_Access;
 
 
-   function  GetData  (Self : Message)
-                       return String;
+   function GetData
+     (Self : Message)
+      return String;
 
-   function  GetData  (Self : Message)
-                       return Ada.Streams.Stream_Element_Array;
+   function GetData
+     (Self : Message)
+      return Ada.Streams.Stream_Element_Array;
 
-   function  GetData  (Self : Message)
-                       return Ada.Strings.Unbounded.Unbounded_String;
+   function GetData (Self : Message) return
+     Ada.Strings.Unbounded.Unbounded_String;
+
+   --  Process the data without copyig the data from the buffar.
+   procedure Process_Data
+     (Self    : Message;
+      Handler : not null access procedure (Data : String));
+
+   procedure Process_Data
+     (Self    : Message;
+      Handler : not null access procedure
+        (Data : Ada.Streams.Stream_Element_Array));
 
    generic
       type Element is private;

@@ -3,7 +3,7 @@
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
-package body ZMQ.Tests.Testcases.Test_Pubsub is
+package body ZMQ.Tests.Testcases.Test_Process is
    use AUnit;
    use Ada.Strings.Unbounded;
    MSG_STRING : constant Unbounded_String := To_Unbounded_String ("Query");
@@ -77,4 +77,4 @@ package body ZMQ.Tests.Testcases.Test_Pubsub is
       Register_Routine (T, Finalize'Access, "Finalize");
    end Register_Tests;
 
-end ZMQ.Tests.TestCases.Test_Pubsub;
+end ZMQ.Tests.TestCases.Test_Process;

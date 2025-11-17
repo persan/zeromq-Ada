@@ -27,6 +27,7 @@
 --  Import tests and sub-suites to run
 with ZMQ.Tests.TestCases.Test_Pubsub;
 with ZMQ.Tests.TestCases.Test_REQRESP;
+with ZMQ.Tests.TestCases.Test_Process;
 package body ZMQ.Tests.Testsuits.Test_All is
    use AUnit.Test_Suites;
 
@@ -36,16 +37,18 @@ package body ZMQ.Tests.Testsuits.Test_All is
 
 
    --  Statically allocate test cases:
-   Test_2 : aliased TestCases.Test_Pubsub.Test_Case;
-   Test_3 : aliased TestCases.Test_REQRESP.Test_Case;
+   Test_Pubsub  : aliased TestCases.Test_Pubsub.Test_Case;
+   Test_REQRESP : aliased TestCases.Test_REQRESP.Test_Case;
+   Test_Process : aliased TestCases.Test_Process.Test_Case;
    -----------
    -- Suite --
    -----------
 
    function Suite return AUnit.Test_Suites.Access_Test_Suite is
    begin
-      Add_Test (Result'Access, Test_2'Access);
-      Add_Test (Result'Access, Test_3'Access);
+      Add_Test (Result'Access, Test_Pubsub'Access);
+      Add_Test (Result'Access, Test_REQRESP'Access);
+      Add_Test (Result'Access, Test_Process'Access);
       return Result'Access;
    end Suite;
 
