@@ -1,0 +1,7 @@
+with "gnatcoll.gpr";
+
+project gnatcoll_core is
+
+
+end gnatcoll_core;
+

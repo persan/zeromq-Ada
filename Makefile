@@ -55,7 +55,7 @@ install: compile uninstall
 	cp examples/zmq-examples.gpr.inst ${DESTDIR}/${PREFIX}/share/zmq/examples/Ada/zmq-examples.gpr
 
 samples:
-	${GNATMAKE} -P examples/zmq-examples.gpr
+	${MAKE} -C examples
 
 generate:
 	rm -rf src/gen/*
@@ -85,7 +85,7 @@ gps gnatstudio:
 
 helpers/getinfo:$(wildcard src/*.ads)
 	cd helpers;gprbuild -p
-	
+
 tag:helpers/getinfo
 	@if [ -n "`git status --porcelain`" ] ; then \
 		echo "Folder is not clean";\
@@ -94,5 +94,5 @@ tag:helpers/getinfo
 	fi
 	@(VERSION=`helpers/getinfo --binding-version`-`date +%Y%m%d`;\
 	git tag $${VERSION})
-	
-	
+
+

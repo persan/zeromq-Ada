@@ -1,6 +1,6 @@
 all: compile
 
 compile:
-	gprbuild -p -P zmq-examples.gpr
+	gprbuild -p -P zmq-examples.gpr -aP ../compat
 
 
