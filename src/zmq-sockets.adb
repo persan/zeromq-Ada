@@ -38,6 +38,32 @@ package body ZMQ.Sockets is
    use Interfaces.C.Strings;
    use Interfaces.C;
    use System;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (This : Socket; Option : Interfaces.C.int) return T is
+      Value : aliased T;
+      Size  : Natural := T'Size / System.Storage_Unit;
+   begin
+      This.Getsockopt (Option, Value'Address, Size);
+
+      if Size /= T'Size / System.Storage_Unit then
+         raise Program_Error;
+      end if;
+
+      return Value;
+   end Get_Option;
+
+   function Get_Natural is new Get_Option (Natural);
+   function Get_Positive is new Get_Option (Positive);
+   function Get_Unsigned_Long is new Get_Option (unsigned_long);
+   function Get_Integer is new Get_Option (Integer);
+   function Get_Long_Long is new Get_Option (Long_Long_Integer);
+   function Get_Boolean is new Get_Option (Boolean);
+   function Get_Duration is new Get_Option (Duration);
+
    ----------------
    -- Initialize --
    ----------------
@@ -202,7 +228,7 @@ package body ZMQ.Sockets is
       Option  : Interfaces.C.int;
       Value   : Duration) is
    begin
-      if Value = Duration'Last or Value = -1.0 then
+      if Value = Duration'Last or else Value = -1.0 then
          This.Setsockopt (Option, Integer'(-1));
       else
          This.Setsockopt (Option, Integer (Value * 1000.0));
@@ -573,7 +599,7 @@ package body ZMQ.Sockets is
    function Get_Linger_Period_For_Socket_Shutdown
      (This : Socket) return Duration is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_LINGER);
+      return Get_Duration (This, ZMQ.Low_Level.Defs.ZMQ_LINGER);
    end Get_Linger_Period_For_Socket_Shutdown;
 
    not overriding
@@ -589,8 +615,8 @@ package body ZMQ.Sockets is
    function Get_Reconnection_Interval
      (This : Socket) return Duration is
    begin
-      return Duration (Natural'(This.Getsockopt
-                       (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL))) / 1000.0;
+      return Duration (Get_Natural
+                       (This, ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL)) / 1000.0;
    end Get_Reconnection_Interval;
 
    not overriding
@@ -613,8 +639,8 @@ package body ZMQ.Sockets is
    function Get_Maximum_Reconnection_Interval
      (This : Socket) return Duration is
    begin
-      return Duration (Natural'(This.Getsockopt
-                       (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL))) / 1000.0;
+      return Duration (Get_Natural
+                       (This, ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL)) / 1000.0;
    end Get_Maximum_Reconnection_Interval;
 
    not overriding
@@ -638,7 +664,7 @@ package body ZMQ.Sockets is
    function Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections
      (This : Socket) return Natural is
    begin
-      return This.Getsockopt (Low_Level.Defs.ZMQ_BACKLOG);
+      return Get_Natural (This, Low_Level.Defs.ZMQ_BACKLOG);
    end Get_Maximum_Length_Of_The_Queue_Of_Outstanding_Connections;
 
    not overriding
@@ -654,7 +680,7 @@ package body ZMQ.Sockets is
    function Get_Maximum_Acceptable_Inbound_Message_Size
      (This : Socket) return Long_Long_Integer  is
    begin
-      return This.Getsockopt (Low_Level.Defs.ZMQ_MAXMSGSIZE);
+      return Get_Long_Long (This, Low_Level.Defs.ZMQ_MAXMSGSIZE);
    end Get_Maximum_Acceptable_Inbound_Message_Size;
 
    not overriding
@@ -670,7 +696,7 @@ package body ZMQ.Sockets is
    function Get_Maximum_Network_Hops_For_Multicast_Packets
      (This : Socket) return Positive is
    begin
-      return This.Getsockopt (Low_Level.Defs.ZMQ_MULTICAST_HOPS);
+      return Get_Positive (This, Low_Level.Defs.ZMQ_MULTICAST_HOPS);
    end Get_Maximum_Network_Hops_For_Multicast_Packets;
 
    not overriding
@@ -686,8 +712,8 @@ package body ZMQ.Sockets is
    function Get_Recieve_Timeout
      (This : Socket) return Duration is
    begin
-      return Duration (Integer'(This.Getsockopt
-                       (Low_Level.Defs.ZMQ_RCVTIMEO))) * 1000.0;
+      return Duration (Get_Integer
+                       (This, Low_Level.Defs.ZMQ_RCVTIMEO)) * 1000.0;
    end Get_Recieve_Timeout;
    not overriding
    procedure Set_Recieve_Timeout
@@ -707,8 +733,8 @@ package body ZMQ.Sockets is
    function Get_Send_Timeout
      (This : Socket) return Duration is
    begin
-      return Duration (Integer'(This.Getsockopt
-                       (Low_Level.Defs.ZMQ_SNDTIMEO))) * 1000.0;
+      return Duration (Get_Integer
+                       (This, Low_Level.Defs.ZMQ_SNDTIMEO)) * 1000.0;
    end Get_Send_Timeout;
    not overriding
    procedure Set_Send_Timeout
@@ -727,7 +753,7 @@ package body ZMQ.Sockets is
    function Get_Use_IPv4_Only
      (This : Socket) return Boolean is
    begin
-      return This.Getsockopt (Low_Level.Defs.ZMQ_IPV4ONLY);
+      return Get_Boolean (This, Low_Level.Defs.ZMQ_IPV4ONLY);
    end Get_Use_IPv4_Only;
    not overriding
    procedure Set_Use_IPv4_Only
@@ -753,7 +779,7 @@ package body ZMQ.Sockets is
                           Value      : System.Address;
                           Value_Size : in out Natural) is
       Ret          : int;
-      Value_Size_I : aliased size_t;
+      Value_Size_I : aliased size_t := size_t (Value_Size);
    begin
       Ret := Low_Level.zmq_getsockopt
         (This.C,
@@ -768,16 +794,10 @@ package body ZMQ.Sockets is
    end Getsockopt;
 
    not overriding
-   function  Getsockopt (This    : in Socket;
-                         Option  : Interfaces.C.int) return unsigned_long is
-      Dummy_Value_Size : Natural := unsigned_long'Size / System.Storage_Unit;
+   function  Getsockopt (This       : in Socket;
+                         Option     : Interfaces.C.int) return unsigned_long is
    begin
-      return Ret : unsigned_long do
-         This.Getsockopt (Option, Ret'Address, Dummy_Value_Size);
-         if Dummy_Value_Size /= 8 then
-            raise Program_Error with "Invalid getsockopt for this type";
-         end if;
-      end return;
+      return Get_Unsigned_Long (This, Option);
    end Getsockopt;
 
 
@@ -796,27 +816,21 @@ package body ZMQ.Sockets is
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return Boolean is
    begin
-      return Ret : Boolean do
-         Ret := unsigned_long'(This.Getsockopt (Option)) /= 0;
-      end return;
+      return Get_Boolean (This, Option);
    end Getsockopt;
 
    not overriding
    function  Getsockopt (This    : in Socket;
                          Option  : Interfaces.C.int) return Integer is
    begin
-      return Ret : Integer do
-         Ret := Integer (unsigned_long'(This.Getsockopt (Option)));
-      end return;
+      return Get_Integer (This, Option);
    end Getsockopt;
 
    function  Getsockopt
      (This    : in Socket;
       Option  : Interfaces.C.int) return Long_Long_Integer is
    begin
-      return Ret : Long_Long_Integer do
-         Ret := Long_Long_Integer (unsigned_long'(This.Getsockopt (Option)));
-      end return;
+      return Get_Long_Long (This, Option);
    end Getsockopt;
 
    not overriding
@@ -837,26 +851,24 @@ package body ZMQ.Sockets is
      (This    : in Socket;
       Option  : Interfaces.C.int) return Duration is
    begin
-      return Duration (Integer'(This.Getsockopt (Option))) * 1000.0;
+      return Duration (Get_Integer (This, Option)) * 1000.0;
    end Getsockopt;
 
    function More_Message_Parts_To_Follow (This : Socket) return Boolean is
    begin
-      return Ret : Boolean do
-         Ret := This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVMORE);
-      end return;
+      return Get_Boolean (This, ZMQ.Low_Level.Defs.ZMQ_RCVMORE);
    end More_Message_Parts_To_Follow;
 
    function Get_High_Water_Mark_For_Outbound_Messages
      (This : Socket) return Natural is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDHWM);
+      return Get_Natural (This, ZMQ.Low_Level.Defs.ZMQ_SNDHWM);
    end Get_High_Water_Mark_For_Outbound_Messages;
 
    function Get_High_Water_Mark_For_Inbound_Messages
      (This : Socket) return Natural is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVHWM);
+      return Get_Natural (This, ZMQ.Low_Level.Defs.ZMQ_RCVHWM);
    end Get_High_Water_Mark_For_Inbound_Messages;
 
 
@@ -880,14 +892,13 @@ package body ZMQ.Sockets is
 
    function Get_Multicast_Data_Rate (This : Socket) return Natural  is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RATE);
+      return Get_Natural (This, ZMQ.Low_Level.Defs.ZMQ_RATE);
    end Get_Multicast_Data_Rate;
 
    function Get_Multicast_Recovery_Interval (This : Socket) return Duration is
    begin
       return Duration
-        (unsigned_long'(
-         This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RECOVERY_IVL)));
+        (Get_Unsigned_Long (This, ZMQ.Low_Level.Defs.ZMQ_RECOVERY_IVL));
    end Get_Multicast_Recovery_Interval;
 
    function Get_Multicast_Loopback (This : Socket) return Boolean is
@@ -898,12 +909,12 @@ package body ZMQ.Sockets is
 
    function Get_Kernel_Transmit_Buffer_Size (This : Socket) return Natural is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_SNDBUF);
+      return Get_Natural (This, ZMQ.Low_Level.Defs.ZMQ_SNDBUF);
    end Get_Kernel_Transmit_Buffer_Size;
 
    function Get_Kernel_Receive_Buffer_Size (This : Socket) return Natural is
    begin
-      return This.Getsockopt (ZMQ.Low_Level.Defs.ZMQ_RCVBUF);
+      return Get_Natural (This, ZMQ.Low_Level.Defs.ZMQ_RCVBUF);
    end Get_Kernel_Receive_Buffer_Size;
 
    not overriding function Retrieve_Socket_Type
@@ -911,7 +922,7 @@ package body ZMQ.Sockets is
       return Socket_Type is
    begin
       return Socket_Type'Val
-        (Natural'(This.Getsockopt (Low_Level.Defs.ZMQ_TYPE)));
+        (Get_Integer (This, Low_Level.Defs.ZMQ_TYPE));
    end Retrieve_Socket_Type;
 
 

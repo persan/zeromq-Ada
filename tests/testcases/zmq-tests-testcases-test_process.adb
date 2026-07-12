@@ -1,5 +1,3 @@
-
-
 with GNAT.Source_Info;
 with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
@@ -24,19 +22,21 @@ package body ZMQ.Tests.Testcases.Test_Process is
 
    Test_Port : constant String := "inproc://pub-sub";
 
-   -------------------------
-   --  initialize
-   -------------------------
-   procedure initialize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
-      T : Test_Case renames Test_Case (Test);
+   -----------------
+   -- Set_Up_Case --
+   -----------------
+
+   overriding
+   procedure Set_Up_Case (Test : in out Test_Case) is
+      T : Test_Case renames Test;
    begin
       T.Pub.Initialize (T.Ctx, Sockets.PUB);
       T.Sub.Initialize (T.Ctx, Sockets.SUB);
-      T.Pub.Connect (Test_Port);
-      T.Sub.Bind    (Test_Port);
+      T.Pub.Bind (Test_Port);
+      T.Sub.Connect (Test_Port);
       T.Sub.Establish_Message_Filter ("");
       delay 0.1;
-   end initialize;
+   end Set_Up_Case;
 
    -------------------------
    --  Publish
@@ -50,20 +50,23 @@ package body ZMQ.Tests.Testcases.Test_Process is
       delay 0.1;
 
       T.Sub.Recv (msg);
-
       Assert (msg = MSG_STRING, "Error");
       delay 0.1;
    end Send;
 
-   -------------------------
-   --  Subscribe
-   -------------------------
-   procedure Finalize (Test : in out AUnit.Test_Cases.Test_Case'Class) is
-      T : Test_Case renames Test_Case (Test);
+
+   --------------------
+   -- Tear_Down_Case --
+   --------------------
+
+   overriding
+   procedure Tear_Down_Case (Test : in out Test_Case) is
+      T : Test_Case renames Test;
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
-   end Finalize;
+   end Tear_Down_Case;
+
    --------------------
    -- Register_Tests --
    --------------------
@@ -72,9 +75,7 @@ package body ZMQ.Tests.Testcases.Test_Process is
       use Test_Cases.Registration;
 
    begin
-      Register_Routine (T, initialize'Access, "initialize");
       Register_Routine (T, Send'Access, "Send");
-      Register_Routine (T, Finalize'Access, "Finalize");
    end Register_Tests;
 
 end ZMQ.Tests.TestCases.Test_Process;

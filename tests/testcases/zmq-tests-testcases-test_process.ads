@@ -16,6 +16,12 @@ package ZMQ.Tests.Testcases.Test_Process is
    procedure Register_Tests (T : in out Test_Case);
    --  Register routines to be run
 
+   overriding
+   procedure Set_Up_Case (Test : in out Test_Case);
+
+   overriding
+   procedure Tear_Down_Case (Test : in out Test_Case);
+
    function Name (T : Test_Case)
                   return AUnit.Message_String;
    --  Returns name identifying the test case
