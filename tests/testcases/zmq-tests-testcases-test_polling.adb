@@ -20,12 +20,12 @@ package body ZMQ.Tests.TestCases.Test_Polling is
    Test_Port : constant String := "inproc://polling";
 
 
-   -----------------
-   -- Set_Up_Case --
-   -----------------
+   ------------
+   -- Set_Up --
+   ------------
 
    overriding
-   procedure Set_Up_Case (Test : in out Test_Case) is
+   procedure Set_Up (Test : in out Test_Case) is
       T : Test_Case renames Test;
    begin
       T.Pub.Initialize (T.Ctx, Sockets.PUB);
@@ -36,8 +36,7 @@ package body ZMQ.Tests.TestCases.Test_Polling is
       T.Pub.Bind    (Test_Port);
       T.Sub.Connect (Test_Port);
       T.Sub.Establish_Message_Filter ("");
-      delay 0.1;
-   end Set_Up_Case;
+   end Set_Up;
 
    ------------
    -- Append --
@@ -79,6 +78,85 @@ package body ZMQ.Tests.TestCases.Test_Polling is
       Assert (not PS.Contains (Item),
               "Poll item found after removing it twice from poll set");
    end Remove;
+
+   ------------------------
+   -- Remove_Middle_Item --
+   ------------------------
+
+   procedure Remove_Middle_Item
+     (Test : in out AUnit.Test_Cases.Test_Case'Class) is
+      T      : Test_Case renames Test_Case (Test);
+      PS     : Poll_Set (10);
+
+      Item1  : constant Poll_Item := (T.Pub_Access, Poll_Out);
+      Item2  : constant Poll_Item := (T.Sub_Access, Poll_In);
+      Item3  : constant Poll_Item := (T.Sub_Access, Poll_Out);
+
+      Events : Natural := 0;
+   begin
+      PS.Append (Item1);
+      PS.Append (Item2);
+      PS.Append (Item3);
+
+      PS.Remove (Item2);
+
+      Assert (PS.Contains (Item1),
+              "First item disappeared");
+      Assert (not PS.Contains (Item2),
+              "Removed item still present");
+      Assert (PS.Contains (Item3),
+              "Last item was not preserved");
+
+      T.Pub.Send ("Data");
+
+      PS.Poll (Timeout => 1, Signaled_Events => Events);
+
+      Assert (Events = 1,
+              "Expected one signaled event");
+   end Remove_Middle_Item;
+
+   ------------------------------
+   -- Append_Resets_Poll_State --
+   ------------------------------
+
+   procedure Append_Resets_Poll_State
+     (Test : in out AUnit.Test_Cases.Test_Case'Class) is
+      T       : Test_Case renames Test_Case (Test);
+      PS      : Poll_Set (10);
+      Item1   : constant Poll_Item := (T.Pub_Access, Poll_Out);
+      Item2   : constant Poll_Item := (T.Sub_Access, Poll_In);
+      Events  : Natural := 0;
+   begin
+      --  Append one item, poll and then append another item. Calling
+      --  Signaled_Events must return empty events.
+      PS.Append (Item1);
+      PS.Poll (Timeout => 1, Signaled_Events => Events);
+      PS.Append (Item2);
+
+      Assert (PS.Signaled_Events'Length = 0, "Expected no signaled events");
+   end Append_Resets_Poll_State;
+
+   ------------------------------
+   -- Remove_Resets_Poll_State --
+   ------------------------------
+
+   procedure Remove_Resets_Poll_State
+     (Test : in out AUnit.Test_Cases.Test_Case'Class) is
+      T       : Test_Case renames Test_Case (Test);
+      PS      : Poll_Set (10);
+      Item1   : constant Poll_Item := (T.Pub_Access, Poll_Out);
+      Item2   : constant Poll_Item := (T.Sub_Access, Poll_In);
+      Events  : Natural := 0;
+   begin
+      --  Append two items, poll and then remove one item. Calling
+      --  Signaled_Events must return empty events.
+      PS.Append (Item1);
+      PS.Append (Item2);
+      PS.Poll (Timeout => 1, Signaled_Events => Events);
+      PS.Remove (Item1);
+
+      Assert (PS.Signaled_Events'Length = 0, "Expected no signaled events");
+   end Remove_Resets_Poll_State;
 
    ----------
    -- Poll --
@@ -154,61 +232,79 @@ package body ZMQ.Tests.TestCases.Test_Polling is
       end;
    end Poll_Many;
 
-   ------------------------------
-   -- Append_Resets_Poll_State --
-   ------------------------------
+   ---------------------------------------
+   -- Poll_Same_Socket_Different_Events --
+   ---------------------------------------
 
-   procedure Append_Resets_Poll_State
+   procedure Poll_Same_Socket_Different_Events
      (Test : in out AUnit.Test_Cases.Test_Case'Class) is
       T       : Test_Case renames Test_Case (Test);
       PS      : Poll_Set (10);
       Item1   : constant Poll_Item := (T.Pub_Access, Poll_Out);
       Item2   : constant Poll_Item := (T.Sub_Access, Poll_In);
+      Item3   : constant Poll_Item := (T.Sub_Access, Poll_Out);
       Events  : Natural := 0;
    begin
-      --  Append one item, poll and then append another item. Calling
-      --  Signaled_Events must return empty events.
+      --  Register for Pub and Sub socket polling of any events and send some
+      --  data on the Sub socket.
       PS.Append (Item1);
-      PS.Poll (Timeout => 1, Signaled_Events => Events);
       PS.Append (Item2);
+      PS.Append (Item3);
+      T.Pub.Send ("Data");
 
-      Assert (PS.Signaled_Events'Length = 0, "Expected no signaled events");
-   end Append_Resets_Poll_State;
+      --  Poll and verify there are 2 events available.
+      PS.Poll (Timeout => 1, Signaled_Events => Events);
+      Assert (Events = 2, "Expected 2 events to be available");
 
-   ------------------------------
-   -- Remove_Resets_Poll_State --
-   ------------------------------
+      --  Retrieve the signaled events and verify.
+      declare
+         Signaled    : constant Poll_Items := PS.Signaled_Events;
+         First_Event : constant Natural := Signaled'First;
+      begin
+         Assert (Signaled'Length = 2, "Expected 2 signaled events");
+         Assert (Signaled (First_Event).Socket = T.Pub_Access,
+                 "Expected Pub socket is invalid");
+         Assert (Signaled (First_Event).Events = (Poll_Out),
+                 "Expected to have Poll_Out signaled events");
+         Assert (Signaled (First_Event + 1).Socket = T.Sub_Access,
+                 "Expected Sub socket is invalid");
+         Assert (Signaled (First_Event + 1).Events = (Poll_In),
+                 "Expected to have Poll_In signaled events");
+      end;
+   end Poll_Same_Socket_Different_Events;
 
-   procedure Remove_Resets_Poll_State
+   --------------------
+   -- Poll_Empty_Set --
+   --------------------
+
+   procedure Poll_Empty_Set
      (Test : in out AUnit.Test_Cases.Test_Case'Class) is
-      T       : Test_Case renames Test_Case (Test);
-      PS      : Poll_Set (10);
-      Item1   : constant Poll_Item := (T.Pub_Access, Poll_Out);
-      Item2   : constant Poll_Item := (T.Sub_Access, Poll_In);
-      Events  : Natural := 0;
+      pragma Unreferenced (Test);
+
+      PS     : Poll_Set (10);
+      Events : Natural := 123;
    begin
-      --  Append two items, poll and then remove one item. Calling
-      --  Signaled_Events must return empty events.
-      PS.Append (Item1);
-      PS.Append (Item2);
       PS.Poll (Timeout => 1, Signaled_Events => Events);
-      PS.Remove (Item1);
 
-      Assert (PS.Signaled_Events'Length = 0, "Expected no signaled events");
-   end Remove_Resets_Poll_State;
+      Assert (Events = 0,
+              "Expected no events");
 
+      Assert (PS.Signaled_Events'Length = 0,
+              "Expected empty Signaled_Events");
+   end Poll_Empty_Set;
 
-   --------------------
-   -- Tear_Down_Case --
-   --------------------
+   ---------------
+   -- Tear_Down --
+   ---------------
 
    overriding
-   procedure Tear_Down_Case (Test : in out Test_Case) is
+   procedure Tear_Down (Test : in out Test_Case) is
       T : Test_Case renames Test;
    begin
       T.Sub.Finalize;
       T.Pub.Finalize;
-   end Tear_Down_Case;
+      delay 0.1;
+   end Tear_Down;
 
    --------------------
    -- Register_Tests --
@@ -220,12 +316,16 @@ package body ZMQ.Tests.TestCases.Test_Polling is
    begin
       Register_Routine (T, Append'Access, "Append");
       Register_Routine (T, Remove'Access, "Remove");
-      Register_Routine (T, Poll'Access, "Poll");
-      Register_Routine (T, Poll_Many'Access, "Poll_Many");
+      Register_Routine (T, Remove_Middle_Item'Access, "Remove_Middle_Item");
       Register_Routine (T, Append_Resets_Poll_State'Access,
                         "Append_Resets_Poll_State");
       Register_Routine (T, Remove_Resets_Poll_State'Access,
                         "Remove_Resets_Poll_State");
+      Register_Routine (T, Poll'Access, "Poll");
+      Register_Routine (T, Poll_Many'Access, "Poll_Many");
+      Register_Routine (T, Poll_Same_Socket_Different_Events'Access,
+                        "Poll_Same_Socket_Different_Events");
+      Register_Routine (T, Poll_Empty_Set'Access, "Poll_Empty_Set");
    end Register_Tests;
 
 end ZMQ.Tests.TestCases.Test_Polling;

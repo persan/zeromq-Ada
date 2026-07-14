@@ -22,6 +22,8 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
+pragma Ada_2022;
+
 with Interfaces.C;
 
 with ZMQ.Sockets;
@@ -191,5 +193,7 @@ private
       Signaled_Events    : Natural := 0;
       Cursor             : Positive := 1;
    end record;
+
+   procedure Reset_State (This : in out Poll_Set);
 
 end ZMQ.Pollsets;

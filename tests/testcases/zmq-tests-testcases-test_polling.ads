@@ -19,10 +19,10 @@ package ZMQ.Tests.TestCases.Test_Polling is
    --  Register routines to be run
 
    overriding
-   procedure Set_Up_Case (Test : in out Test_Case);
+   procedure Set_Up (Test : in out Test_Case);
 
    overriding
-   procedure Tear_Down_Case (Test : in out Test_Case);
+   procedure Tear_Down (Test : in out Test_Case);
 
    function Name (T : Test_Case)
                   return AUnit.Message_String;

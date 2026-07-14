@@ -22,12 +22,12 @@ package body ZMQ.Tests.Testcases.Test_Process is
 
    Test_Port : constant String := "inproc://pub-sub";
 
-   -----------------
-   -- Set_Up_Case --
-   -----------------
+   ------------
+   -- Set_Up --
+   ------------
 
    overriding
-   procedure Set_Up_Case (Test : in out Test_Case) is
+   procedure Set_Up (Test : in out Test_Case) is
       T : Test_Case renames Test;
    begin
       T.Pub.Initialize (T.Ctx, Sockets.PUB);
@@ -36,7 +36,7 @@ package body ZMQ.Tests.Testcases.Test_Process is
       T.Sub.Connect (Test_Port);
       T.Sub.Establish_Message_Filter ("");
       delay 0.1;
-   end Set_Up_Case;
+   end Set_Up;
 
    -------------------------
    --  Publish
@@ -55,17 +55,18 @@ package body ZMQ.Tests.Testcases.Test_Process is
    end Send;
 
 
-   --------------------
-   -- Tear_Down_Case --
-   --------------------
+   ---------------
+   -- Tear_Down --
+   ---------------
 
    overriding
-   procedure Tear_Down_Case (Test : in out Test_Case) is
+   procedure Tear_Down (Test : in out Test_Case) is
       T : Test_Case renames Test;
    begin
       T.Pub.Finalize;
       T.Sub.Finalize;
-   end Tear_Down_Case;
+      delay 0.1;
+   end Tear_Down;
 
    --------------------
    -- Register_Tests --
