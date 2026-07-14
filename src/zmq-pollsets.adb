@@ -29,45 +29,149 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
+with GNAT.OS_Lib;
+
 package body ZMQ.Pollsets is
+   use Interfaces.C;
+   --  use type ZMQ.Sockets.Any_Socket;
 
-   ------------
-   -- append --
-   ------------
+   -----------------
+   -- Reset_State --
+   -----------------
 
-   procedure Append (This : in out Pollset; Item : Pollitem'Class) is
-      pragma Unreferenced (This, Item);
+   procedure Reset_State (This : in out Poll_Set) is
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "append unimplemented");
-      raise Program_Error with "Unimplemented procedure append";
+      This.Signaled_Events := 0;
+   end Reset_State;
+
+   --------------
+   -- Contains --
+   --------------
+
+   function Contains
+     (This : Poll_Set; Item : Poll_Item) return Boolean
+   is
+   begin
+      for Element of This.Items loop
+         if Element = Item then
+            return True;
+         end if;
+      end loop;
+
+      return False;
+   end Contains;
+
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (This : in out Poll_Set; Item : Poll_Item) is
+   begin
+      if This.Cursor > This.Max_Size then
+         raise Program_Error with "Array overflow with cursor = " &
+           This.Cursor'Image;
+      end if;
+
+      This.Local_Data (This.Cursor) := (socket  => Item.Socket.Get_Impl,
+                                        fd      => -1,
+                                        events  => short (Item.Events),
+                                        revents => 0);
+      This.Items (This.Cursor) := Item;
+      This.Cursor := This.Cursor + 1;
+
+      This.Reset_State;
+
+      pragma Assert (This.Cursor > 1 and then This.Cursor <= This.Max_Size,
+                     "Invalid calculated cursor position");
    end Append;
 
    ------------
-   -- remove --
+   -- Remove --
    ------------
 
-   procedure Remove (This : in out Pollset; Item : Pollitem'Class) is
-      pragma Unreferenced (This, Item);
+   procedure Remove
+     (This : in out Poll_Set; Item : Poll_Item) is
+      Item_Position : Natural := 0;
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "remove unimplemented");
-      raise Program_Error with "Unimplemented procedure remove";
+      --  Search for Item in the Items array.
+      for I in This.Items'Range loop
+         if This.Items (I) = Item then
+            Item_Position := I;
+            exit;
+         end if;
+
+         pragma Loop_Invariant (Item_Position <= This.Max_Size);
+      end loop;
+
+      --  Return if not found.
+      if Item_Position = 0 then
+         return;
+      end if;
+
+      --  Update cursor and copy last element to the found item slot.
+      This.Cursor := This.Cursor - 1;
+      This.Local_Data (Item_Position) := This.Local_Data (This.Cursor);
+      This.Items (Item_Position) := This.Items (This.Cursor);
+
+      --  Clear previous last element by initializing it.
+      This.Local_Data (This.Cursor) := (socket  => <>,
+                                        fd      => -1,
+                                        events  => 0,
+                                        revents => 0);
+      This.Items (This.Cursor) := (others => <>);
+
+      This.Reset_State;
+
+      pragma Assert (This.Cursor >= 1 and then This.Cursor < This.Max_Size,
+                     "Invalid calculated cursor position");
    end Remove;
 
    ----------
-   -- poll --
+   -- Poll --
    ----------
 
    procedure Poll
-     (This    : in out Pollset;
-      Timeout : Duration)
+     (This            : in out Poll_Set;
+      Timeout         : Integer;
+      Signaled_Events : out Natural)
    is
-      pragma Unreferenced (This, Timeout);
+      Ret  : int;
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "poll unimplemented");
-      raise Program_Error with "Unimplemented procedure poll";
+      This.Signaled_Events := 0;
+
+      Ret := Low_Level.zmq_poll
+        (items_u   => This.Local_Data (1)'Unrestricted_Access,
+         nitems_u  => int (This.Cursor - 1),
+         timeout_u => long (Timeout));
+
+      --  Values greater or equal to zero indicate number of poll items with
+      --  signaled events. Other values indicate an error condition.
+      if Ret < 0 then
+         raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno);
+      end if;
+
+      Signaled_Events := Natural (Ret);
+      This.Signaled_Events := Signaled_Events;
    end Poll;
+
+   ---------------------
+   -- Signaled_Events --
+   ---------------------
+
+   function Signaled_Events (This : Poll_Set) return Poll_Items is
+      R_Index : Positive := 1;
+   begin
+      return R : Poll_Items (1 .. This.Signaled_Events) do
+         for I in This.Local_Data'Range loop
+            pragma Loop_Invariant (R_Index <= I);
+
+            if This.Local_Data (I).revents > 0 then
+               R (R_Index) := This.Items (I);
+               R_Index := R_Index + 1;
+            end if;
+         end loop;
+      end return;
+   end Signaled_Events;
 
 end ZMQ.Pollsets;

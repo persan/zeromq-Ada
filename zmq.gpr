@@ -30,12 +30,16 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 with "libzmq.gpr";
+with "config/zeromq_ada_config.gpr";
 project ZMQ is
    for Languages use ("Ada", "Makefile", "Python");
 
    type ZMQ_Kind_Type is ("static", "relocatable");
    ZMQ_Kind : ZMQ_Kind_Type := external ("LIBRARY_TYPE", "static");
    Version := "4.1.5";
+
+   -- Define a scenario variable to flag Alire usage
+   Is_Alire := external ("ALIRE", "");
 
    for Library_Name use "zmqAda";
    for Library_Version use "lib" & project'Library_Name & ".so." & Version;
@@ -69,8 +73,17 @@ project ZMQ is
       for Driver ("Python") use "";
       for Driver ("Toml") use "";
 
-      for Default_Switches ("ada") use
-        ("-g", "-O2", "-gnatf", "-gnat2022", "-gnatwa", "-gnaty");
+      case Is_Alire is
+        when "" =>
+          -- Configurations when built manually
+          for Default_Switches ("ada") use
+            ("-g", "-O2", "-gnatf", "-gnat2022", "-gnatwa", "-gnaty");
+        when others =>
+          -- Default settings.
+          for Default_Switches ("ada") use
+            Zeromq_Ada_Config.Ada_Compiler_Switches &
+            ("-gnat2022", "-gnaty-u", "-gnaty-I", "-gnaty-O");
+      end case;
 
       for Switches ("zmq-low_level.ads") use
         Compiler'Default_Switches ("ada") & ("-gnaty-M");
@@ -79,7 +92,15 @@ project ZMQ is
    end Compiler;
 
    package Check is
-      for Default_Switches ("ada") use ("-rules", "-from=zmq.rules");
+     -- Check if it's built from Alire.
+     case Is_Alire is
+       when "" =>
+         -- Configurations when built manually
+         for Default_Switches ("ada") use ("-rules", "-from=zmq.rules");
+       when others =>
+         -- Default settings.
+         null;
+     end case;
    end Check;
 
    package Ide is
