@@ -1,6 +1,6 @@
 with "../zmq.gpr";
 with "xmlada.gpr";
-with "gnatcoll.gpr";
+with "gnatcoll_core.gpr";
 
 project ZMQ.Examples is
    for Main use ("zmq-examples-client.adb",

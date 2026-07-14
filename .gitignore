@@ -23,3 +23,9 @@ libzmq.gpr
 libsodium.gpr
 _
 .clang*
+bin/
+obj/
+lib/
+alire/
+config/
+.DS_Store

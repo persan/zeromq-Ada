@@ -219,8 +219,17 @@ def expand(args):
                         with open(tgt, "w") as outf:
                             outf.write(inf.read() % args.__dict__)
 
+def writeConfigIfNeeded():
+    configFile = "config/zeromq_ada_config.gpr"
+    if not exists(configFile):
+        os.mkdir('config')
+        with open(configFile, "w") as outf:
+            outf.write("""abstract project Zeromq_Ada_Config is
+    Ada_Compiler_Switches := External_As_List ("ADAFLAGS", " ");
+end Zeromq_Ada_Config;""")
 
 def main(args):
+    writeConfigIfNeeded()
     expand(parsargs(args))
 
 if __name__ == "__main__":

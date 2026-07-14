@@ -28,6 +28,7 @@
 with ZMQ.Tests.TestCases.Test_Pubsub;
 with ZMQ.Tests.TestCases.Test_REQRESP;
 with ZMQ.Tests.TestCases.Test_Process;
+with ZMQ.Tests.TestCases.Test_Polling;
 package body ZMQ.Tests.Testsuits.Test_All is
    use AUnit.Test_Suites;
 
@@ -40,6 +41,7 @@ package body ZMQ.Tests.Testsuits.Test_All is
    Test_Pubsub  : aliased TestCases.Test_Pubsub.Test_Case;
    Test_REQRESP : aliased TestCases.Test_REQRESP.Test_Case;
    Test_Process : aliased TestCases.Test_Process.Test_Case;
+   Test_Polling : aliased TestCases.Test_Polling.Test_Case;
    -----------
    -- Suite --
    -----------
@@ -49,6 +51,7 @@ package body ZMQ.Tests.Testsuits.Test_All is
       Add_Test (Result'Access, Test_Pubsub'Access);
       Add_Test (Result'Access, Test_REQRESP'Access);
       Add_Test (Result'Access, Test_Process'Access);
+      Add_Test (Result'Access, Test_Polling'Access);
       return Result'Access;
    end Suite;
 
