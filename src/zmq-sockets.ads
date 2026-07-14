@@ -112,16 +112,16 @@ package ZMQ.Sockets is
       Messages : Natural := 1_000);
    --  Sets the high water mark for outbound messages on the specified socket.
    --  The high water mark is a hard limit on the maximum number of outstanding
-   --  messages �MQ shall queue in memory for any single peer that the
+   --  messages ØMQ shall queue in memory for any single peer that the
    --  specified socket is communicating with.
    --  If this limit has been reached the socket shall enter an
    --  exceptional state and depending on the socket type,
-   --  �MQ shall take appropriate action such as blocking or dropping
+   --  ØMQ shall take appropriate action such as blocking or dropping
    --  sent messages.
    --  Refer to the individual socket descriptions for details on the exact
    --  action taken for each socket type.
    --  The value of zero means "no limit".
-   --  �MQ does not guarantee that the socket will accept as many  messages,
+   --  ØMQ does not guarantee that the socket will accept as many  messages,
    --  and the actual limit may be as much as 60-70% lower depending on the
    --  flow of messages on the socket.
    ----------------------------------------------------------------------------
@@ -138,11 +138,11 @@ package ZMQ.Sockets is
       Messages : Natural := 1_000);
    --  Sets the high water mark for inbound messages on the specified socket.
    --  The high water mark is a hard limit on the maximum number of
-   --  outstanding messages �MQ shall queue in memory for any single peer
+   --  outstanding messages ØMQ shall queue in memory for any single peer
    --  that the specified socket is communicating with.
    --  If this limit has been reached the socket shall enter an exceptional
    --  state and depending on the socket type,
-   --  �MQ shall take appropriate action such as blocking or dropping sent
+   --  ØMQ shall take appropriate action such as blocking or dropping sent
    --  messages.
    --  Refer to the individual socket descriptions for details on the exact
    --  action taken for each socket type.
@@ -373,10 +373,10 @@ package ZMQ.Sockets is
      (This   : in out Socket;
       Period : Duration := 0.100);
    --  Sets the initial reconnection interval for the specified socket.
-   --  The reconnection interval is the period �MQ shall wait between attempts
+   --  The reconnection interval is the period ØMQ shall wait between attempts
    --  to reconnect disconnected peers when using connection-oriented
    --  transports. The negative value means no reconnection.
-   --  The reconnection interval may be randomized by �MQ to prevent
+   --  The reconnection interval may be randomized by ØMQ to prevent
    --  reconnection storms in topologies with a large number of
    --  peers per socket.
 
@@ -390,7 +390,7 @@ package ZMQ.Sockets is
       Period : Duration := 0.0) with
      Pre => Period = 0.0 or else This.Get_Reconnection_Interval < Period;
    --  Sets the maximum reconnection interval for the specified socket.
-   --  This is the maximum period �MQ shall wait between attempts to reconnect.
+   --  This is the maximum period ØMQ shall wait between attempts to reconnect.
    --  On each reconnect attempt, the previous interval shall be doubled
    --  untill ZMQ_RECONNECT_IVL_MAX is reached.
    --  This allows for exponential backoff strategy.
