@@ -311,7 +311,7 @@ package ZMQ.Sockets is
 
    not overriding
    function Get_Kernel_Transmit_Buffer_Size
-     (This : Socket) return Natural;
+     (This : Socket) return Integer;
    not overriding
    procedure  Set_Kernel_Transmit_Buffer_Size
      (This  : in out Socket;
@@ -325,7 +325,7 @@ package ZMQ.Sockets is
 
    not overriding
    function Get_Kernel_Receive_Buffer_Size
-     (This : Socket) return Natural;
+     (This : Socket) return Integer;
    not overriding
    procedure  Set_Kernel_Receive_Buffer_Size
      (This  : in out Socket;
