@@ -71,7 +71,7 @@ package body ZMQ.Sockets is
    is
    begin
       if With_Context.GetImpl = Null_Address then
-         raise ZMQ_Error with "Contecxt Not Initialized";
+         raise ZMQ_Error with "Context Not Initialized";
       end if;
       if This.C /= Null_Address then
          raise ZMQ_Error with "Socket Initialized";

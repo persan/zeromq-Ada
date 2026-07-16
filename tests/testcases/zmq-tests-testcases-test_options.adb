@@ -42,12 +42,14 @@ package body ZMQ.Tests.TestCases.Test_Options is
       I_Value_Ignore : Integer;
       D_Value_Ignore : Duration;
       L_Value_Ignore : Long_Long_Integer;
+      T_Value_Ignore : ZMQ.Sockets.Thread_Bitmap;
    begin
       --  With checks enabled, any of the following functions could raise if
       --  there is a mismatch with 0MQ's expected data types/sizes.
       --  Values are simply ignored.
       I_Value_Ignore := T.Rep.Get_High_Water_Mark_For_Inbound_Messages;
       I_Value_Ignore := T.Rep.Get_High_Water_Mark_For_Outbound_Messages;
+      T_Value_Ignore := T.Rep.Get_IO_Thread_Affinity;
       I_Value_Ignore := T.Rep.Get_Kernel_Receive_Buffer_Size;
       I_Value_Ignore := T.Rep.Get_Kernel_Transmit_Buffer_Size;
       D_Value_Ignore := T.Rep.Get_Linger_Period_For_Socket_Shutdown;
