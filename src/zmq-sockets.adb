@@ -818,7 +818,7 @@ package body ZMQ.Sockets is
    function Getsockopt (This   : in Socket;
                         Option : Interfaces.C.int) return Duration is
    begin
-      return Duration (Get_C_Int (This, Option)) * 1000.0;
+      return Duration (Get_C_Int (This, Option)) / 1000.0;
    end Getsockopt;
 
    function More_Message_Parts_To_Follow (This : Socket) return Boolean is

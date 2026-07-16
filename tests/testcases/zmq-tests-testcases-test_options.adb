@@ -1,4 +1,5 @@
 with GNAT.Source_Info;
+with AUnit.Assertions; use AUnit.Assertions;
 
 package body ZMQ.Tests.TestCases.Test_Options is
 
@@ -68,6 +69,26 @@ package body ZMQ.Tests.TestCases.Test_Options is
    end Check_Options;
 
    ---------------
+   -- Durations --
+   ---------------
+
+   procedure Durations (Test : in out AUnit.Test_Cases.Test_Case'Class) is
+      T      : Test_Case renames Test_Case (Test);
+      Value  : Duration;
+   begin
+      --  Set to 1 second. Internally, 0MQ takes milliseconds.
+      T.Rep.Set_Linger_Period_For_Socket_Shutdown (1.0);
+      Value := T.Rep.Get_Linger_Period_For_Socket_Shutdown;
+      Assert (Value = 1.0,
+              "Expected a linger period of 1 second; got " & Value'Image);
+
+      T.Rep.Set_Send_Timeout (1.0);
+      Value := T.Rep.Get_Send_Timeout;
+      Assert (Value = 1.0,
+              "Expected a send timeout of 1 second; got " & Value'Image);
+   end Durations;
+
+   ---------------
    -- Tear_Down --
    ---------------
 
@@ -88,6 +109,7 @@ package body ZMQ.Tests.TestCases.Test_Options is
 
    begin
       Register_Routine (T, Check_Options'Access, "Check_Options");
+      Register_Routine (T, Durations'Access, "Durations");
    end Register_Tests;
 
 end ZMQ.Tests.TestCases.Test_Options;
