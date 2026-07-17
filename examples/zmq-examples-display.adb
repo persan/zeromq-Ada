@@ -26,7 +26,6 @@ with ZMQ.Sockets;
 with ZMQ.Contexts;
 with Ada.Text_IO;
 procedure ZMQ.Examples.Display is
-   use Ada.Text_IO;
    Context  : aliased Contexts.Context;
    Socket   : Sockets.Socket;
 
