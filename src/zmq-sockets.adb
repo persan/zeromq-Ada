@@ -61,6 +61,42 @@ package body ZMQ.Sockets is
    function Get_C_Unsigned_Long is new Get_Option (unsigned_long);
    function Get_Long_Long is new Get_Option (Long_Long_Integer);
 
+   -----------------------
+   -- Duration_To_Msecs --
+   -----------------------
+
+   function Duration_To_Msecs (D : Duration) return Interfaces.C.int is
+      MSec : Long_Long_Integer;
+   begin
+      if D = Duration'Last then
+         return Interfaces.C.int (-1);
+      elsif D < 0.0 then
+         --  Map negative to -1.
+         return Interfaces.C.int (-1);
+      else
+         --  Round to nearest millisecond, then check bounds.
+         MSec := Long_Long_Integer (D * 1000.0 + Duration (0.5));
+         if MSec > Long_Long_Integer (Interfaces.C.int'Last) then
+            raise Constraint_Error with
+              "Duration too large to convert to milliseconds";
+         end if;
+         return Interfaces.C.int (MSec);
+      end if;
+   end Duration_To_Msecs;
+
+   -----------------------
+   -- Msecs_To_Duration --
+   -----------------------
+
+   function Msecs_To_Duration (MSec : Interfaces.C.int) return Duration is
+   begin
+      if MSec < 0 then
+         return Duration'Last;
+      else
+         return Duration (MSec) / 1000.0;
+      end if;
+   end Msecs_To_Duration;
+
    ----------------
    -- Initialize --
    ----------------
@@ -219,11 +255,7 @@ package body ZMQ.Sockets is
       Value  : Duration)
    is
    begin
-      if Value = Duration'Last or else Value = -1.0 then
-         This.Setsockopt (Option, Integer'(-1));
-      else
-         This.Setsockopt (Option, Integer (Value * 1000.0));
-      end if;
+      This.Setsockopt (Option, Integer (Duration_To_Msecs (Value)));
    end Setsockopt;
 
    -------------
@@ -605,13 +637,9 @@ package body ZMQ.Sockets is
      (This   : in out Socket;
       Period : Duration := 0.100) is
    begin
-      if Period < 0.0 then
-         This.Setsockopt (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL, Integer'(-1));
-      else
-         This.Setsockopt
-           (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (Period * 1000.0));
-      end if;
-
+      This.Setsockopt
+        (ZMQ.Low_Level.Defs.ZMQ_RECONNECT_IVL,
+         Integer (Duration_To_Msecs (Period)));
    end Set_Reconnection_Interval;
 
    not overriding
@@ -627,13 +655,9 @@ package body ZMQ.Sockets is
      (This   : in out Socket;
       Period : Duration := 0.0) is
    begin
-      if Period < 0.0 then
-         This.Setsockopt (Low_Level.Defs.ZMQ_RECONNECT_IVL, Integer'(-1));
-      else
-         This.Setsockopt
-           (Low_Level.Defs.ZMQ_RECONNECT_IVL, Natural (Period * 1000.0));
-      end if;
-
+      This.Setsockopt
+        (Low_Level.Defs.ZMQ_RECONNECT_IVL_MAX,
+         Integer (Duration_To_Msecs (Period)));
    end Set_Maximum_Reconnection_Interval;
 
    not overriding
@@ -693,12 +717,8 @@ package body ZMQ.Sockets is
      (This    : in out Socket;
       Timeout : Duration := Duration'Last) is
    begin
-      if Timeout = Duration'Last then
-         This.Setsockopt (Low_Level.Defs.ZMQ_RCVTIMEO, Integer (-1));
-      else
-         This.Setsockopt
-           (Low_Level.Defs.ZMQ_RCVTIMEO, Integer (Timeout * 1000.0));
-      end if;
+      This.Setsockopt
+        (Low_Level.Defs.ZMQ_RCVTIMEO, Integer (Duration_To_Msecs (Timeout)));
    end Set_Recieve_Timeout;
 
    not overriding
@@ -713,12 +733,8 @@ package body ZMQ.Sockets is
      (This    : in out Socket;
       Timeout : Duration := Duration'Last) is
    begin
-      if Timeout = Duration'Last then
-         This.Setsockopt (Low_Level.Defs.ZMQ_SNDTIMEO, Integer (-1));
-      else
-         This.Setsockopt
-           (Low_Level.Defs.ZMQ_SNDTIMEO, Integer (Timeout * 1000.0));
-      end if;
+      This.Setsockopt
+        (Low_Level.Defs.ZMQ_SNDTIMEO, Integer (Duration_To_Msecs (Timeout)));
    end Set_Send_Timeout;
 
    not overriding
@@ -818,7 +834,7 @@ package body ZMQ.Sockets is
    function Getsockopt (This   : in Socket;
                         Option : Interfaces.C.int) return Duration is
    begin
-      return Duration (Get_C_Int (This, Option)) / 1000.0;
+      return Msecs_To_Duration (Get_C_Int (This, Option));
    end Getsockopt;
 
    function More_Message_Parts_To_Follow (This : Socket) return Boolean is

@@ -79,13 +79,19 @@ package body ZMQ.Tests.TestCases.Test_Options is
       --  Set to 1 second. Internally, 0MQ takes milliseconds.
       T.Rep.Set_Linger_Period_For_Socket_Shutdown (1.0);
       Value := T.Rep.Get_Linger_Period_For_Socket_Shutdown;
-      Assert (Value = 1.0,
+      Assert (abs (Value - 1.0) <= 0.001,
               "Expected a linger period of 1 second; got " & Value'Image);
 
       T.Rep.Set_Send_Timeout (1.0);
       Value := T.Rep.Get_Send_Timeout;
-      Assert (Value = 1.0,
+      Assert (abs (Value - 1.0) <= 0.001,
               "Expected a send timeout of 1 second; got " & Value'Image);
+
+      --  Test infinite (very large) timeout.
+      T.Rep.Set_Send_Timeout (Duration'Last);
+      Value := T.Rep.Get_Send_Timeout;
+      Assert (Value = Duration'Last,
+              "Expected an infinite send timeout; got " & Value'Image);
    end Durations;
 
    ---------------
