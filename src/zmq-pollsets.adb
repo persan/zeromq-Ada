@@ -31,6 +31,8 @@
 
 with GNAT.OS_Lib;
 
+with ZMQ.Errors;
+
 package body ZMQ.Pollsets is
    use Interfaces.C;
    --  use type ZMQ.Sockets.Any_Socket;
@@ -148,6 +150,8 @@ package body ZMQ.Pollsets is
       --  Values greater or equal to zero indicate number of poll items with
       --  signaled events. Other values indicate an error condition.
       if Ret < 0 then
+         ZMQ.Errors.Set_To_Errno;
+
          raise ZMQ_Error with Error_Message (GNAT.OS_Lib.Errno);
       end if;
 

@@ -98,6 +98,7 @@ package ZMQ.Sockets is
    not overriding function Retrieve_Socket_Type
      (This : in Socket)
       return Socket_Type;
+
    --  ========================================================================
    --  Socket control
    --  ========================================================================

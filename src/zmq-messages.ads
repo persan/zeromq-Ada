@@ -145,6 +145,7 @@ package ZMQ.Messages is
 private
    type Message is new Ada.Finalization.Limited_Controlled with record
       Msg            : aliased ZMQ.Low_Level.zmq_msg_t;
+      Is_Valid       : Boolean := False;
    end record;
 
 end ZMQ.Messages;

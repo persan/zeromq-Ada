@@ -32,11 +32,14 @@
 with ZMQ.Low_Level;
 with Interfaces.C; use Interfaces.C;
 with System; use System;
+
+with ZMQ.Errors;
+
 package body ZMQ.Proxys is
-   --
-   -----------
-   -- Proxy --
-   -----------
+--
+-----------
+-- Proxy --
+-----------
 
    procedure Proxy
      (Frontend  : not null access Sockets.Socket;
@@ -49,6 +52,7 @@ package body ZMQ.Proxys is
       Dummy := ZMQ.Low_Level.zmq_proxy
         (Frontend.Get_Impl, Backend.Get_Impl,
          (if Capture /= null then Capture.Get_Impl else System.Null_Address));
+      ZMQ.Errors.Set_To_Errno;
    end Proxy;
 
 end ZMQ.Proxys;

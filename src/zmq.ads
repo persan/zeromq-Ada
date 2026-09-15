@@ -30,7 +30,6 @@
 -------------------------------------------------------------------------------
 
 
-
 --  This is the Ada binding to 0MQ  The Intelligent Transport Layer
 --  http://www.zeromq.org/
 
