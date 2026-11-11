@@ -24,10 +24,9 @@
 
 pragma Ada_2022;
 
-with Interfaces.C;
-
 with ZMQ.Sockets;
 with ZMQ.Low_Level;
+with ZMQ_Platform;
 
 --  Implements 0MQ socket input/output multiplexing.
 --
@@ -178,7 +177,7 @@ private
      of aliased ZMQ.Low_Level.zmq_pollitem_t with
        Convention => C;
 
-   use type Interfaces.C.int;
+   use type ZMQ_Platform.zmq_fd_t;
 
    type Poll_Set (Max_Size : Positive) is tagged limited record
    --  Local_Data and Items arrays are maintained in lockstep, with each
