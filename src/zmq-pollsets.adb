@@ -30,6 +30,7 @@
 -------------------------------------------------------------------------------
 
 with GNAT.OS_Lib;
+with Interfaces.C;
 
 package body ZMQ.Pollsets is
    use Interfaces.C;
