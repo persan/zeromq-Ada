@@ -39,6 +39,7 @@ pragma Warnings (Off, "-gnatwu");
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Strings;
 with System;
+with ZMQ_Platform;
 
 package ZMQ.Low_Level is
 
@@ -607,15 +608,13 @@ package ZMQ.Low_Level is
      --  ****************************************************************************
      --  Hide socket fd type; this was before zmq_poller_event_t typedef below
      --  ****************************************************************************
-     -- Windows uses a pointer-sized unsigned integer to store the socket fd.
-   subtype zmq_fd_t is int;  -- zmq.h:475
 
    --  ****************************************************************************
    --  Deprecated I/O multiplexing. Prefer using zmq_poller API
    --  ****************************************************************************
    type zmq_pollitem_t is record
       socket  : System.Address;  -- zmq.h:489
-      fd      : aliased zmq_fd_t;  -- zmq.h:490
+      fd      : aliased ZMQ_Platform.zmq_fd_t;  -- zmq.h:490
       events  : aliased short;  -- zmq.h:491
       revents : aliased short;  -- zmq.h:492
    end record with

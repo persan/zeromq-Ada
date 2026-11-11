@@ -24,4 +24,7 @@ Fedora 27 /native
 GNATPro 19.x
 
 openSUSE Tumbleweed
-FSF GNAT 15.2.1
+FSF GNAT 16.2.1
+
+Windows 11
+FSF GNAT 16.1.0
